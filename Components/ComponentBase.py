@@ -22,6 +22,7 @@ class ComponentBase:
         self.__UnitsEndurance = ""
         self.__Type = self.TYPE_OTHER
         self.__DesignVariant = ""
+        self.__ManufacturerPartNumber = ""
         self.__MountWay = self.MOUNT_WAY_NOT_SET
         self.__Parse(self.__Name)
 
@@ -99,6 +100,8 @@ class ComponentBase:
                 self.__UnitsEndurance = re.search(r'\D?А', res[0])[0]
                 self.__SetAsInductor()
 
+        self.__UnitsEndurance = self.__UnitsEndurance.replace(' ', '')
+
 
 
     def __ParseUnits(self, name):
@@ -156,7 +159,7 @@ class ComponentBase:
                                 if temp_units:
                                     self.__UnitsValue = temp_units[0] + self.__UnitsValue
 
-
+        self.__UnitsValue = self.__UnitsValue.replace(' ', '')
 
 
 
@@ -214,6 +217,30 @@ class ComponentBase:
                     self.__DesignVariant = res[0]
 
 
+    def __ParseManufacturerPartNumber(self, name):
+        tmp = name.split(" ")
+
+        for item in tmp:
+
+            probe = re.search(self.GetUnitsValue(), item)
+            if probe:
+                continue
+
+            probe = re.search(self.GetUnitsEndurance(), item)
+            if probe:
+                continue
+
+
+            probe = re.search(r'[0-9][.][0-9]', item)
+            if probe:
+                continue
+
+            if len(item) > 4:
+                probe = re.search(r'((([a-zA-Z]+\d+)|(\d+[a-zA-Z]+))[a-zA-Z\d]*)', item)
+                if probe:
+                    self.__ManufacturerPartNumber = probe[0]
+
+
 
 
 
@@ -227,6 +254,9 @@ class ComponentBase:
             self.__ParseTolerance(name)
             self.__ParseCase(name)
             self.__ParseDesignVariant(name)
+            self.__ParseManufacturerPartNumber(name)
+        else:
+            self.__ManufacturerPartNumber = name
 
 
 
@@ -257,6 +287,7 @@ class ComponentBase:
         print(f'Case: {self.GetCase():s}')
         print(f'Tolerance: {self.GetTolerance():.1f} %')
         print(f'Designe type: {self.GetDesignVariant():s}')
+        print(f'Manufacturer part number: {self.GetManufacturerPartNumber():s}')
         print('\r\n')
 
 
@@ -305,3 +336,6 @@ class ComponentBase:
     
     def GetMountWay(self):
         return self.__MountWay
+    
+    def GetManufacturerPartNumber(self):
+        return self.__ManufacturerPartNumber

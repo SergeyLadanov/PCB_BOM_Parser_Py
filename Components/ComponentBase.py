@@ -149,7 +149,7 @@ class ComponentBase:
                                 
                         else:
                             # Try to get res value and units in English
-                            res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[kKmM]?\W?', name)
+                            res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[kKmM]?\s', name)
                             if res:
                                 self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
                                 temp_units = re.search(r'\s?[^0-9.]', res[0])
@@ -178,7 +178,7 @@ class ComponentBase:
 
     def __ParseCase(self, name):
         # Try to get case
-        res = re.search(r'\s?[0-9][0-9][0-9][0-9]\s?', name)
+        res = re.search(r'[^A-Z0-9][0-9][0-9][0-9][0-9][^A-Z0-9]?', name)
 
         if res:
             self.__Case = res[0].replace(' ', '')
@@ -222,13 +222,15 @@ class ComponentBase:
 
         for item in tmp:
 
-            probe = re.search(self.GetUnitsValue(), item)
-            if probe:
-                continue
-
-            probe = re.search(self.GetUnitsEndurance(), item)
-            if probe:
-                continue
+            if self.GetUnitsValue():
+                probe = re.search(self.GetUnitsValue(), item)
+                if probe:
+                    continue
+            
+            if self.GetUnitsEndurance():
+                probe = re.search(self.GetUnitsEndurance(), item)
+                if probe:
+                    continue
 
 
             probe = re.search(r'[0-9][.][0-9]', item)
@@ -236,7 +238,7 @@ class ComponentBase:
                 continue
 
             if len(item) > 4:
-                probe = re.search(r'((([a-zA-Z]+\d+)|(\d+[a-zA-Z]+))[a-zA-Z\d]*)', item)
+                probe = re.search(r'((([a-zA-Z-]+\d+)|(\d+[a-zA-Z-]+))[a-zA-Z\d-]*)', item)
                 if probe:
                     self.__ManufacturerPartNumber = probe[0]
 

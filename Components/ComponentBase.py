@@ -181,6 +181,22 @@ class ComponentBase:
             self.__Case = res[0].replace(' ', '')
             self.__MountWay = self.MOUNT_WAY_SMD
 
+        else:
+            # Try to get tantalum case in English
+            res = re.search(r'[cC]ase\s[A-Z]', name)
+
+            if res:
+                res = re.search(r'\s[A-Z]', res[0])
+                self.__Case = res[0].replace(' ', '')
+                self.__MountWay = self.MOUNT_WAY_SMD
+            else:
+                # Try to get tantalum case in Russian
+                res = re.search(r'[тТ]ип\s[A-Z]', name)
+                if res:
+                    res = re.search(r'\s[A-Z]', res[0])
+                    self.__Case = res[0].replace(' ', '')
+                    self.__MountWay = self.MOUNT_WAY_SMD
+
 
     def __ParseDesignVariant(self, name):
 

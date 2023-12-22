@@ -87,7 +87,7 @@ class ComponentBase:
 
 
         # Try to get current value and units in English
-        res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?\w?A', name)
+        res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?\w?A\W', name)
         if res:
             self.__Endurance = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
             self.__UnitsEndurance = re.search(r'\D?A', res[0])[0]
@@ -242,9 +242,15 @@ class ComponentBase:
                 if probe:
                     self.__ManufacturerPartNumber = probe[0]
 
+    def __CheckParsing(self):
+        if self.GetMountWay() == self.MOUNT_WAY_NOT_SET and self.GetEndurance() == 0 and self.GetTolerance() == 0 and not self.GetCase():
+            self.SetForcedDesignator(self.__Name)
+            self.__UnitsValue = ""
+            self.__Value = 0.0
+            if not self.GetManufacturerPartNumber():
+                return False
 
-
-
+        return True
 
     def __Parse(self, name):
 
@@ -257,6 +263,9 @@ class ComponentBase:
             self.__ParseCase(name)
             self.__ParseDesignVariant(name)
             self.__ParseManufacturerPartNumber(name)
+
+            if not self.__CheckParsing():
+                self.__ManufacturerPartNumber = name.replace(' ','-')
         else:
             self.__ManufacturerPartNumber = name
 
@@ -282,10 +291,11 @@ class ComponentBase:
         if self.GetMountWay() == self.MOUNT_WAY_SMD:
             mout_way_str = "SMD"
 
+        print(f'Specname: {self.GetName():s}')
         print(f'Component: {type_str:s}')
         print(f'Mount type: {mout_way_str:s}')
         print(f'Value: {self.GetValue():.1f} {self.GetUnitsValue():s}')
-        print(f'Power/Voltage: {self.GetEndurance():.1f} {self.GetUnitsEndurance():s}')
+        print(f'Power/Voltage: {self.GetEndurance():.3f} {self.GetUnitsEndurance():s}')
         print(f'Case: {self.GetCase():s}')
         print(f'Tolerance: {self.GetTolerance():.1f} %')
         print(f'Designe type: {self.GetDesignVariant():s}')

@@ -21,6 +21,7 @@ class ComponentBase:
         self.__Endurance = 0.0
         self.__UnitsEndurance = ""
         self.__Type = self.TYPE_OTHER
+        self.__DesignVariant = ""
         self.__MountWay = self.MOUNT_WAY_NOT_SET
         self.__Parse(self.__Name)
 
@@ -110,7 +111,7 @@ class ComponentBase:
                 
         else:
             # Try to get res value and units in English
-            res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[kKmM]?\W?', name)
+            res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[kKmM]?\W', name)
             if res:
 
                 self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
@@ -123,6 +124,26 @@ class ComponentBase:
 
                 if temp_units:
                     self.__UnitsValue = temp_units + self.__UnitsValue
+
+
+        # Try to get cap value and units value in Russian
+        res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?\w?\w?Ф', name)
+        if res:
+            self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
+            self.__UnitsValue = re.search(r'\D?\D?Ф', res[0])[0]
+            self.__SetAsCapacitor()
+                
+        else:
+            # Try to get cap value and units in English
+            res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[mun]?F', name)
+            if res:
+
+                self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
+
+                self.__UnitsValue = re.search(r'\s?[mun]?F', res[0])[0]
+
+                self.__SetAsCapacitor()
+
 
 
 
@@ -143,6 +164,22 @@ class ComponentBase:
             self.__MountWay = self.MOUNT_WAY_SMD
 
 
+    def __ParseDesignVariant(self, name):
+
+        if (self.GetDesignator() == "C"):
+
+            # Try to get design variant
+            res = re.search(r'X\dR', name)
+
+            if res:
+                self.__DesignVariant = res[0]
+            else:
+                res = re.search(r'NP\d', name)
+
+                if res:
+                    self.__DesignVariant = res[0]
+
+
 
 
 
@@ -151,10 +188,12 @@ class ComponentBase:
         self.__ParseUnits(name)
         self.__ParseTolerance(name)
         self.__ParseCase(name)
+        self.__ParseDesignVariant(name)
 
 
 
-
+    def GetDesignVariant(self):
+        return self.__DesignVariant
 
 
     def GetOrderName(self):

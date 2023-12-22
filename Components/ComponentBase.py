@@ -113,13 +113,9 @@ class ComponentBase:
             # Try to get res value and units in English
             res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[kKmM]?\W', name)
             if res:
-
                 self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
-
                 temp_units = re.search(r'\s?[^0-9.]', res[0])[0]
-
                 self.__UnitsValue = "Ohm"
-
                 self.__SetAsResistor()
 
                 if temp_units:
@@ -137,12 +133,26 @@ class ComponentBase:
             # Try to get cap value and units in English
             res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[mun]?F', name)
             if res:
+                self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
+                self.__UnitsValue = re.search(r'\s?[mun]?F', res[0])[0]
+                self.__SetAsCapacitor()
+
+
+        # Try to get inductor value and units value in Russian
+        res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?\w?\w?Гн', name)
+        if res:
+            self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
+            self.__UnitsValue = re.search(r'\D?\D?Гн', res[0])[0]
+            self.__SetAsInductor()
+                
+        else:
+            # Try to get inductor value and units in English
+            res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[mun]?H', name)
+            if res:
 
                 self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
-
-                self.__UnitsValue = re.search(r'\s?[mun]?F', res[0])[0]
-
-                self.__SetAsCapacitor()
+                self.__UnitsValue = re.search(r'\s?[mun]?H', res[0])[0]
+                self.__SetAsInductor()
 
 
 
@@ -192,6 +202,36 @@ class ComponentBase:
 
 
 
+    def PrintInfo(self):
+        type_str = "Unknown"
+        mout_way_str = "Unknown"
+
+        if self.GetDesignator() == "C":
+            type_str = "Capacitor"
+
+        if self.GetDesignator() == "R":
+            type_str = "Resistor"
+
+        if self.GetDesignator() == "L":
+            type_str = "Inductor"
+
+        
+        if self.GetMountWay() == self.MOUNT_WAY_AXIAL:
+            mout_way_str = "Axial"
+
+        if self.GetMountWay() == self.MOUNT_WAY_SMD:
+            mout_way_str = "SMD"
+
+        print(f'Component: {type_str:s}')
+        print(f'Mount type: {mout_way_str:s}')
+        print(f'Value: {self.GetValue():.1f} {self.GetUnitsValue():s}')
+        print(f'Power/Voltage: {self.GetEndurance():.1f} {self.GetUnitsEndurance():s}')
+        print(f'Case: {self.GetCase():s}')
+        print(f'Tolerance: {self.GetTolerance():.1f} %')
+        print(f'Designe type: {self.GetDesignVariant():s}')
+        print('\r\n')
+
+
     def GetDesignVariant(self):
         return self.__DesignVariant
 
@@ -234,3 +274,6 @@ class ComponentBase:
 
     def GetType(self):
         return self.__Type
+    
+    def GetMountWay(self):
+        return self.__MountWay

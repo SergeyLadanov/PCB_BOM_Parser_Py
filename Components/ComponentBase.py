@@ -1,19 +1,13 @@
 
 import re
 
-
-
 class ComponentBase:
 
-    TYPE_NONE = 0
-    TYPE_SMRES = 1
-    TYPE_AXIALRES = 2
-    TYPE_SMCCAP = 3
-    TYPE_AXIALCCAP = 4
-    TYPE_SMTCAP = 5
-    TYPE_AXIALTCAP = 6
-    TYPE_SMIND = 7
-    TYPE_AXIALIND = 8
+    TYPE_OTHER = 0
+    TYPE_PASSIVE = 1
+
+    MOUNT_WAY_AXIAL = 0
+    MOUNT_WAY_SMD = 1
 
 
     def __init__(self, name=""):
@@ -25,11 +19,37 @@ class ComponentBase:
         self.__Case = ""
         self.__Endurance = 0.0
         self.__UnitsEndurance = ""
-        self.__Type = self.TYPE_NONE
-
+        self.__Type = self.TYPE_OTHER
+        self.__MountWay = self.MOUNT_WAY_AXIAL
         self.__Parse(self.__Name)
 
 
+    def __SetAsCapacitor(self):
+        self.SetDesignator("C")
+
+    def __SetAsResistor(self):
+        self.SetDesignator("R")
+
+    def __SetAsInductor(self):
+        self.SetDesignator("L")
+
+
+    def IsPassive(self):
+        if (self.__Type > 0):
+            return True
+        return False
+    
+
+    def SetForcedDesignator(self, desValue):
+        self.__Designator = desValue
+
+        if self.GetDesignator() == "R" or self.GetDesignator() == "C" or self.GetDesignator() == "L":
+            self.__Type = self.TYPE_PASSIVE
+    
+
+    def SetDesignator(self, desValue):
+        if not self.GetDesignator():
+            self.SetForcedDesignator(desValue)
 
 
     def __ParseEndurance(self, name):
@@ -38,12 +58,14 @@ class ComponentBase:
         if res:
             self.__Endurance = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
             self.__UnitsEndurance = re.search(r'\D?W', res[0])[0]
+            self.__SetAsResistor()
         else:
             # Try to get power value and units in Russian
             res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?\w?Вт', name)
             if res:
                 self.__Endurance = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
                 self.__UnitsEndurance = re.search(r'\D?Вт', res[0])[0]
+                self.__SetAsResistor()
 
 
         # Try to get voltage value and units in English
@@ -51,12 +73,14 @@ class ComponentBase:
         if res:
             self.__Endurance = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
             self.__UnitsEndurance = re.search(r'\D?V', res[0])[0]
+            self.__SetAsCapacitor()
         else:
             # Try to get voltage value and units in Russian
             res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?\w?В\W', name)
             if res:
                 self.__Endurance = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
                 self.__UnitsEndurance = re.search(r'\D?В', res[0])[0]
+                self.__SetAsCapacitor()
 
 
         # Try to get current value and units in English
@@ -64,12 +88,14 @@ class ComponentBase:
         if res:
             self.__Endurance = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
             self.__UnitsEndurance = re.search(r'\D?A', res[0])[0]
+            self.__SetAsInductor()
         else:
             # Try to get current value and units in Russian
             res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?\w?А\W', name)
             if res:
                 self.__Endurance = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
                 self.__UnitsEndurance = re.search(r'\D?А', res[0])[0]
+                self.__SetAsInductor()
 
 
 
@@ -79,6 +105,7 @@ class ComponentBase:
         if res:
             self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
             self.__UnitsValue = re.search(r'\D?Ом', res[0])[0]
+            self.__SetAsResistor()
                 
         else:
             # Try to get res value and units in English
@@ -90,6 +117,8 @@ class ComponentBase:
                 temp_units = re.search(r'\s?[^0-9.]', res[0])[0]
 
                 self.__UnitsValue = "Ohm"
+
+                self.__SetAsResistor()
 
                 if temp_units:
                     self.__UnitsValue = temp_units + self.__UnitsValue
@@ -109,7 +138,8 @@ class ComponentBase:
         res = re.search(r'\s?[0-9][0-9][0-9][0-9]\s?', name)
 
         if res:
-            self.__Case = res[0]
+            self.__Case = res[0].replace(' ', '')
+            self.__MountWay = self.MOUNT_WAY_SMD
 
 
 

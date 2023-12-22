@@ -6,8 +6,9 @@ class ComponentBase:
     TYPE_OTHER = 0
     TYPE_PASSIVE = 1
 
-    MOUNT_WAY_AXIAL = 0
-    MOUNT_WAY_SMD = 1
+    MOUNT_WAY_NOT_SET = 0
+    MOUNT_WAY_AXIAL = 1
+    MOUNT_WAY_SMD = 2
 
 
     def __init__(self, name=""):
@@ -20,7 +21,7 @@ class ComponentBase:
         self.__Endurance = 0.0
         self.__UnitsEndurance = ""
         self.__Type = self.TYPE_OTHER
-        self.__MountWay = self.MOUNT_WAY_AXIAL
+        self.__MountWay = self.MOUNT_WAY_NOT_SET
         self.__Parse(self.__Name)
 
 

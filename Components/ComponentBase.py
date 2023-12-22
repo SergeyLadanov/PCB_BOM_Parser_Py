@@ -102,24 +102,6 @@ class ComponentBase:
 
 
     def __ParseUnits(self, name):
-        # Try to get res value and units value in Russian
-        res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?\w?Ом', name)
-        if res:
-            self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
-            self.__UnitsValue = re.search(r'\D?Ом', res[0])[0]
-            self.__SetAsResistor()
-                
-        else:
-            # Try to get res value and units in English
-            res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[kKmM]?\W', name)
-            if res:
-                self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
-                temp_units = re.search(r'\s?[^0-9.]', res[0])[0]
-                self.__UnitsValue = "Ohm"
-                self.__SetAsResistor()
-
-                if temp_units:
-                    self.__UnitsValue = temp_units + self.__UnitsValue
 
 
         # Try to get cap value and units value in Russian
@@ -131,28 +113,54 @@ class ComponentBase:
                 
         else:
             # Try to get cap value and units in English
-            res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[mun]?F', name)
+            res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[munp]?F', name)
             if res:
                 self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
-                self.__UnitsValue = re.search(r'\s?[mun]?F', res[0])[0]
+                self.__UnitsValue = re.search(r'\s?[munp]?F', res[0])[0]
                 self.__SetAsCapacitor()
 
+            else:
+                # Try to get inductor value and units value in Russian
+                res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?\w?\w?Гн', name)
+                if res:
+                    self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
+                    self.__UnitsValue = re.search(r'\D?\D?Гн', res[0])[0]
+                    self.__SetAsInductor()
+                        
+                else:
+                    # Try to get inductor value and units in English
+                    res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[mun]?H', name)
+                    if res:
 
-        # Try to get inductor value and units value in Russian
-        res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?\w?\w?Гн', name)
-        if res:
-            self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
-            self.__UnitsValue = re.search(r'\D?\D?Гн', res[0])[0]
-            self.__SetAsInductor()
-                
-        else:
-            # Try to get inductor value and units in English
-            res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[mun]?H', name)
-            if res:
+                        self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
+                        self.__UnitsValue = re.search(r'\s?[mun]?H', res[0])[0]
+                        self.__SetAsInductor()
 
-                self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
-                self.__UnitsValue = re.search(r'\s?[mun]?H', res[0])[0]
-                self.__SetAsInductor()
+                    else:
+                        # Try to get res value and units value in Russian
+                        res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?\w?Ом', name)
+                        if res:
+                            self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
+                            self.__UnitsValue = re.search(r'\D?Ом', res[0])[0]
+                            self.__SetAsResistor()
+                                
+                        else:
+                            # Try to get res value and units in English
+                            res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[kKmM]?\W?', name)
+                            if res:
+                                self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
+                                temp_units = re.search(r'\s?[^0-9.]', res[0])
+                                self.__UnitsValue = "Ohm"
+                                self.__SetAsResistor()
+
+                                if temp_units:
+                                    self.__UnitsValue = temp_units[0] + self.__UnitsValue
+
+
+
+
+
+
 
 
 
@@ -194,16 +202,20 @@ class ComponentBase:
 
 
     def __Parse(self, name):
-        self.__ParseEndurance(name)
-        self.__ParseUnits(name)
-        self.__ParseTolerance(name)
-        self.__ParseCase(name)
-        self.__ParseDesignVariant(name)
+
+        res = re.search(r'\s*\s', name)
+
+        if (res):
+            self.__ParseEndurance(name)
+            self.__ParseUnits(name)
+            self.__ParseTolerance(name)
+            self.__ParseCase(name)
+            self.__ParseDesignVariant(name)
 
 
 
     def PrintInfo(self):
-        type_str = "Unknown"
+        type_str = self.__Name
         mout_way_str = "Unknown"
 
         if self.GetDesignator() == "C":

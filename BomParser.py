@@ -1,9 +1,12 @@
 import sys, os
 sys.path.append(os.path.abspath(os.path.join('Components')))
+sys.path.append(os.path.abspath(os.path.join('Stores')))
 
 import ComponentBase as Component
 
 import re
+
+import elitan as elitanGenerator
 
 
 test = [
@@ -54,7 +57,9 @@ test = [
 
 for item in test:
     res = Component.ComponentBase(item)
+    print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res):s}')
     res.PrintInfo()
+    
 
 print("\r\n-----------------------------------\r\n")
 
@@ -104,6 +109,6 @@ test = [
     ]
 
 
-for item in test:
-    res = Component.ComponentBase(item)
-    res.PrintInfo()
+# for item in test:
+#     res = Component.ComponentBase(item)
+#     res.PrintInfo()

@@ -14,10 +14,21 @@ def __count_decimal_places(number):
 
 def __GenerateValueForResistor(component_obj):
     res = ""
-    probe = re.search(r'[a-zA-Z]', component_obj.GetUnitsValue())
+
+
+    probe = re.search(r'[a-zA-Z]?Ohm', component_obj.GetUnitsValue())
     if  probe:
-        number_str = str(component_obj.GetValue())
-        res = number_str.replace('.', probe[0])
+        probe = probe[0].replace('Ohm', '')
+        if probe != "":
+            number_str = str(component_obj.GetValue())
+            res = number_str.replace('.', probe.upper())
+        else:
+            res = str(component_obj.GetValue()) + 'R'
+
+        probe = re.search(r'.0[A-Z]', res)
+
+        if (probe):
+            res = res.replace('.0', '')
 
 
     return res

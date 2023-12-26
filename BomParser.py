@@ -112,4 +112,5 @@ test = [
 for item in test:
     res = Component.ComponentBase(item)
     print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res):s}')
+    print(f'Elitan link: {elitanGenerator.GenerateFindLink(res):s}')
     res.PrintInfo()

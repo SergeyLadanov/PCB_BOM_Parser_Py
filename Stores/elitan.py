@@ -25,9 +25,6 @@ def __GenerateValueForResistor(component_obj):
 
 
 
-
-
-
     probe = re.search(r'[a-zA-Z]?Ohm', units_str)
     if  probe:
         probe = probe[0].replace('Ohm', '')
@@ -83,3 +80,13 @@ def GenerateFindRequest(component_obj):
                 res = f'SMRES/{component_obj.GetCase():s}-{__GenerateValueForResistor(component_obj):s}-{__GenerateToleranceForResistor(component_obj):s}'
 
     return res
+
+
+
+def GenerateFindLink(component_obj):
+    find_str = GenerateFindRequest(component_obj)
+    find_str = find_str.replace('/', '%2F')
+
+    link_str = f'https://www.elitan.ru/price/index.php?find={find_str:s}&delay=-1&mfg=all&seenform=y'
+
+    return link_str

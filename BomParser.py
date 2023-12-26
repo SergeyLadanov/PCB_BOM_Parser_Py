@@ -8,6 +8,13 @@ import re
 
 import elitan as elitanGenerator
 
+from ParamFilter import FilterObj as Filter
+
+
+test = Filter()
+
+
+test.SetSkipingEndurance('C', True)
 
 test = [
     # "1001312",

@@ -12,8 +12,22 @@ class FilterObj:
                   'R': FilterItem(),
                   'L': FilterItem(),
                   }
+
     def SetFilter(self, key_str, filter):
         self.FilterData[key_str] = filter
 
+
+    def GetFilter(self, key_str, filter):
+        return self.FilterData[key_str]
+
+
     def SetSkipingEndurance(self, key_str, value):
         self.FilterData[key_str].SkipEndurance = value
+
+
+    def SetSkipingTolerance(self, key_str, value):
+        self.FilterData[key_str].SkipTolerance = value
+
+
+    def SetSkipingVariant(self, key_str, value):
+        self.FilterData[key_str].SkipVariant = value

@@ -11,10 +11,11 @@ import elitan as elitanGenerator
 from ParamFilter import FilterObj as Filter
 
 
-test = Filter()
+testFil = Filter()
 
 
-test.SetSkipingEndurance('C', True)
+testFil.SetSkipingEndurance('C', True)
+testFil.SetSkipingTolerance('R', True)
 
 test = [
     # "1001312",
@@ -118,6 +119,6 @@ test = [
 
 for item in test:
     res = Component.ComponentBase(item)
-    print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res):s}')
-    print(f'Elitan link: {elitanGenerator.GenerateFindLink(res):s}')
+    print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
+    print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
     res.PrintInfo()

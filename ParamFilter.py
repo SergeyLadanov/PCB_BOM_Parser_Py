@@ -17,7 +17,7 @@ class FilterObj:
         self.FilterData[key_str] = filter
 
 
-    def GetFilter(self, key_str, filter):
+    def GetFilter(self, key_str):
         return self.FilterData[key_str]
 
 

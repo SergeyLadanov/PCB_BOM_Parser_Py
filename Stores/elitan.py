@@ -2,8 +2,10 @@ import sys, os
 import re
 
 sys.path.append(os.path.abspath(os.path.join('../Components')))
+sys.path.append(os.path.abspath(os.path.join('..')))
 
 import ComponentBase as Component
+from ParamFilter import FilterObj as Filter
 
 
 def __count_decimal_places(number):
@@ -69,22 +71,25 @@ def __GenerateValueForCapacitor(component_obj):
 
 
 
-def GenerateFindRequest(component_obj):
+def GenerateFindRequest(component_obj, filter):
     res = ""
+
+    test = __GenerateToleranceForResistor(component_obj) if not filter.GetFilter('R').SkipTolerance else '*'
 
     if component_obj.GetManufacturerPartNumber() != "":
         res = component_obj.GetManufacturerPartNumber()
     else:
         if component_obj.GetMountWay() == component_obj.MOUNT_WAY_SMD:
             if component_obj.GetDesignator() == "R":
-                res = f'SMRES/{component_obj.GetCase():s}-{__GenerateValueForResistor(component_obj):s}-{__GenerateToleranceForResistor(component_obj):s}'
+                tolerance_str = __GenerateToleranceForResistor(component_obj) if not filter.GetFilter(component_obj.GetDesignator()).SkipTolerance else '*'
+                res = f'SMRES/{component_obj.GetCase():s}-{__GenerateValueForResistor(component_obj):s}-{tolerance_str:s}'
 
     return res
 
 
 
-def GenerateFindLink(component_obj):
-    find_str = GenerateFindRequest(component_obj)
+def GenerateFindLink(component_obj, filter):
+    find_str = GenerateFindRequest(component_obj, filter)
     find_str = find_str.replace('/', '%2F')
 
     link_str = f'https://www.elitan.ru/price/index.php?find={find_str:s}&delay=-1&mfg=all&seenform=y'

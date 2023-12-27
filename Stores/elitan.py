@@ -25,8 +25,6 @@ def __GenerateValueForResistor(component_obj):
         units_str = re.sub(r'[кK]', 'k', units_str)
         units_str = re.sub(r'[М]', 'M', units_str)
 
-
-
     probe = re.search(r'[a-zA-Z]?Ohm', units_str)
     if  probe:
         probe = probe[0].replace('Ohm', '')
@@ -48,7 +46,7 @@ def __GenerateValueForResistor(component_obj):
     return res
 
 
-def __GenerateToleranceForResistor(component_obj):
+def __GenerateTolerance(component_obj):
     res = "*"
     if component_obj.GetTolerance() == 0.1:
         res = "B"
@@ -61,6 +59,12 @@ def __GenerateToleranceForResistor(component_obj):
 
     if component_obj.GetTolerance() == 5.0:
         res = "J"
+    
+    if component_obj.GetTolerance() == 10.0:
+        res = "K"
+
+    if component_obj.GetTolerance() == 20.0:
+        res = "M"
 
     return res
 
@@ -74,15 +78,30 @@ def __GenerateValueForCapacitor(component_obj):
 def GenerateFindRequest(component_obj, filter):
     res = ""
 
-    test = __GenerateToleranceForResistor(component_obj) if not filter.GetFilter('R').SkipTolerance else '*'
-
     if component_obj.GetManufacturerPartNumber() != "":
         res = component_obj.GetManufacturerPartNumber()
     else:
-        if component_obj.GetMountWay() == component_obj.MOUNT_WAY_SMD:
-            if component_obj.GetDesignator() == "R":
-                tolerance_str = __GenerateToleranceForResistor(component_obj) if not filter.GetFilter(component_obj.GetDesignator()).SkipTolerance else '*'
+        if component_obj.GetDesignator() == "R":
+            if component_obj.GetMountWay() == component_obj.MOUNT_WAY_SMD:
+                tolerance_str = __GenerateTolerance(component_obj) if not filter.GetFilter(component_obj.GetDesignator()).SkipTolerance else '*'
                 res = f'SMRES/{component_obj.GetCase():s}-{__GenerateValueForResistor(component_obj):s}-{tolerance_str:s}'
+        if component_obj.GetDesignator() == "C":
+            if component_obj.GetMountWay() == component_obj.MOUNT_WAY_SMD:
+
+                endurance_str = ""
+                tolerance_str = ""
+                designvar_str = ""
+
+                case_probe = re.search(r'[0-9][0-9][0-9][0-9]', component_obj.GetCase())
+
+                if case_probe:
+                    pass
+                
+                case_probe = re.search(r'[A-Z]', component_obj.GetCase())
+
+                if case_probe:
+                    pass
+
 
     return res
 

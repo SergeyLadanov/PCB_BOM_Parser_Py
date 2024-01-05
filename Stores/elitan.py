@@ -70,10 +70,32 @@ def __GenerateTolerance(component_obj):
 
 
 def __GenerateValueForCapacitor(component_obj):
-    pass
+    res = ""
+    units_str = component_obj.GetUnitsValue()
+
+    val = component_obj.GetValue()
+
+    probe = re.search(r'[а-яА-Я]?[а-яА-Я]?Ф', units_str)
+
+    if probe:
+        units_str = re.sub(r'[фФ]', '', units_str)
+        units_str = re.sub(r'[мк]', '', units_str)
+        units_str = re.sub(r'[нН]', 'n', units_str)
+        units_str = re.sub(r'[пП]', 'p', units_str)
+
+    probe = re.search(r'[a-zA-Z]', units_str)
 
 
+    res = re.sub(r'\.[0][0]?[0]?', '', str(val)) + units_str.upper()
 
+    
+    
+    return res
+
+
+def __GenerateEnduranceForCapacitor(component_obj):
+    res = re.sub(r'\.[0][0]?[0]?', '', str(component_obj.GetEndurance()))
+    return res
 
 def GenerateFindRequest(component_obj, filter):
     res = ""
@@ -88,14 +110,14 @@ def GenerateFindRequest(component_obj, filter):
         if component_obj.GetDesignator() == "C":
             if component_obj.GetMountWay() == component_obj.MOUNT_WAY_SMD:
 
-                endurance_str = ""
-                tolerance_str = ""
-                designvar_str = ""
+                endurance_str = __GenerateEnduranceForCapacitor(component_obj) if not filter.GetFilter(component_obj.GetDesignator()).SkipEndurance else '*'
+                tolerance_str = __GenerateTolerance(component_obj) if not filter.GetFilter(component_obj.GetDesignator()).SkipTolerance else '*'
+                designvar_str = component_obj.GetDesignVariant().upper() if not filter.GetFilter(component_obj.GetDesignator()).SkipVariant else '*'
 
                 case_probe = re.search(r'[0-9][0-9][0-9][0-9]', component_obj.GetCase())
 
                 if case_probe:
-                    pass
+                    res = f'SMCCAP/{component_obj.GetCase():s}-{endurance_str:s}-{__GenerateValueForCapacitor(component_obj):s}-{tolerance_str:s}-{designvar_str:s}'
                 
                 case_probe = re.search(r'[A-Z]', component_obj.GetCase())
 

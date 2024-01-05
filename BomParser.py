@@ -81,9 +81,9 @@ test = [
     "0.1 мкФ 1% 16В X7R 0603",
     "1 мкФ 1% 16В X7R 0603",
     "4.7 мкФ 1% 16В X7R 0603",
-    # "1 пФ 1% 50В NP0 0603",
-    # "820 пФ 1% 50В NP0 0603",
-    # "4.7 мкФ 10% 10В тант. тип A",
+    "1 пФ 1% 50В NP0 0603",
+    "820 пФ 1% 50В NP0 0603",
+    "4.7 мкФ 10% 10В тант. тип A",
     # "ME6211C33M5G",
     # "MCP73831T-2ACI/OT",
     # "DWM1000",
@@ -120,8 +120,8 @@ test = [
     ]
 
 
-# for item in test:
-#     res = Component.ComponentBase(item)
-#     print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
-#     print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
-#     res.PrintInfo()
+for item in test:
+    res = Component.ComponentBase(item)
+    print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
+    print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
+    res.PrintInfo()

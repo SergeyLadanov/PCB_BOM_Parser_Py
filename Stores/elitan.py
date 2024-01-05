@@ -123,7 +123,7 @@ def GenerateFindRequest(component_obj, filter):
                 case_probe = re.search(r'[A-Z]', component_obj.GetCase())
 
                 if case_probe:
-                    pass
+                    res = f'SMTCAP/{component_obj.GetCase():s}-{endurance_str:s}-{__GenerateValueForCapacitor(component_obj):s}-{tolerance_str:s}-*'
 
 
     return res

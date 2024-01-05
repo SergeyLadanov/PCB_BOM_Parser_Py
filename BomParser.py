@@ -65,10 +65,11 @@ test = [
     ]
 
 
-# for item in test:
-#     res = Component.ComponentBase(item)
-#     print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res):s}')
-#     res.PrintInfo()
+for item in test:
+    res = Component.ComponentBase(item)
+    print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
+    print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
+    res.PrintInfo()
     
 
 print("\r\n-----------------------------------\r\n")
@@ -119,8 +120,8 @@ test = [
     ]
 
 
-for item in test:
-    res = Component.ComponentBase(item)
-    print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
-    print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
-    res.PrintInfo()
+# for item in test:
+#     res = Component.ComponentBase(item)
+#     print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
+#     print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
+#     res.PrintInfo()

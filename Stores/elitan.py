@@ -83,7 +83,8 @@ def __GenerateValueForCapacitor(component_obj):
         units_str = re.sub(r'[нН]', 'n', units_str)
         units_str = re.sub(r'[пП]', 'p', units_str)
 
-    probe = re.search(r'[a-zA-Z]', units_str)
+    units_str = re.sub(r'[fF]', '', units_str)
+    units_str = re.sub(r'[uU]', '', units_str)
 
 
     res = re.sub(r'\.[0][0]?[0]?', '', str(val)) + units_str.upper()

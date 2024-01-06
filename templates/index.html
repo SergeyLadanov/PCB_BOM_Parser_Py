@@ -185,12 +185,82 @@
 
 <main class="container">
 
+
   <div class="my-3 p-3 bg-body rounded shadow-sm">
+
+    <div class="container text-center">
+      <div class="row p-3">
+        <div class="col">
+          <div class="input-group">
+            <span class="input-group-text">Исходный список</span>
+            <textarea rows="15" class="form-control" aria-label="With textarea"></textarea>
+          </div>
+        </div>
+        <div class="col">
+
+          <div class="row">
+            <div class="col-md-4">
+              <label for="validationServer01" class="form-label">Кол. устройств, шт.</label>
+              <input type="number" min="1" max="1000" step="1" value="1"class="form-control" id="validationServer01" value="Mark" required>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <label for="validationServer01" class="form-label">Технолог. запас, %</label>
+              <input type="number" min="0" max="100" step="1" value="0"class="form-control" id="validationServer01" value="Mark" required>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="row p-3">
+        <button type="button" class="btn btn-primary">Обработать</button>
+      </div>
+    </div>
+
+
 
   </div>
 
   <div class="my-3 p-3 bg-body rounded shadow-sm">
-
+    <div class="bd-example-snippet bd-code-snippet"><div class="bd-example m-0 border-0">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Наименование</th>
+          <th scope="col">Тип</th>
+          <th scope="col">Параметры</th>
+          <th scope="col">Ссылки</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <th scope="row">1</th>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <th scope="row">2</th>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <th scope="row">3</th>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+        </tbody>
+      </table>
+      </div></div>
   </div>
 </main>
 <script src=".{{ url_for('static', filename='bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>

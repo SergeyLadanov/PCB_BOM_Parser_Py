@@ -55,7 +55,18 @@ def handle_bom():
     bom = request.form.get('bom')
     component_list = __GetComponentList(bom)
     count_list = __GetCountList(bom)
-    return "Ok"
+    res_list = []
+    for item in component_list:
+        temp_item = { 
+            'name': item, 
+            'type': 'none',
+            'count': 1,
+            'params': 1,
+            'links': ['test'] 
+            }
+        res_list.append(temp_item)
+
+    return res_list
     
 
 

@@ -41,16 +41,16 @@ $( "#handle_button" ).on( "click", function()
         };
 
         //ClearResTable();
-        AddRowResTable("test","test1","test3","test4","https://mail.ru");
+        //AddRowResTable("test","test1","test3","test4","https://mail.ru");
 
-        // //Отправка данных серверу, обработка ответа
-        // $.post("./bom_data", data, function(data){
-        //     // alert("Настройки успешно применены");
-        // })
-        // // Обработчик неуспешной отправки данных
-        // .fail(function() {
-        //     alert("Потеря связи с сервером");
-        // });
+        //Отправка данных серверу, обработка ответа
+        $.post("./bom_data", data, function(data){
+            alert("Данные успешно получены");
+        })
+        // Обработчик неуспешной отправки данных
+        .fail(function() {
+            alert("Потеря связи с сервером");
+        });
         // alert( "Handler for `click` called." );
     } 
 );

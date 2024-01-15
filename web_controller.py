@@ -12,27 +12,50 @@ path = os.path.realpath(os.path.dirname(sys.argv[0]))
 #------------------------------
 app = Flask(__name__)
 
+
+def __GetComponentList(data):
+    result = []
+    rows = data.split('\n')
+
+    for row in rows:
+        try:
+            name = row.split('\t')[0]
+            if name != "":
+                result.append(name)
+        except:
+            continue
+
+    return result
+
+def __GetCountList(data):
+    result = []
+    rows = data.split('\n')
+
+    for row in rows:
+        try:
+            count = row.split('\t')[1]
+            if count != "":
+                result.append(count)
+        except:
+            continue
+
+    return result
+
+    
+
+
 @app.route("/")
 def index():
     return render_template('index.html')
 
+    
 
-
-@app.route('/get_data', methods=['GET', 'POST'])
-def control():
-    try:
-        sock = socket.socket()
-        sock.connect(('localhost', 9090))
-        data = sock.recv(1024)
-        sock.close()
-        data = data.decode()
-    except:
-        #data = "49.1;26.8\r\n09:11 10/06/22\r\n26.7;26.7;\r\n49.1;26.7;\r\n09:00;09:30;\r\n"
-        data = "none;none\r\nnone\r\n"
-    if data is None:
-        return "No data"
-    else:
-        return data
+@app.route('/bom_data', methods=['GET', 'POST'])
+def handle_bom():
+    bom = request.form.get('bom')
+    component_list = __GetComponentList(bom)
+    count_list = __GetCountList(bom)
+    return "Ok"
     
 
 

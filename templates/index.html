@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ru" data-bs-theme="auto">
-  <head><script src=".{{ url_for('static', filename='bootstrap/js/color-modes.js') }}"></script>
+  <head>
+    <script src=".{{ url_for('static', filename='bootstrap/js/color-modes.js') }}"></script>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,7 +12,7 @@
 
     <!-- <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/offcanvas-navbar/"> -->
 
-    
+    <script src=".{{ url_for('static', filename='app/js/jquery-3.7.1.min.js') }}"></script>
 
     <link rel="stylesheet" href=".{{ url_for('static', filename='app/css/search.css') }}">
 
@@ -194,22 +195,22 @@
           <p class="h2">Исходный список компонентов</p>
           <div class="input-group">
             <!-- <span class="input-group-text">Исходный список</span> -->
-            <textarea rows="15" class="form-control" aria-label="With textarea"></textarea>
+            <textarea id = "input_list" rows="15" class="form-control" aria-label="With textarea"></textarea>
           </div>
         </div>
         <div class="col">
           <p class="h2">Параметры</p>
           <div class="row p-3">
             <div class="col-md-4">
-              <label for="validationServer01" class="form-label">Кол. устройств, шт.</label>
-              <input type="number" min="1" max="1000" step="1" value="1"class="form-control" id="validationServer01" value="Mark" required>
+              <label for="deivice_count" class="form-label">Кол. устройств, шт.</label>
+              <input type="number" min="1" max="1000" step="1" value="1"class="form-control" id="deivice_count" value="Mark" required>
             </div>
           </div>
 
           <div class="row p-3">
             <div class="col-md-4">
-              <label for="validationServer01" class="form-label">Технолог. запас, %</label>
-              <input type="number" min="0" max="100" step="1" value="0"class="form-control" id="validationServer01" value="Mark" required>
+              <label for="tech_reserve" class="form-label">Технолог. запас, %</label>
+              <input type="number" min="0" max="100" step="1" value="0"class="form-control" id="tech_reserve" value="Mark" required>
             </div>
           </div>
 
@@ -221,8 +222,8 @@
             <div class="col-md-5">
               
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="invalidCheck3" required>
-                <label class="form-check-label" for="invalidCheck3">
+                <input class="form-check-input" type="checkbox" value="" id="skip_res_tol" required>
+                <label class="form-check-label" for="skip_res_tol">
                   Пропускать точность
                 </label>
               </div>
@@ -232,8 +233,8 @@
             <div class="col-md-5">
               
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="invalidCheck3" required>
-                <label class="form-check-label" for="invalidCheck3">
+                <input class="form-check-input" type="checkbox" value="" id="skip_res_power" required>
+                <label class="form-check-label" for="skip_res_power">
                   Пропускать мощность
                 </label>
               </div>
@@ -250,8 +251,8 @@
             <div class="col-md-5">
               
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="invalidCheck3" required>
-                <label class="form-check-label" for="invalidCheck3">
+                <input class="form-check-input" type="checkbox" value="" id="skip_cap_tol" required>
+                <label class="form-check-label" for="skip_cap_tol">
                   Пропускать точность
                 </label>
               </div>
@@ -261,8 +262,8 @@
             <div class="col-md-5">
               
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="invalidCheck3" required>
-                <label class="form-check-label" for="invalidCheck3">
+                <input class="form-check-input" type="checkbox" value="" id="skip_cap_dielectric" required>
+                <label class="form-check-label" for="skip_cap_dielectric">
                   Пропускать диэлектрик
                 </label>
               </div>
@@ -274,8 +275,8 @@
             <div class="col-md-5">
               
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="invalidCheck3" required>
-                <label class="form-check-label" for="invalidCheck3">
+                <input class="form-check-input" type="checkbox" value="" id="skip_cap_voltage" required>
+                <label class="form-check-label" for="skip_cap_voltage">
                   Пропускать напряжение
                 </label>
               </div>
@@ -292,7 +293,7 @@
 
 
       <div class="row p-3">
-          <button type="button" class="btn btn-primary">Обработать</button>
+          <button type="button" id = "handle_button" class="btn btn-primary">Обработать</button>
 
       </div>
 
@@ -364,7 +365,8 @@
       </div></div>
   </div>
 </main>
-<script src=".{{ url_for('static', filename='bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
-
-    <script src=".{{ url_for('static', filename='app/js/offcanvas-navbar.js') }}"></script></body>
+  <script src=".{{ url_for('static', filename='bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+  <script src=".{{ url_for('static', filename='app/js/offcanvas-navbar.js') }}"></script>
+  <script src=".{{ url_for('static', filename='app/js/control.js') }}"></script>
+</body>
 </html>

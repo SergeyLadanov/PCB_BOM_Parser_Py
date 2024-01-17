@@ -10,19 +10,31 @@ import elitan as elitanGenerator
 
 from ParamFilter import FilterObj as Filter
 
+import math
 
 
-def __CorrectionCount(spec_item_name, device_count = 1, tech_reserve = 1.0):
+
+def __CorrectionCount(spec_item, device_count = 1, tech_reserve = 1.0):
+    spec_item['count'] = spec_item['count'] * device_count
+    spec_item['count'] = math.ceil(spec_item['count'] * tech_reserve)
+
+    return spec_item
+
+def __GetParamString(spec_item, filter = None):
     pass
 
-def __GetParamString(spec_item_name, filter = None):
+def __GetOrderName(spec_item, store_name, filter = None):
     pass
 
-def __GetOrderName(spec_item_name, store_name, filter = None):
-    pass
+def __GetOrderLink(spec_item, store_name, filter = None):
+    if store_name == 'elitan':
+        pass
 
-def __GetOrderLink(order_name, store_name):
-    pass
+    if store_name == 'chipdip':
+        pass
+
+    if store_name == 'platan':
+        pass
 
 
 # testFil = Filter()

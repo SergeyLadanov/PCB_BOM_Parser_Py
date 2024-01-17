@@ -13,29 +13,26 @@ path = os.path.realpath(os.path.dirname(sys.argv[0]))
 app = Flask(__name__)
 
 
-def __GetComponentList(data):
+def __GetSpec(data):
     result = []
     rows = data.split('\n')
 
     for row in rows:
         try:
+            temp_item = { 
+                'name': '', 
+                'count': 1, 
+                }
             name = row.split('\t')[0]
             if name != "":
-                result.append(name)
-        except:
-            continue
+                temp_item['name'] = name
 
-    return result
-
-def __GetCountList(data):
-    result = []
-    rows = data.split('\n')
-
-    for row in rows:
-        try:
             count = row.split('\t')[1]
             if count != "":
-                result.append(count)
+                temp_item['count'] = count
+
+
+            result.append(temp_item)
         except:
             continue
 
@@ -53,10 +50,9 @@ def index():
 @app.route('/bom_data', methods=['GET', 'POST'])
 def handle_bom():
     bom = request.form.get('bom')
-    component_list = __GetComponentList(bom)
-    count_list = __GetCountList(bom)
+    spec_list = __GetSpec(bom)
     res_list = []
-    for item in component_list:
+    for item in spec_list:
         temp_item = { 
             'name': item, 
             'type': 'none',

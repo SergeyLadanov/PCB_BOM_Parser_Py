@@ -24,19 +24,31 @@ $( "#handle_button" ).on( "click", function()
     {
         let bom_table = document.getElementById("input_list");
 
+        let device_count = parseInt(document.getElementById("deivice_count").value);
+
+        let tech_reserve = parseFloat(document.getElementById("tech_reserve").value) * 0.01;
+
+        let res_skip_tol_checkbox = document.getElementById("skip_res_tol");
+        let res_skip_power_checkbox = document.getElementById("skip_res_power");
+
+
+        let cap_skip_tol_checkbox = document.getElementById("skip_cap_tol");
+        let cap_skip_diel_checkbox = document.getElementById("skip_cap_dielectric");
+        let cap_skip_voltage_checkbox = document.getElementById("skip_cap_voltage");
+
         let data  = {
             bom: bom_table.value,
-            count: 1,
-            tech_tol: 0.1,
+            count: device_count,
+            tech_tol: tech_reserve,
             res_filter: {
-                skip_tol: false,
-                skip_power: false,
+                skip_tol: res_skip_tol_checkbox.checked,
+                skip_power: res_skip_power_checkbox.checked,
             },
             cap_filter:
             {
-                skip_tol: false,
-                skip_dielectric: false,
-                skip_voltage: false,
+                skip_tol: cap_skip_tol_checkbox.checked,
+                skip_dielectric: cap_skip_diel_checkbox.checked,
+                skip_voltage: cap_skip_voltage_checkbox.checked,
             }
         };
 

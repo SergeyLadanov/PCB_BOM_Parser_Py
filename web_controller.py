@@ -5,6 +5,9 @@ import json
 import os
 import sys
 import socket
+from ParamFilter import FilterObj as Filter
+
+import model
 
 
 path = os.path.realpath(os.path.dirname(sys.argv[0]))
@@ -49,14 +52,30 @@ def index():
 
 @app.route('/bom_data', methods=['GET', 'POST'])
 def handle_bom():
+    parser_filter = Filter()
     bom = request.form.get('bom')
     spec_list = __GetSpec(bom)
+
+    device_count = int(request.form.get('count'))
+    tech_reseve = float(request.form.get('tech_res'))
+
+    parser_filter.SetSkipingEndurance('R', request.form.get('res_filter[skip_power]') == 'true')
+    parser_filter.SetSkipingTolerance('R', request.form.get('res_filter[skip_tol]') == 'true')
+
+    parser_filter.SetSkipingTolerance('C', request.form.get('cap_filter[skip_tol]') == 'true')
+    parser_filter.SetSkipingEndurance('C', request.form.get('cap_filter[skip_voltage]') == 'true')
+    parser_filter.SetSkipingVariant('C', request.form.get('cap_filter[skip_dielectric]') == 'true')
+
+
     res_list = []
     for item in spec_list:
+
+        model.CorrectionCount(item, device_count, tech_reseve)
+
         temp_item = { 
-            'name': item, 
+            'name': item['name'], 
             'type': 'none',
-            'count': 1,
+            'count': item['count'],
             'params': 1,
             'links': ['test'] 
             }

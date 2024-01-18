@@ -26,7 +26,7 @@ $( "#handle_button" ).on( "click", function()
 
         let device_count = parseInt(document.getElementById("deivice_count").value);
 
-        let tech_reserve = parseFloat(document.getElementById("tech_reserve").value) * 0.01;
+        let tech_reserve = (parseFloat(document.getElementById("tech_reserve").value) * 0.01) + 1.0;
 
         let res_skip_tol_checkbox = document.getElementById("skip_res_tol");
         let res_skip_power_checkbox = document.getElementById("skip_res_power");
@@ -39,7 +39,7 @@ $( "#handle_button" ).on( "click", function()
         let data  = {
             bom: bom_table.value,
             count: device_count,
-            tech_tol: tech_reserve,
+            tech_res: tech_reserve,
             res_filter: {
                 skip_tol: res_skip_tol_checkbox.checked,
                 skip_power: res_skip_power_checkbox.checked,

@@ -72,12 +72,14 @@ def handle_bom():
 
         model.CorrectionCount(item, device_count, tech_reseve)
 
+        parse_res = model.HandleRowBOM(item, ['elitan'], parser_filter)
+
         temp_item = { 
             'name': item['name'], 
-            'type': 'none',
+            'type': parse_res['type'],
             'count': item['count'],
-            'params': 1,
-            'links': ['test'] 
+            'params': parse_res['params'],
+            'ordering': parse_res['ordering'] 
             }
         res_list.append(temp_item)
 

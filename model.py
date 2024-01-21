@@ -40,15 +40,29 @@ def __GetParamArray(spec_component):
     EnduranceName = None
     mout_way_str = ""
 
+    isParameters = False
+
+
+    res = [
+        f'Способ монтажа: -',
+        f'Значение: -',
+        f'Корпус: -',
+        f'Точность: -',
+        f'Тип: -'
+    ]
+
 
     if spec_component.GetDesignator() == "C":
         EnduranceName = "Напряжение"
+        isParameters = True
 
     if spec_component.GetDesignator() == "R":
         EnduranceName = "Мощность"
+        isParameters = True
 
     if spec_component.GetDesignator() == "L":
         EnduranceName = "Ток"
+        isParameters = True
     
 
     if spec_component.GetMountWay() == spec_component.MOUNT_WAY_AXIAL:
@@ -57,18 +71,18 @@ def __GetParamArray(spec_component):
     if spec_component.GetMountWay() == spec_component.MOUNT_WAY_SMD:
         mout_way_str = "SMD"
 
-    res = [
-        f'Способ монтажа: {mout_way_str:s}',
-        f'Значение: {spec_component.GetValue():.1f} {spec_component.GetUnitsValue():s}',
-        f'Корпус: {spec_component.GetCase():s}',
-        f'Точность: {spec_component.GetTolerance():.1f} %',
-        f'Тип: {spec_component.GetDesignVariant():s}'
-        ]
+    if isParameters:
+        res = [
+            f'Способ монтажа: {mout_way_str:s}',
+            f'Значение: {spec_component.GetValue():.1f} {spec_component.GetUnitsValue():s}',
+            f'Корпус: {spec_component.GetCase():s}',
+            f'Точность: {spec_component.GetTolerance():.1f} %',
+            f'Тип: {spec_component.GetDesignVariant():s}'
+            ]
 
-
-    if EnduranceName:
-        enndurance_str = f'{EnduranceName:s}: {spec_component.GetEndurance():.3f} {spec_component.GetUnitsEndurance():s}'
-        res.insert(2, enndurance_str)
+        if EnduranceName:
+            enndurance_str = f'{EnduranceName:s}: {spec_component.GetEndurance():.3f} {spec_component.GetUnitsEndurance():s}'
+            res.insert(2, enndurance_str)
 
     return res
 
@@ -101,7 +115,7 @@ def __GetOrderLink(spec_component, store_name, filter = None):
     if store_name == 'platan':
         pass
 
-    
+
     return res
 
 

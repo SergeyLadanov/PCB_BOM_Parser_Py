@@ -8,11 +8,25 @@ function ClearResTable()
     res_table.innerHTML = "";
 }
 
-function AddRowResTable(name, type, parameters, count, links)
+function AddRowResTable(bom_item)
 {
     let res_table = document.getElementById("res_table_body");
+    var index;
+    let params = ""
+    let links = ""
 
-    let row_content = `<th scope="row">${ResTableRowCount}</th><td>${name}</td><td>${type}</td><td>${parameters}</td><td>${count}</td><td><a href="${links}" target="_blank">Elitan</a></td>`;
+    for (index = 0; index < bom_item["params"].length; index++) 
+    {
+        params += `<p>${bom_item["params"][index]}</p>`;
+    }
+
+
+    for (index = 0; index < bom_item["ordering"].length; index++) 
+    {
+        links += `<p><a href="${bom_item["ordering"][index]["order_link"]}" target="_blank">${bom_item["ordering"][index]["store_name"]}</a></p>`;
+    }
+
+    let row_content = `<th scope="row">${ResTableRowCount}</th><td>${bom_item["name"]}</td><td>${bom_item["type"]}</td><td>${params}</td><td>${bom_item["count"]}</td><td>${links}</td>`;
 
     res_table.innerHTML += `<tr>${row_content}</tr>`;
 
@@ -57,7 +71,16 @@ $( "#handle_button" ).on( "click", function()
 
         //Отправка данных серверу, обработка ответа
         $.post("./bom_data", data, function(data){
-            alert("Данные успешно получены");
+            // alert("Данные успешно получены");
+            var index;
+
+            ClearResTable();
+
+            for (index = 0; index < data.length; index++) 
+            {
+                AddRowResTable(data[index]);
+            }
+
         })
         // Обработчик неуспешной отправки данных
         .fail(function() {

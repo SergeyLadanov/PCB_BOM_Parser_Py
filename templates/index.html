@@ -311,18 +311,42 @@
 
 
     <div class="row p-3">
-      <div class="col-md-4">
-        <button type="button" class="btn btn-primary">Список англ.</button>
-      </div>
 
-      <div class="col-md-4">
-        <button type="button" class="btn btn-primary">Список рус.</button>
+      <div class="col-md-2">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="en">Список англ.</button>
       </div>
-
-      <div class="col-md-4">
-        <button type="button" class="btn btn-primary">Список Элитан</button>
+      <div class="col-md-2">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="ru">Список рус.</button>
+      </div>
+      <div class="col-md-2">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="elitan">Список Элитан</button>
       </div>
     </div>
+
+
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Заказ</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="mb-3">
+                  <label for="message-text" class="col-form-label">Компоненты:</label>
+                  <textarea class="form-control" rows="15" id="message-text"></textarea>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
 
 
     <p class="h3">Таблица для заказа</p>

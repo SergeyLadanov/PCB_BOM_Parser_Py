@@ -38,7 +38,7 @@ function AddRowResTable(bom_item)
 
     for (index = 0; index < bom_item["params"].length; index++) 
     {
-        params += `<p>${bom_item["params"][index]}</p>`;
+        params += `${bom_item["params"][index]}<br/>`;
     }
 
 
@@ -47,7 +47,7 @@ function AddRowResTable(bom_item)
         links += `<p><a href="${bom_item["ordering"][index]["order_link"]}" target="_blank">${bom_item["ordering"][index]["store_name"]}</a></p>`;
     }
 
-    let row_content = `<th scope="row">${ResTableRowCount}</th><td>${bom_item["name"]}</td><td>${bom_item["type"]}</td><td>${params}</td><td>${bom_item["count"]}</td><td>${links}</td>`;
+    let row_content = `<th scope="row">${ResTableRowCount}</th><td>${bom_item["name"]}</td><td>${bom_item["type"]}</td><td style="font-size:12px">${params}</td><td>${bom_item["count"]}</td><td>${links}</td>`;
 
     res_table.innerHTML += `<tr>${row_content}</tr>`;
 

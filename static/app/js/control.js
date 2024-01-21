@@ -2,6 +2,8 @@
 var ResTableRowCount = 1;
 
 const exampleModal = document.getElementById('exampleModal');
+
+
 if (exampleModal) {
   exampleModal.addEventListener('show.bs.modal', event => {
     // Button that triggered the modal
@@ -44,16 +46,101 @@ function AddRowResTable(bom_item)
 
     for (index = 0; index < bom_item["ordering"].length; index++) 
     {
-        links += `<p><a href="${bom_item["ordering"][index]["order_link"]}" target="_blank">${bom_item["ordering"][index]["store_name"]}</a></p>`;
+        links += `<p><a id="store_link" href="${bom_item["ordering"][index]["order_link"]}" target="_blank">${bom_item["ordering"][index]["store_name"]}</a></p>`;
     }
 
-    let row_content = `<th scope="row">${ResTableRowCount}</th><td>${bom_item["name"]}</td><td>${bom_item["type"]}</td><td style="font-size:12px">${params}</td><td>${bom_item["count"]}</td><td>${links}</td>`;
+    // links += `<p><a id="store_link" href="#" >test</a></p>`;
+
+    let svg_field = `<svg width="100" height="100"><circle id="status_circle" cx="50" cy="50" r="10" fill="gray"/></svg><p id="clicked_store"></p>`;
+
+    let row_content = `<th scope="row">${ResTableRowCount}</th><td>${bom_item["name"]}</td><td>${bom_item["type"]}</td><td style="font-size:12px">${params}</td><td>${bom_item["count"]}</td><td id="links_col">${links}</td><td id="status_col" class="text-center">${svg_field}</td>`;
 
     res_table.innerHTML += `<tr>${row_content}</tr>`;
 
     ResTableRowCount++;
     
 }
+
+
+
+function onRowClick(tableId, statusCallBack, linkCallBack) {
+    var table = document.getElementById(tableId);
+    var rows = table.getElementsByTagName("tr");
+ 
+    for (var i = 1; i < rows.length; i++) 
+    { 
+       var status_col = table.rows[i].querySelector("#status_col");
+       var link_array = table.rows[i].getElementsByTagName("a");
+
+
+
+
+       status_col.onclick = function(row) 
+       {
+          return function() 
+          {
+                statusCallBack(row);
+          };
+       }(table.rows[i]);
+
+
+
+       for (var j = 0; j < link_array.length; j++) 
+       { 
+            link_array[j].onclick = function(row, store_link) 
+            {
+                return function() 
+                {
+                    linkCallBack(row, store_link);
+                };
+            }(table.rows[i], link_array[j]);
+       }
+    }
+ }
+
+
+ function swicthStatus(status_obj)
+ {
+    if (status_obj.getAttribute("fill") == 'gray')
+    {
+        status_obj.setAttribute("fill", 'yellow');  
+    }
+    else if (status_obj.getAttribute("fill") == 'yellow')
+    {
+        status_obj.setAttribute("fill", 'green'); 
+    }
+    else if (status_obj.getAttribute("fill") == 'green')
+    {
+        status_obj.setAttribute("fill", 'gray'); 
+    }
+ }
+
+
+ function updateStatus(tableId, row) 
+ {
+    var table = document.getElementById(tableId);
+    var rows = table.getElementsByTagName("tr");
+ 
+    for (var i = 1; i < rows.length; i++) 
+    { 
+        var status_obj = table.rows[i].querySelector("#status_circle");
+
+        if (table.rows[i] != row)
+        {
+            if (status_obj.getAttribute("fill") == 'yellow')
+            {
+                status_obj.setAttribute("fill", 'gray'); 
+            }
+        }
+        else
+        {
+            status_obj.setAttribute("fill", 'yellow'); 
+        }
+    }
+ }
+ 
+
+
 
 $( "#handle_button" ).on( "click", function() 
     {
@@ -101,6 +188,23 @@ $( "#handle_button" ).on( "click", function()
             {
                 AddRowResTable(data[index]);
             }
+
+
+            onRowClick("res_table", function(row) 
+            {
+                const status_obj = row.querySelector("#status_circle");
+
+                swicthStatus(status_obj);
+                
+            },
+            function(row, store_link) 
+            {
+                updateStatus("res_table", row);
+                const link_status = row.querySelector("#clicked_store");
+                link_status.innerHTML = store_link.innerHTML;
+            }
+            );
+            
 
         })
         // Обработчик неуспешной отправки данных

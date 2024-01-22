@@ -1,0 +1,18 @@
+version: '2'
+
+networks:
+  default:
+    name: local-stack
+
+services:
+  bom_parser:
+    container_name: bom-parser
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5003:5004
+    restart: always
+    volumes:
+        - /etc/timezone:/etc/timezone:ro
+        - /etc/localtime:/etc/localtime:ro

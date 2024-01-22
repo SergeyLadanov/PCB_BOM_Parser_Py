@@ -1,21 +1,86 @@
 
 var ResTableRowCount = 1;
 
-const exampleModal = document.getElementById('exampleModal');
+const bom_list_modal = document.getElementById('exampleModal');
 
 
-if (exampleModal) {
-  exampleModal.addEventListener('show.bs.modal', event => {
+
+function GetRequestData()
+{
+   let bom_table = document.getElementById("input_list");
+
+   let device_count = parseInt(document.getElementById("deivice_count").value);
+
+   let tech_reserve = (parseFloat(document.getElementById("tech_reserve").value) * 0.01) + 1.0;
+
+   let res_skip_tol_checkbox = document.getElementById("skip_res_tol");
+   let res_skip_power_checkbox = document.getElementById("skip_res_power");
+
+
+   let cap_skip_tol_checkbox = document.getElementById("skip_cap_tol");
+   let cap_skip_diel_checkbox = document.getElementById("skip_cap_dielectric");
+   let cap_skip_voltage_checkbox = document.getElementById("skip_cap_voltage");
+
+   let data  = {
+       bom: bom_table.value,
+       count: device_count,
+       tech_res: tech_reserve,
+       res_filter: {
+           skip_tol: res_skip_tol_checkbox.checked,
+           skip_power: res_skip_power_checkbox.checked,
+       },
+       cap_filter:
+       {
+           skip_tol: cap_skip_tol_checkbox.checked,
+           skip_dielectric: cap_skip_diel_checkbox.checked,
+           skip_voltage: cap_skip_voltage_checkbox.checked,
+       }
+   };
+
+   return data;
+}
+
+
+
+if (bom_list_modal) {
+    bom_list_modal.addEventListener('show.bs.modal', event => {
     // Button that triggered the modal
     const button = event.relatedTarget
     // Extract info from data-bs-* attributes
-    const recipient = button.getAttribute('data-bs-whatever')
+    const list_name = button.getAttribute('data-bs-whatever')
     // If necessary, you could initiate an Ajax request here
     // and then do the updating in a callback.
 
     // Update the modal's content.
-    const modalTitle = exampleModal.querySelector('.modal-title')
-    const modalBodyInput = exampleModal.querySelector('.modal-body input')
+    const modalTitle = bom_list_modal.querySelector('.modal-title')
+    const modalBodyInput = bom_list_modal.querySelector('.modal-body input')
+
+    modal_text = bom_list_modal.querySelector('#message-text');
+
+    modal_text.value = "";
+
+    let request = GetRequestData();
+
+    //Отправка данных серверу, обработка ответа
+    $.post("./bom_data", request, function(data){
+        // alert("Данные успешно получены");
+        var index;
+
+        for (index = 0; index < data.length; index++) 
+        {
+            modal_text.value += `${data[index][list_name]}\t${data[index]["count"]}\n`;
+        }
+        
+
+    })
+    // Обработчик неуспешной отправки данных
+    .fail(function() {
+        //alert("Потеря связи с сервером");
+    });
+
+
+
+    //modal_text.value = recipient;
 
     modalTitle.textContent = `Список для заказа ${recipient}`
     modalBodyInput.value = recipient
@@ -140,45 +205,16 @@ function onRowClick(tableId, statusCallBack, linkCallBack) {
  }
  
 
-
-
 $( "#handle_button" ).on( "click", function() 
     {
-        let bom_table = document.getElementById("input_list");
 
-        let device_count = parseInt(document.getElementById("deivice_count").value);
-
-        let tech_reserve = (parseFloat(document.getElementById("tech_reserve").value) * 0.01) + 1.0;
-
-        let res_skip_tol_checkbox = document.getElementById("skip_res_tol");
-        let res_skip_power_checkbox = document.getElementById("skip_res_power");
-
-
-        let cap_skip_tol_checkbox = document.getElementById("skip_cap_tol");
-        let cap_skip_diel_checkbox = document.getElementById("skip_cap_dielectric");
-        let cap_skip_voltage_checkbox = document.getElementById("skip_cap_voltage");
-
-        let data  = {
-            bom: bom_table.value,
-            count: device_count,
-            tech_res: tech_reserve,
-            res_filter: {
-                skip_tol: res_skip_tol_checkbox.checked,
-                skip_power: res_skip_power_checkbox.checked,
-            },
-            cap_filter:
-            {
-                skip_tol: cap_skip_tol_checkbox.checked,
-                skip_dielectric: cap_skip_diel_checkbox.checked,
-                skip_voltage: cap_skip_voltage_checkbox.checked,
-            }
-        };
 
         //ClearResTable();
         //AddRowResTable("test","test1","test3","test4","https://mail.ru");
+        let request = GetRequestData();
 
         //Отправка данных серверу, обработка ответа
-        $.post("./bom_data", data, function(data){
+        $.post("./bom_data", request, function(data){
             // alert("Данные успешно получены");
             var index;
 

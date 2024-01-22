@@ -149,6 +149,9 @@ def HandleRowBOM(spec_item, store_array, filter = None):
         'type': "-",
         'params': [],
         'ordering': [],
+        'ru_text_item': "-",
+        'en_text_item': "-",
+        'elitan_text_item': "-",
         }
     
 
@@ -170,5 +173,9 @@ def HandleRowBOM(spec_item, store_array, filter = None):
         }
 
         res['ordering'].append(store_item)
+    
+    res['ru_text_item'] = en_to_ru_units_decoder.GetParametersString(parse_res, filter)
+    res['en_text_item'] = ru_to_en_units_decoder.GetParametersString(parse_res, filter)
+    res['elitan_text_item'] = elitanGenerator.GenerateFindRequest(parse_res, filter)
     
     return res

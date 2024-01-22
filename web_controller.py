@@ -79,7 +79,10 @@ def handle_bom():
             'type': parse_res['type'],
             'count': item['count'],
             'params': parse_res['params'],
-            'ordering': parse_res['ordering'] 
+            'ordering': parse_res['ordering'],
+            'ru': parse_res['ru_text_item'],
+            'en': parse_res['en_text_item'],
+            'elitan': parse_res['elitan_text_item']
             }
         res_list.append(temp_item)
 

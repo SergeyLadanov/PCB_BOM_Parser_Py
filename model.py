@@ -6,11 +6,30 @@ import ComponentBase as Component
 
 import re
 
-import elitan as elitanGenerator
-
 from ParamFilter import FilterObj as Filter
 
 import math
+
+
+import en_to_ru_units_decoder
+import ru_to_en_units_decoder
+
+
+import elitan as elitanGenerator
+import platan
+import chipdip
+import promelec
+
+
+
+
+
+def GetEnSpecItem(spec_item, filter = None):
+    pass
+
+
+def GetRuSpecItem(spec_item, filter = None):
+    pass
 
 
 
@@ -94,10 +113,13 @@ def __GetOrderName(spec_component, store_name, filter = None):
         res = elitanGenerator.GenerateFindRequest(spec_component, filter)
 
     if store_name == 'chipdip':
-        pass
+        res = chipdip.GenerateFindRequest(spec_component, filter)
 
     if store_name == 'platan':
-        pass
+        res = platan.GenerateFindRequest(spec_component, filter)
+
+    if store_name == 'promelec':
+        res = promelec.GenerateFindRequest(spec_component, filter)
 
     return res
 
@@ -110,11 +132,13 @@ def __GetOrderLink(spec_component, store_name, filter = None):
        res = elitanGenerator.GenerateFindLink(spec_component, filter)
 
     if store_name == 'chipdip':
-        pass
+        res = chipdip.GenerateFindLink(spec_component, filter)
 
     if store_name == 'platan':
-        pass
+        res = platan.GenerateFindLink(spec_component, filter)
 
+    if store_name == 'promelec':
+        res = promelec.GenerateFindLink(spec_component, filter)
 
     return res
 
@@ -141,8 +165,8 @@ def HandleRowBOM(spec_item, store_array, filter = None):
     for store in store_array:
         store_item = {
             'store_name': store,
-            'order_name': __GetOrderName(parse_res, 'elitan', ParamFilter),
-            'order_link':  __GetOrderLink(parse_res, 'elitan', ParamFilter)
+            'order_name': __GetOrderName(parse_res, store, ParamFilter),
+            'order_link':  __GetOrderLink(parse_res, store, ParamFilter)
         }
 
         res['ordering'].append(store_item)

@@ -72,7 +72,7 @@ def handle_bom():
 
         model.CorrectionCount(item, device_count, tech_reseve)
 
-        parse_res = model.HandleRowBOM(item, ['elitan'], parser_filter)
+        parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec'], parser_filter)
 
         temp_item = { 
             'name': item['name'], 

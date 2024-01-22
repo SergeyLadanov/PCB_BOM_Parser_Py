@@ -18,7 +18,10 @@ class FilterObj:
 
 
     def GetFilter(self, key_str):
-        return self.FilterData[key_str]
+        try:
+            return self.FilterData[key_str]
+        except:
+            return FilterItem(True, True, True)
 
 
     def SetSkipingEndurance(self, key_str, value):

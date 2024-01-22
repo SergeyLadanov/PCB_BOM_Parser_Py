@@ -8,10 +8,19 @@ import re
 
 import elitan as elitanGenerator
 
+import chipdip
+
 from ParamFilter import FilterObj as Filter
 
 
+import en_to_ru_units_decoder
+
+import platan
+
+
 testFil = Filter()
+
+test_encode = "Ом".encode("cp1251")
 
 
 # testFil.SetSkipingEndurance('C', True)
@@ -36,19 +45,19 @@ test = [
     # "RA-08H",
     # "MAX16054AZT+T",
     # "LSM6DSLTR STMicroelectronics",
-    # "4.7 nH 0.1 A BLM18HG102SN1D",
-    # "0 1% 0.063W 0603",
-    # "5.1k 1% 0.063W 0603",
-    # "1.5k 1% 0.063W 0603",
-    # "22 1% 0.063W 0603",
-    # "10 1% 0.063W 0603",
-    # "10k 1% 0.063W 0603",
-    # "1 1% 0.063W 0603",
-    # "47k 1% 0.063W 0603",
-    # "2.2k 1% 0.063W 0603",
-    # "100 1% 0.063W 0603",
-    # "4.7k 1% 0.063W 0603",
-    # "470 1% 0.063W 0603",
+    "4.7 nH 0.1 A BLM18HG102SN1D",
+    "0 1% 0.063W 0603",
+    "5.1k 1% 0.063W 0603",
+    "1.5k 1% 0.063W 0603",
+    "22 1% 0.063W 0603",
+    "10 1% 0.063W 0603",
+    "10k 1% 0.063W 0603",
+    "1 1% 0.063W 0603",
+    "47k 1% 0.063W 0603",
+    "2.2k 1% 0.063W 0603",
+    "100 1% 0.063W 0603",
+    "4.7k 1% 0.063W 0603",
+    "470 1% 0.063W 0603",
     # "B3U-3100PM",
     # "SP0503BAHTG Littelfuse",
     # "VS-10BQ100TRPbF Vishay",
@@ -67,8 +76,11 @@ test = [
 
 for item in test:
     res = Component.ComponentBase(item)
-    print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
-    print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
+    # print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
+    # print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
+    #print(f'Translated string: {en_to_ru_units_decoder.GetParametersString(res, testFil):s}')
+    print(f'Chipdip: {chipdip.GenerateFindRequest(res, testFil):s}')
+    print(f'Platan link: {platan.GenerateFindLink(res, testFil):s}')
     res.PrintInfo()
     
 
@@ -120,8 +132,10 @@ test = [
     ]
 
 
-for item in test:
-    res = Component.ComponentBase(item)
-    print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
-    print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
-    res.PrintInfo()
+# for item in test:
+#     res = Component.ComponentBase(item)
+#     #print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
+#     #print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
+    
+    
+#     res.PrintInfo()

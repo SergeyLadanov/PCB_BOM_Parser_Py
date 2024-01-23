@@ -265,6 +265,8 @@ class ComponentBase:
             self.__ParseManufacturerPartNumber(name)
 
             if not self.__CheckParsing():
+                if name.endswith(' '):
+                    name = name[:-1]
                 self.__ManufacturerPartNumber = name.replace(' ','-')
         else:
             self.__ManufacturerPartNumber = name

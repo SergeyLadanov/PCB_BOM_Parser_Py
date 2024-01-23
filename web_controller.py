@@ -48,6 +48,11 @@ def __GetSpec(data):
 def index():
     return render_template('index.html')
 
+
+@app.route("/version", methods=['GET'])
+def getversion():
+    return model.GetVersion()
+
     
 
 @app.route('/bom_data', methods=['GET', 'POST'])

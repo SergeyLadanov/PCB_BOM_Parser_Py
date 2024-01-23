@@ -21,7 +21,11 @@ import chipdip
 import promelec
 
 
+import version
 
+
+def GetVersion():
+    return version.Value
 
 
 def GetEnSpecItem(spec_item, filter = None):

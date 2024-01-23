@@ -19,10 +19,19 @@ function ShowAppVersion()
 }
 
 
+function replaceAll(str, find, replace) 
+{
+    return str.replace(new RegExp(find, 'g'), replace);
+}
+
 
 function GetRequestData()
 {
    let bom_table = document.getElementById("input_list");
+
+   let bom_request_content = bom_table.value;
+
+   bom_request_content = replaceAll(bom_request_content, ';', '\t');
 
    let device_count = parseInt(document.getElementById("deivice_count").value);
 
@@ -37,7 +46,7 @@ function GetRequestData()
    let cap_skip_voltage_checkbox = document.getElementById("skip_cap_voltage");
 
    let data  = {
-       bom: bom_table.value,
+       bom: bom_request_content,
        count: device_count,
        tech_res: tech_reserve,
        res_filter: {

@@ -47,12 +47,12 @@ def GetParametersString(component_obj, filter):
 
             res = res + Value
 
-        if len(Tolerance):
+        if len(Tolerance) and component_obj.GetTolerance() != 0.0:
             Tolerance = Tolerance.replace('.0', '') 
             Tolerance = Tolerance + '%'
             res = res + ' ' + Tolerance
 
-        if len(Endurance):
+        if len(Endurance) and component_obj.GetEndurance() != 0.0:
             if component_obj.GetDesignator() == 'R':
                 Endurance = re.sub(r'[W]', 'Вт', Endurance)
                 probe = re.search(r'.[0][а-яА-Я]', Endurance)

@@ -6,17 +6,6 @@ const bom_list_modal = document.getElementById('exampleModal');
 
 function ShowAppVersion()
 {
-    
-
-    // //Отправка данных серверу, обработка ответа
-    // $.ajax("./version", function(data){
-    //     // alert("Данные успешно получены");
-    //     let version_container = document.getElementById('version_container');
-    //     version_container.innerHTML = data;
-
-    // });
-
-
     $.ajax({
         url: './version',         
         method: 'get',             
@@ -28,9 +17,6 @@ function ShowAppVersion()
         }
     });
 }
-
-
-ShowAppVersion();
 
 
 
@@ -279,3 +265,8 @@ $( "#handle_button" ).on( "click", function()
         // alert( "Handler for `click` called." );
     } 
 );
+
+
+
+
+ShowAppVersion();

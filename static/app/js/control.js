@@ -82,8 +82,8 @@ if (bom_list_modal) {
 
     //modal_text.value = recipient;
 
-    modalTitle.textContent = `Список для заказа ${recipient}`
-    modalBodyInput.value = recipient
+    modalTitle.textContent = `Список для заказа ${list_name}`
+    //modalBodyInput.value = recipient
   })
 }
 

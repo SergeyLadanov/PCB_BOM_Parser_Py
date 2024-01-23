@@ -18,7 +18,7 @@ function ShowAppVersion()
 
 
     $.ajax({
-        url: '/version',         
+        url: './version',         
         method: 'get',             
         dataType: 'html',          
         data: {text: ''},           

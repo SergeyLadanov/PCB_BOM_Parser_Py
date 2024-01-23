@@ -11,7 +11,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 5003:5004
+      - 5004:5003
     restart: always
     volumes:
         - /etc/timezone:/etc/timezone:ro

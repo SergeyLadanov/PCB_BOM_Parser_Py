@@ -29,7 +29,7 @@ test_encode = "Ом".encode("cp1251")
 testFil.SetSkipingTolerance('C', True)
 
 test = [
-    # "1001312",
+    "1001312",
     "12pF 1% 50V NP0 0603",
     "100uF 10% 10V Tantalum Case D",
     "0.1uF 1% 16V X7R 0603",
@@ -38,13 +38,13 @@ test = [
     "1pF 1% 50V NP0 0603",
     "820pF 1% 50V NP0 0603",
     "4.7uF 10% 10V Tantalum Case A",
-    # "ME6211C33M5G",
-    # "MCP73831T-2ACI/OT",
-    # "DWM1000",
-    # "nRF52840-QIAA nRF52840-QIAA",
-    # "RA-08H",
-    # "MAX16054AZT+T",
-    # "LSM6DSLTR STMicroelectronics",
+    "ME6211C33M5G",
+    "MCP73831T-2ACI/OT",
+    "DWM1000",
+    "nRF52840-QIAA nRF52840-QIAA",
+    "RA-08H",
+    "MAX16054AZT+T",
+    "LSM6DSLTR STMicroelectronics",
     "4.7 nH 0.1 A BLM18HG102SN1D",
     "0 1% 0.063W 0603",
     "5.1k 1% 0.063W 0603",
@@ -58,19 +58,19 @@ test = [
     "100 1% 0.063W 0603",
     "4.7k 1% 0.063W 0603",
     "470 1% 0.063W 0603",
-    # "B3U-3100PM",
-    # "SP0503BAHTG Littelfuse",
-    # "VS-10BQ100TRPbF Vishay",
-    # "GNL-3012GD",
-    # "GNL-3012HD",
-    # "IRLML2244TRPBF",
-    # "IRLML2502TRPBF",
-    # "WF-2R",
-    # "PLS-6",
-    # "PLS-3",
-    # "1054500101 Molex",
-    # "32.768 кГц KX-327S 32.768 кГц",
-    # "32 МГц KX-7 32 МГц"
+    "B3U-3100PM",
+    "SP0503BAHTG Littelfuse",
+    "VS-10BQ100TRPbF Vishay",
+    "GNL-3012GD",
+    "GNL-3012HD",
+    "IRLML2244TRPBF",
+    "IRLML2502TRPBF",
+    "WF-2R",
+    "PLS-6",
+    "PLS-3",
+    "1054500101 Molex",
+    "32.768 кГц KX-327S 32.768 кГц",
+    "32 МГц KX-7 32 МГц"
     ]
 
 
@@ -79,9 +79,9 @@ for item in test:
     # print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
     # print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
     #print(f'Translated string: {en_to_ru_units_decoder.GetParametersString(res, testFil):s}')
-    print(f'Chipdip: {chipdip.GenerateFindRequest(res, testFil):s}')
-    print(f'Platan link: {platan.GenerateFindLink(res, testFil):s}')
-    res.PrintInfo()
+    # print(f'Chipdip: {chipdip.GenerateFindRequest(res, testFil):s}')
+    # print(f'Platan link: {platan.GenerateFindLink(res, testFil):s}')
+    # res.PrintInfo()
     
 
 print("\r\n-----------------------------------\r\n")
@@ -132,10 +132,10 @@ test = [
     ]
 
 
-# for item in test:
-#     res = Component.ComponentBase(item)
-#     #print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
-#     #print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
+for item in test:
+    res = Component.ComponentBase(item)
+    #print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
+    #print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
     
     
-#     res.PrintInfo()
+    res.PrintInfo()

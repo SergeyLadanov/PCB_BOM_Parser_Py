@@ -12,7 +12,7 @@ class ComponentBase:
 
 
     def __init__(self, name=""):
-        self.__Name = name
+        self.__Name = name.rstrip()
         self.__Designator = ""
         self.__Value = 0.0
         self.__UnitsValue = ""
@@ -265,9 +265,8 @@ class ComponentBase:
             self.__ParseManufacturerPartNumber(name)
 
             if not self.__CheckParsing():
-                if name.endswith(' '):
-                    name = name[:-1]
-                self.__ManufacturerPartNumber = name.replace(' ','-')
+                # self.__ManufacturerPartNumber = name.replace(' ','-')
+                self.__ManufacturerPartNumber = name
         else:
             self.__ManufacturerPartNumber = name
 

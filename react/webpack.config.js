@@ -4,7 +4,7 @@ const path = require('path')
 const autoprefixer = require('autoprefixer')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 // const WebpackPwaManifest = require('webpack-pwa-manifest')
-const WorkboxWebpackPlugin = require('workbox-webpack-plugin')
+// const WorkboxWebpackPlugin = require('workbox-webpack-plugin')
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production' // Проверяем режим сборки
@@ -25,20 +25,20 @@ module.exports = (env, argv) => {
     },
     plugins: [
       new HtmlWebpackPlugin({
-        template: './public/index.html',
+        // template: './public/index.html',
         favicon: './public/favicon.ico'
-      }),
+      })
 
       // Подключаем WorkboxWebpackPlugin.GenerateSW только в production режиме
-      ...(isProduction
-        ? [
-            new WorkboxWebpackPlugin.GenerateSW({
-              clientsClaim: true,
-              skipWaiting: true,
-              maximumFileSizeToCacheInBytes: 5000000
-            })
-          ]
-        : [])
+      // ...(isProduction
+      //   ? [
+      //       new WorkboxWebpackPlugin.GenerateSW({
+      //         clientsClaim: true,
+      //         skipWaiting: true,
+      //         maximumFileSizeToCacheInBytes: 5000000
+      //       })
+      //     ]
+      //   : [])
     ],
     module: {
       rules: [

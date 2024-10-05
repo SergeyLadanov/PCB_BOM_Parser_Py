@@ -1,0 +1,48 @@
+{
+  "name": "webpack",
+  "description": "Include Bootstrap's source Sass and individual JavaScript plugins with Webpack.",
+  "version": "0.0.0",
+  "private": true,
+  "repository": "twbs/examples",
+  "license": "MIT",
+  "stackblitz": {
+    "startCommand": "npm start"
+  },
+  "scripts": {
+    "start": "webpack serve",
+    "build": "npm run format:write && webpack build --mode=production",
+    "format:write": "npx prettier --write .",
+    "format:check": "npx prettier --check .",
+    "test": "npm run build"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@types/react-router-dom": "^5.3.3",
+    "bootstrap": "^5.3.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2"
+  },
+  "devDependencies": {
+    "@types/bootstrap": "^5.2.10",
+    "@types/jquery": "^3.5.30",
+    "autoprefixer": "^10.4.19",
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.0",
+    "jquery": "^3.7.1",
+    "postcss-loader": "^8.1.1",
+    "prettier": "^3.3.3",
+    "sass": "^1.77.4",
+    "sass-loader": "^14.2.1",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4",
+    "webpack-pwa-manifest": "^4.3.0",
+    "workbox-webpack-plugin": "^7.1.0"
+  }
+}

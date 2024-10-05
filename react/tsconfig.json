@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "es2017",
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "sourceMap": true
+  },
+  "include": ["src"]
+}

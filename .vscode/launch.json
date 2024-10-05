@@ -20,6 +20,13 @@
             ],
             "jinja": true,
             "autoStartBrowser": false
-        }
+        },
+        {
+            "command": "npm start",
+            "name": "Web server debug",
+            "request": "launch",
+            "type": "node-terminal",
+            "cwd": "${workspaceFolder}/react"
+        },
     ]
 }

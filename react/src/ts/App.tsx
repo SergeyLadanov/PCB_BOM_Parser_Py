@@ -9,8 +9,10 @@ function App() {
   return (
     <>
       <Navbar />
-      <SwitchTheme />
-      <MainContainer />
+      <div className="container">
+        <SwitchTheme />
+        <MainContainer />
+      </div>
     </>
   )
 }

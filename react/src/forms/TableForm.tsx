@@ -2,10 +2,6 @@ import React, { useEffect, useState } from 'react'
 import '../scss/styles.scss'
 import '../css/circle_status.css'
 
-interface OrderLink {
-  OrderLink: string
-  StoreName: string
-}
 
 interface TableRow {
   Id: Number
@@ -15,6 +11,46 @@ interface TableRow {
   Quantity: Number
   Links: OrderLink[]
   Status: Number
+}
+
+interface OrderLink {
+  OrderLink: string
+  StoreName: string
+}
+
+interface LinkArrayProps
+{
+  Links:OrderLink[];
+}
+
+
+const LinkArray = ({Links}: LinkArrayProps) => {
+  const [selectedLinkIndex, setSelectedLinkIndex] = useState(null);
+
+  // Обработчик клика по кнопке
+  const handleLinkClick = (index:any) => {
+    setSelectedLinkIndex(index);
+  };
+
+  return (
+    <>
+    {Links.map((link, index) => (
+        <tr key={index}>
+          <a
+            id="store_link"
+            href={link.OrderLink}
+            target="_blank"
+            onClick={() => handleLinkClick(index)}
+          >
+            {link.StoreName}
+          </a>
+          {selectedLinkIndex === index && (
+            <span style={{ color: 'green', marginLeft: '8px' }}>&#10004;</span>
+          )}
+        </tr>
+    ))}
+    </>
+  )
 }
 
 
@@ -111,19 +147,7 @@ function TableForm() {
                   </td>
                   <td>{item.Quantity.toString()}</td>
                   <td>
-                    {item.Links.map(link => (
-                      <>
-                        <tr>
-                          <a
-                            id="store_link"
-                            href={link.OrderLink}
-                            target="_blank"
-                          >
-                            {link.StoreName}
-                          </a>
-                        </tr>
-                      </>
-                    ))}
+                    <LinkArray Links={item.Links} />
                   </td>
                   <td className="text-center">
                     <CircleButton />

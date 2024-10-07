@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import '../scss/styles.scss'
+import '../css/circle_status.css'
+
+interface OrderLink {
+  OrderLink: string
+  StoreName: string
+}
 
 interface TableRow {
   Id: Number
-  Name: String
-  Type: String
-  Parameters: String[]
+  Name: string
+  Type: string
+  Parameters: string[]
   Quantity: Number
-  Links: string[]
+  Links: OrderLink[]
   Status: Number
 }
 
@@ -73,14 +79,60 @@ interface TableRow {
 //   return Form
 // }
 
+const CircleButton = () => {
+  const [color, setColor] = useState('gray')
+
+  // Обработчик клика по кнопке
+  const handleClick = () => {
+    setColor(prevColor => {
+      if (prevColor === 'gray') return 'yellow'
+      if (prevColor === 'yellow') return 'green'
+      return 'gray'
+    })
+  }
+
+  return <button className={`circle-button ${color}`} onClick={handleClick} />
+}
+
 function TableForm() {
-
   const [TableData, SetTableData] = useState<TableRow[]>([
-    {Id: 1, Links: ["sdfsd", "sdfsdf"], Name: "sdfsdf", Parameters: ["sdfsdf"], Quantity: 5, Status: 0, Type: "Res"},
-    {Id: 2, Links: ["sdfsd", "sdfsdf"], Name: "sdfsdf", Parameters: ["sdfsdf"], Quantity: 5, Status: 0, Type: "Res"},
-    {Id: 3, Links: ["sdfsd", "sdfsdf"], Name: "sdfsdf", Parameters: ["sdfsdf"], Quantity: 5, Status: 0, Type: "Res"}
-  ]);
-
+    {
+      Id: 1,
+      Links: [
+        { OrderLink: '#', StoreName: 'store1' },
+        { OrderLink: '#', StoreName: 'store2' }
+      ],
+      Name: 'sdfsdf',
+      Parameters: ['sdfsdf'],
+      Quantity: 5,
+      Status: 0,
+      Type: 'Res'
+    },
+    {
+      Id: 2,
+      Links: [
+        { OrderLink: '#', StoreName: 'store1' },
+        { OrderLink: '#', StoreName: 'store2' }
+      ],
+      Name: 'sdfsdf',
+      Parameters: ['sdfsdf'],
+      Quantity: 5,
+      Status: 0,
+      Type: 'Res'
+    },
+    {
+      Id: 3,
+      Links: [
+        { OrderLink: '#', StoreName: 'store1' },
+        { OrderLink: '#', StoreName: 'store2' }
+      ],
+      Name: 'sdfsdf',
+      Parameters: ['sdfsdf'],
+      Quantity: 5,
+      Status: 0,
+      Type: 'Res'
+    }
+  ])
 
   return (
     <>
@@ -102,33 +154,37 @@ function TableForm() {
               </tr>
             </thead>
             <tbody id="res_table_body">
-            {TableData.map((item) => (
-              <tr key={item.Id.toString()}>
-                <th scope="row">{item.Id.toString()}</th>
-                <td>{item.Name}</td>
-                <td>{item.Type}</td>
-                <td style={{fontSize: "12px"}}>            
-                  {item.Parameters.map((parameter) => (
-                    <>
-                      {parameter} <br />
-                    </>
-                  ))}
-                </td>
-                <td>
-                  {item.Quantity.toString()}
-                </td>
-                <td>
-                  {item.Links.map((link) => (
+              {TableData.map(item => (
+                <tr key={item.Id.toString()}>
+                  <th scope="row">{item.Id.toString()}</th>
+                  <td>{item.Name}</td>
+                  <td>{item.Type}</td>
+                  <td style={{ fontSize: '12px' }}>
+                    {item.Parameters.map(parameter => (
                       <>
-                        <p><a id="store_link" href={link} target="_blank">{link}</a></p>
+                        {parameter} <br />
                       </>
                     ))}
-                </td>
-                <td>
-                    
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td>{item.Quantity.toString()}</td>
+                  <td>
+                    {item.Links.map(link => (
+                      <>
+                        <p>
+                          <a
+                            id="store_link"
+                            href={link.OrderLink}
+                            target="_blank"
+                          >
+                            {link.StoreName}
+                          </a>
+                        </p>
+                      </>
+                    ))}
+                  </td>
+                  <td className="text-center"><CircleButton /></td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

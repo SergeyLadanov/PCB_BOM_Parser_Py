@@ -17,67 +17,6 @@ interface TableRow {
   Status: Number
 }
 
-// interface FormData {
-//   BomList: String
-//   Quantity: Number
-//   TechReserve: Number
-//   SkipResTol: Boolean
-//   SkipResPower: Boolean
-//   SkipCapTol: Boolean
-//   SkipCapDiel: Boolean
-//   SkipCapVoltage: Boolean
-// }
-
-// interface FormController extends FormData {
-//   SetBomList: (value: string) => void
-//   SetQuantity: (value: Number) => void
-//   SetTechReserve: (value: Number) => void
-//   SetSkipResTol: (value: Boolean) => void
-//   SetSkipResPower: (value: Boolean) => void
-//   SetSkipCapTol: (value: Boolean) => void
-//   SetSkipCapDiel: (value: Boolean) => void
-//   SetSkipCapVoltage: (value: Boolean) => void
-// }
-
-// interface FormProps {
-//   form: FormController
-//   // OnButtonClick: () => void
-// }
-
-// export function useTableForm(): FormController {
-//   const [formState, setFormData] = useState<FormData>({
-//     BomList: '',
-//     Quantity: 1,
-//     TechReserve: 0,
-//     SkipResTol: false,
-//     SkipResPower: false,
-//     SkipCapTol: false,
-//     SkipCapDiel: false,
-//     SkipCapVoltage: false
-//   })
-
-//   const Form: FormController = {
-//     ...formState,
-//     SetBomList: (value: string) =>
-//       setFormData(prev => ({ ...prev, BomList: value })),
-//     SetQuantity: (value: Number) =>
-//       setFormData(prev => ({ ...prev, Quantity: value })),
-//     SetTechReserve: (value: Number) =>
-//       setFormData(prev => ({ ...prev, TechReserve: value })),
-//     SetSkipResTol: (value: Boolean) =>
-//       setFormData(prev => ({ ...prev, SkipResTol: value })),
-//     SetSkipResPower: (value: Boolean) =>
-//       setFormData(prev => ({ ...prev, SkipResPower: value })),
-//     SetSkipCapTol: (value: Boolean) =>
-//       setFormData(prev => ({ ...prev, SkipCapTol: value })),
-//     SetSkipCapDiel: (value: Boolean) =>
-//       setFormData(prev => ({ ...prev, SkipCapDiel: value })),
-//     SetSkipCapVoltage: (value: Boolean) =>
-//       setFormData(prev => ({ ...prev, SkipCapVoltage: value }))
-//   }
-
-//   return Form
-// }
 
 const CircleButton = () => {
   const [color, setColor] = useState('gray')
@@ -100,10 +39,11 @@ function TableForm() {
       Id: 1,
       Links: [
         { OrderLink: '#', StoreName: 'store1' },
-        { OrderLink: '#', StoreName: 'store2' }
+        { OrderLink: '#', StoreName: 'store2' },
+        { OrderLink: '#', StoreName: 'store3' }
       ],
       Name: 'sdfsdf',
-      Parameters: ['sdfsdf'],
+      Parameters: ['param1', 'param2', 'param3', 'param4'],
       Quantity: 5,
       Status: 0,
       Type: 'Res'
@@ -112,10 +52,11 @@ function TableForm() {
       Id: 2,
       Links: [
         { OrderLink: '#', StoreName: 'store1' },
-        { OrderLink: '#', StoreName: 'store2' }
+        { OrderLink: '#', StoreName: 'store2' },
+        { OrderLink: '#', StoreName: 'store3' }
       ],
       Name: 'sdfsdf',
-      Parameters: ['sdfsdf'],
+      Parameters: ['param1', 'param2', 'param3', 'param4'],
       Quantity: 5,
       Status: 0,
       Type: 'Res'
@@ -124,10 +65,11 @@ function TableForm() {
       Id: 3,
       Links: [
         { OrderLink: '#', StoreName: 'store1' },
-        { OrderLink: '#', StoreName: 'store2' }
+        { OrderLink: '#', StoreName: 'store2' },
+        { OrderLink: '#', StoreName: 'store3' }
       ],
       Name: 'sdfsdf',
-      Parameters: ['sdfsdf'],
+      Parameters: ['param1', 'param2', 'param3', 'param4'],
       Quantity: 5,
       Status: 0,
       Type: 'Res'
@@ -139,7 +81,7 @@ function TableForm() {
       <p className="h3">Таблица для заказа</p>
       <div className="bd-example-snippet bd-code-snippet">
         <div className="bd-example m-0 border-0 table-responsive-md">
-          <table id="res_table" className="table table-striped">
+          <table id="res_table" className="table table-striped table-hover">
             <thead>
               <tr>
                 <th scope="col">#</th>
@@ -155,22 +97,23 @@ function TableForm() {
             </thead>
             <tbody id="res_table_body">
               {TableData.map(item => (
-                <tr key={item.Id.toString()}>
+                <tr
+                  key={item.Id.toString()}
+                  style={{ verticalAlign: 'middle' }}
+                >
                   <th scope="row">{item.Id.toString()}</th>
                   <td>{item.Name}</td>
                   <td>{item.Type}</td>
                   <td style={{ fontSize: '12px' }}>
                     {item.Parameters.map(parameter => (
-                      <>
-                        {parameter} <br />
-                      </>
+                      <tr>{parameter}</tr>
                     ))}
                   </td>
                   <td>{item.Quantity.toString()}</td>
                   <td>
                     {item.Links.map(link => (
                       <>
-                        <p>
+                        <tr>
                           <a
                             id="store_link"
                             href={link.OrderLink}
@@ -178,11 +121,13 @@ function TableForm() {
                           >
                             {link.StoreName}
                           </a>
-                        </p>
+                        </tr>
                       </>
                     ))}
                   </td>
-                  <td className="text-center"><CircleButton /></td>
+                  <td className="text-center">
+                    <CircleButton />
+                  </td>
                 </tr>
               ))}
             </tbody>

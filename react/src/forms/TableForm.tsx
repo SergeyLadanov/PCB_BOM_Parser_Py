@@ -7,7 +7,7 @@ interface TableRow {
   Type: String
   Parameters: String[]
   Quantity: Number
-  Links: String[]
+  Links: string[]
   Status: Number
 }
 
@@ -74,6 +74,14 @@ interface TableRow {
 // }
 
 function TableForm() {
+
+  const [TableData, SetTableData] = useState<TableRow[]>([
+    {Id: 1, Links: ["sdfsd", "sdfsdf"], Name: "sdfsdf", Parameters: ["sdfsdf"], Quantity: 5, Status: 0, Type: "Res"},
+    {Id: 2, Links: ["sdfsd", "sdfsdf"], Name: "sdfsdf", Parameters: ["sdfsdf"], Quantity: 5, Status: 0, Type: "Res"},
+    {Id: 3, Links: ["sdfsd", "sdfsdf"], Name: "sdfsdf", Parameters: ["sdfsdf"], Quantity: 5, Status: 0, Type: "Res"}
+  ]);
+
+
   return (
     <>
       <p className="h3">Таблица для заказа</p>
@@ -93,7 +101,35 @@ function TableForm() {
                 </th>
               </tr>
             </thead>
-            <tbody id="res_table_body"></tbody>
+            <tbody id="res_table_body">
+            {TableData.map((item) => (
+              <tr key={item.Id.toString()}>
+                <th scope="row">{item.Id.toString()}</th>
+                <td>{item.Name}</td>
+                <td>{item.Type}</td>
+                <td style={{fontSize: "12px"}}>            
+                  {item.Parameters.map((parameter) => (
+                    <>
+                      {parameter} <br />
+                    </>
+                  ))}
+                </td>
+                <td>
+                  {item.Quantity.toString()}
+                </td>
+                <td>
+                  {item.Links.map((link) => (
+                      <>
+                        <p><a id="store_link" href={link} target="_blank">{link}</a></p>
+                      </>
+                    ))}
+                </td>
+                <td>
+                    
+                </td>
+              </tr>
+            ))}
+            </tbody>
           </table>
         </div>
       </div>

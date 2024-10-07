@@ -1,116 +1,88 @@
 import React, { useEffect, useState } from 'react'
 import '../scss/styles.scss'
 import '../css/circle_status.css'
+import LinkArray, { OrderLink } from '../components/LinkArray'
 
-
-interface TableRow {
-  Id: Number
+export interface TableRow {
   Name: string
   Type: string
   Parameters: string[]
   Quantity: Number
   Links: OrderLink[]
-  Status: Number
 }
 
-interface OrderLink {
-  OrderLink: string
-  StoreName: string
+interface TableController {
+  RowArray: TableRow[]
+  // RowIdArray: Number[];
+  RowStatusArray: any[]
+  AddRow: (value: TableRow) => void
+  Clear: () => void
+  ToggleStatus: (index: number) => void
+  SetStatus: (index: number, value: string) => void
 }
 
-interface LinkArrayProps
-{
-  Links:OrderLink[];
-}
+export function useTableForm(): TableController {
+  const [formState, setFormData] = useState<TableRow[]>([])
+  const [rowStatuses, setRowStatus] = useState([])
 
-
-const LinkArray = ({Links}: LinkArrayProps) => {
-  const [selectedLinkIndex, setSelectedLinkIndex] = useState(null);
-
-  // Обработчик клика по кнопке
-  const handleLinkClick = (index:any) => {
-    setSelectedLinkIndex(index);
-  };
-
-  return (
-    <>
-    {Links.map((link, index) => (
-        <tr key={index}>
-          <a
-            id="store_link"
-            href={link.OrderLink}
-            target="_blank"
-            onClick={() => handleLinkClick(index)}
-          >
-            {link.StoreName}
-          </a>
-          {selectedLinkIndex === index && (
-            <span style={{ color: 'green', marginLeft: '8px' }}>&#10004;</span>
-          )}
-        </tr>
-    ))}
-    </>
-  )
-}
-
-
-const CircleButton = () => {
-  const [color, setColor] = useState('gray')
-
-  // Обработчик клика по кнопке
-  const handleClick = () => {
-    setColor(prevColor => {
-      if (prevColor === 'gray') return 'yellow'
-      if (prevColor === 'yellow') return 'green'
-      return 'gray'
-    })
+  const SetRowStatusFn = (index: number, value: string) => {
+    const newRowStates = [...rowStatuses]
+    if (value === 'yellow') {
+      const yellowButtonIndex = newRowStates.indexOf('yellow')
+      if (yellowButtonIndex !== -1) {
+        newRowStates[yellowButtonIndex] = 'gray'
+      }
+    }
+    newRowStates[index] = value
+    setRowStatus(newRowStates)
   }
 
-  return <button className={`circle-button ${color}`} onClick={handleClick} />
+  const Form: TableController = {
+    RowArray: formState,
+    RowStatusArray: rowStatuses,
+
+    AddRow: (value: TableRow) => {
+      formState.push(value)
+      setFormData(formState)
+      rowStatuses.push('gray')
+      setRowStatus(rowStatuses)
+    },
+    Clear: () => {
+      setFormData([])
+      setRowStatus([])
+    },
+
+    SetStatus: SetRowStatusFn,
+
+    ToggleStatus: (index: number) => {
+      const newRowStates = [...rowStatuses]
+
+      // Поменять цвет нажатой кнопки: gray -> yellow -> green
+      if (newRowStates[index] === 'gray') {
+        SetRowStatusFn(index, 'yellow')
+      } else if (newRowStates[index] === 'yellow') {
+        SetRowStatusFn(index, 'green')
+      } else {
+        SetRowStatusFn(index, 'gray')
+      }
+    }
+  }
+
+  return Form
 }
 
-function TableForm() {
-  const [TableData, SetTableData] = useState<TableRow[]>([
-    {
-      Id: 1,
-      Links: [
-        { OrderLink: '#', StoreName: 'store1' },
-        { OrderLink: '#', StoreName: 'store2' },
-        { OrderLink: '#', StoreName: 'store3' }
-      ],
-      Name: 'sdfsdf',
-      Parameters: ['param1', 'param2', 'param3', 'param4'],
-      Quantity: 5,
-      Status: 0,
-      Type: 'Res'
-    },
-    {
-      Id: 2,
-      Links: [
-        { OrderLink: '#', StoreName: 'store1' },
-        { OrderLink: '#', StoreName: 'store2' },
-        { OrderLink: '#', StoreName: 'store3' }
-      ],
-      Name: 'sdfsdf',
-      Parameters: ['param1', 'param2', 'param3', 'param4'],
-      Quantity: 5,
-      Status: 0,
-      Type: 'Res'
-    },
-    {
-      Id: 3,
-      Links: [
-        { OrderLink: '#', StoreName: 'store1' },
-        { OrderLink: '#', StoreName: 'store2' },
-        { OrderLink: '#', StoreName: 'store3' }
-      ],
-      Name: 'sdfsdf',
-      Parameters: ['param1', 'param2', 'param3', 'param4'],
-      Quantity: 5,
-      Status: 0,
-      Type: 'Res'
-    }
-  ])
+interface TableFormProps {
+  form: TableController
+}
+
+function TableForm({ form }: TableFormProps) {
+  const handleButtonClick = (index: number) => {
+    form.ToggleStatus(index)
+  }
+
+  const handleLinkClick = (index: number) => {
+    form.SetStatus(index, 'yellow')
+  }
 
   return (
     <>
@@ -132,25 +104,31 @@ function TableForm() {
               </tr>
             </thead>
             <tbody id="res_table_body">
-              {TableData.map(item => (
-                <tr
-                  key={item.Id.toString()}
-                  style={{ verticalAlign: 'middle' }}
-                >
-                  <th scope="row">{item.Id.toString()}</th>
+              {form.RowArray.map((item, index) => (
+                <tr key={index.toString()} style={{ verticalAlign: 'middle' }}>
+                  <th scope="row">{(index + 1).toString()}</th>
                   <td>{item.Name}</td>
                   <td>{item.Type}</td>
                   <td style={{ fontSize: '12px' }}>
-                    {item.Parameters.map(parameter => (
-                      <tr>{parameter}</tr>
+                    {item.Parameters.map((parameter, index) => (
+                      <span key={index}>
+                        {parameter}
+                        <br />
+                      </span>
                     ))}
                   </td>
                   <td>{item.Quantity.toString()}</td>
                   <td>
-                    <LinkArray Links={item.Links} />
+                    <LinkArray
+                      Links={item.Links}
+                      HandleClick={() => handleLinkClick(index)}
+                    />
                   </td>
                   <td className="text-center">
-                    <CircleButton />
+                    <button
+                      className={`circle-button ${form.RowStatusArray[index]}`}
+                      onClick={() => handleButtonClick(index)}
+                    />
                   </td>
                 </tr>
               ))}

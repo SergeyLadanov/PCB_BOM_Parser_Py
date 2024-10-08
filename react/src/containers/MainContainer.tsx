@@ -57,9 +57,7 @@ function MainContainer() {
     return str.replace(new RegExp(find, 'g'), replace)
   }
 
-  const OnSubmitButtonClick = () => {
-    console.log('Button clicked')
-
+  const GetRequest = (): BomRequest => {
     var data: BomRequest = {
       bom: replaceAll(srcDataForm.BomList, ';', '\t'),
       cap_filter: {
@@ -74,6 +72,12 @@ function MainContainer() {
       count: srcDataForm.Quantity,
       tech_res: srcDataForm.TechReserve * 0.01 + 1.0
     }
+
+    return data
+  }
+
+  const OnSubmitButtonClick = () => {
+    const data: BomRequest = GetRequest()
 
     SendData(API_URL, data)
       .then((value: ParseResult[]) => {
@@ -95,7 +99,51 @@ function MainContainer() {
           tableForm.AddRow(Row)
         })
       })
-      .catch(() => {})
+      .catch(() => {
+        alert('Потеряна связь с сервером')
+      })
+  }
+
+  const OnEnButtonClick = () => {
+    const data: BomRequest = GetRequest()
+
+    SendData(API_URL, data)
+      .then((value: ParseResult[]) => {
+        value.forEach(item => {
+          modalListForm.AddModalTextRow(`${item.en}\t${item.count}`)
+        })
+      })
+      .catch(() => {
+        alert('Потеряна связь с сервером')
+      })
+  }
+
+  const OnRuButtonClick = () => {
+    const data: BomRequest = GetRequest()
+
+    SendData(API_URL, data)
+      .then((value: ParseResult[]) => {
+        value.forEach(item => {
+          modalListForm.AddModalTextRow(`${item.ru}\t${item.count}`)
+        })
+      })
+      .catch(() => {
+        alert('Потеряна связь с сервером')
+      })
+  }
+
+  const OnElitanButtonClick = () => {
+    const data: BomRequest = GetRequest()
+
+    SendData(API_URL, data)
+      .then((value: ParseResult[]) => {
+        value.forEach(item => {
+          modalListForm.AddModalTextRow(`${item.elitan}\t${item.count}`)
+        })
+      })
+      .catch(() => {
+        alert('Потеряна связь с сервером')
+      })
   }
 
   return (
@@ -105,7 +153,12 @@ function MainContainer() {
         OnHandleButtonClick={OnSubmitButtonClick}
       />
       <div className="my-3 p-3 bg-body rounded shadow-sm">
-        <ModalForm form={modalListForm} />
+        <ModalForm
+          form={modalListForm}
+          OnEnButtonClick={OnEnButtonClick}
+          OnRuButtonClick={OnRuButtonClick}
+          OnElitanButtonClick={OnElitanButtonClick}
+        />
         <TableForm form={tableForm} />
       </div>
     </>

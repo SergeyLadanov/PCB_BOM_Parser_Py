@@ -3,35 +3,93 @@ import '../scss/styles.scss'
 
 interface FormData {
   ModalText: string
+  TitleText: string
 }
 
 interface FormController extends FormData {
   SetModalText: (value: string) => void
+  AddModalTextRow: (value: string) => void
+  SetTitleText: (value: string) => void
+  Clear: () => void
 }
 
 interface FormProps {
   form: FormController
-  // OnButtonClick: () => void
+  OnEnButtonClick?: () => void
+  OnRuButtonClick?: () => void
+  OnElitanButtonClick?: () => void
 }
 
 export function useModalForm(): FormController {
   const [formState, setFormData] = useState<FormData>({
-    ModalText: ''
+    ModalText: '',
+    TitleText: ''
   })
 
   const Form: FormController = {
     ...formState,
     SetModalText: (value: string) =>
-      setFormData(prev => ({ ...prev, ModalText: value }))
+      setFormData(prev => ({ ...prev, ModalText: value })),
+    AddModalTextRow: (value: string) => {
+      setFormData(prev => ({
+        ...prev,
+        ModalText: `${prev.ModalText}${value}\n`
+      }))
+    },
+    SetTitleText: (value: string) =>
+      setFormData(prev => ({ ...prev, TitleText: value })),
+    Clear: () => {
+      setFormData(prev => ({ ...prev, ModalText: '' }))
+    }
   }
 
   return Form
 }
 
-function ModalForm({ form }: FormProps) {
+function ModalForm({
+  form,
+  OnEnButtonClick,
+  OnRuButtonClick,
+  OnElitanButtonClick
+}: FormProps) {
+  const OnModalTextChanged = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    form.SetModalText(event.target.value)
+  }
+
+  const OnEnButtonClickedCallback = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    form.Clear()
+    form.SetTitleText('Список для заказа (ед. измер. на англ.)')
+    if (OnEnButtonClick) {
+      OnEnButtonClick()
+    }
+  }
+
+  const OnRuButtonClickedCallback = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    form.Clear()
+    form.SetTitleText('Список для заказа (ед. измер. на рус.)')
+    if (OnRuButtonClick) {
+      OnRuButtonClick()
+    }
+  }
+
+  const OnElitanButtonClickedCallback = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    form.Clear()
+    form.SetTitleText('Список для заказа (магазин Элитан)')
+    if (OnElitanButtonClick) {
+      OnElitanButtonClick()
+    }
+  }
+
   return (
     <>
-      {/* <div className="my-3 p-3 bg-body rounded shadow-sm"> */}
       <p className="h2">Результаты</p>
       <p></p>
 
@@ -43,6 +101,7 @@ function ModalForm({ form }: FormProps) {
             data-bs-toggle="modal"
             data-bs-target="#exampleModal"
             data-bs-whatever="en"
+            onClick={OnEnButtonClickedCallback}
           >
             Список англ.
           </button>
@@ -54,6 +113,7 @@ function ModalForm({ form }: FormProps) {
             data-bs-toggle="modal"
             data-bs-target="#exampleModal"
             data-bs-whatever="ru"
+            onClick={OnRuButtonClickedCallback}
           >
             Список рус.
           </button>
@@ -65,6 +125,7 @@ function ModalForm({ form }: FormProps) {
             data-bs-toggle="modal"
             data-bs-target="#exampleModal"
             data-bs-whatever="elitan"
+            onClick={OnElitanButtonClickedCallback}
           >
             Список Элитан
           </button>
@@ -83,7 +144,7 @@ function ModalForm({ form }: FormProps) {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Заказ
+                {form.TitleText}
               </h1>
               <button
                 type="button"
@@ -102,6 +163,8 @@ function ModalForm({ form }: FormProps) {
                     className="form-control"
                     rows={15}
                     id="message-text"
+                    value={form.ModalText}
+                    onChange={OnModalTextChanged}
                   ></textarea>
                 </div>
               </form>
@@ -118,7 +181,6 @@ function ModalForm({ form }: FormProps) {
           </div>
         </div>
       </div>
-      {/* </div> */}
     </>
   )
 }

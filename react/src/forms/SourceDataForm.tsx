@@ -76,9 +76,7 @@ function SourceDataForm({ form, OnHandleButtonClick }: FormProps) {
     form.SetTechReserve(Number(event.target.value))
   }
 
-  const OnSkipResTolChanged = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const OnSkipResTolChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     form.SetSkipResTol(Boolean(event.target.checked))
   }
   const OnSkipResPowerChanged = (
@@ -87,14 +85,10 @@ function SourceDataForm({ form, OnHandleButtonClick }: FormProps) {
     form.SetSkipResPower(Boolean(event.target.checked))
   }
 
-  const OnSkipCapTolChanged = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const OnSkipCapTolChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     form.SetSkipCapTol(Boolean(event.target.checked))
   }
-  const OnSkipCapDielChanged = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const OnSkipCapDielChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     form.SetSkipCapDiel(Boolean(event.target.checked))
   }
 
@@ -104,13 +98,11 @@ function SourceDataForm({ form, OnHandleButtonClick }: FormProps) {
     form.SetSkipCapVoltage(Boolean(event.target.checked))
   }
 
-
   const HandleButtonClickedCallback = (
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
-    if (OnHandleButtonClick)
-    {
-      OnHandleButtonClick();
+    if (OnHandleButtonClick) {
+      OnHandleButtonClick()
     }
   }
 

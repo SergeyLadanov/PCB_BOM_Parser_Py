@@ -2,30 +2,30 @@ import React, { useEffect, useState } from 'react'
 import '../scss/styles.scss'
 
 interface FormData {
-  BomList: String
-  Quantity: Number
-  TechReserve: Number
-  SkipResTol: Boolean
-  SkipResPower: Boolean
-  SkipCapTol: Boolean
-  SkipCapDiel: Boolean
-  SkipCapVoltage: Boolean
+  BomList: string
+  Quantity: number
+  TechReserve: number
+  SkipResTol: boolean
+  SkipResPower: boolean
+  SkipCapTol: boolean
+  SkipCapDiel: boolean
+  SkipCapVoltage: boolean
 }
 
 interface FormController extends FormData {
   SetBomList: (value: string) => void
   SetQuantity: (value: Number) => void
   SetTechReserve: (value: Number) => void
-  SetSkipResTol: (value: Boolean) => void
-  SetSkipResPower: (value: Boolean) => void
-  SetSkipCapTol: (value: Boolean) => void
-  SetSkipCapDiel: (value: Boolean) => void
-  SetSkipCapVoltage: (value: Boolean) => void
+  SetSkipResTol: (value: boolean) => void
+  SetSkipResPower: (value: boolean) => void
+  SetSkipCapTol: (value: boolean) => void
+  SetSkipCapDiel: (value: boolean) => void
+  SetSkipCapVoltage: (value: boolean) => void
 }
 
 interface FormProps {
   form: FormController
-  // OnButtonClick: () => void
+  OnHandleButtonClick?: () => void
 }
 
 export function useSourceDataForm(): FormController {
@@ -44,26 +44,76 @@ export function useSourceDataForm(): FormController {
     ...formState,
     SetBomList: (value: string) =>
       setFormData(prev => ({ ...prev, BomList: value })),
-    SetQuantity: (value: Number) =>
+    SetQuantity: (value: number) =>
       setFormData(prev => ({ ...prev, Quantity: value })),
-    SetTechReserve: (value: Number) =>
+    SetTechReserve: (value: number) =>
       setFormData(prev => ({ ...prev, TechReserve: value })),
-    SetSkipResTol: (value: Boolean) =>
+    SetSkipResTol: (value: boolean) =>
       setFormData(prev => ({ ...prev, SkipResTol: value })),
-    SetSkipResPower: (value: Boolean) =>
+    SetSkipResPower: (value: boolean) =>
       setFormData(prev => ({ ...prev, SkipResPower: value })),
-    SetSkipCapTol: (value: Boolean) =>
+    SetSkipCapTol: (value: boolean) =>
       setFormData(prev => ({ ...prev, SkipCapTol: value })),
-    SetSkipCapDiel: (value: Boolean) =>
+    SetSkipCapDiel: (value: boolean) =>
       setFormData(prev => ({ ...prev, SkipCapDiel: value })),
-    SetSkipCapVoltage: (value: Boolean) =>
+    SetSkipCapVoltage: (value: boolean) =>
       setFormData(prev => ({ ...prev, SkipCapVoltage: value }))
   }
 
   return Form
 }
 
-function SourceDataForm({ form }: FormProps) {
+function SourceDataForm({ form, OnHandleButtonClick }: FormProps) {
+  const OnBomListChanged = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    form.SetBomList(event.target.value)
+  }
+
+  const OnQuantityChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+    form.SetQuantity(Number(event.target.value))
+  }
+
+  const OnTechReserveChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+    form.SetTechReserve(Number(event.target.value))
+  }
+
+  const OnSkipResTolChanged = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    form.SetSkipResTol(Boolean(event.target.checked))
+  }
+  const OnSkipResPowerChanged = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    form.SetSkipResPower(Boolean(event.target.checked))
+  }
+
+  const OnSkipCapTolChanged = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    form.SetSkipCapTol(Boolean(event.target.checked))
+  }
+  const OnSkipCapDielChanged = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    form.SetSkipCapDiel(Boolean(event.target.checked))
+  }
+
+  const OnSkipCapVoltageChanged = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    form.SetSkipCapVoltage(Boolean(event.target.checked))
+  }
+
+
+  const HandleButtonClickedCallback = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    if (OnHandleButtonClick)
+    {
+      OnHandleButtonClick();
+    }
+  }
+
   return (
     <>
       <div className="my-3 p-3 bg-body rounded shadow-sm">
@@ -73,10 +123,12 @@ function SourceDataForm({ form }: FormProps) {
               <p className="h2">Исходный список компонентов</p>
               <div className="input-group">
                 <textarea
+                  onChange={OnBomListChanged}
                   id="input_list"
                   rows={15}
                   className="form-control"
                   aria-label="With textarea"
+                  value={form.BomList}
                 ></textarea>
               </div>
             </div>
@@ -92,10 +144,11 @@ function SourceDataForm({ form }: FormProps) {
                     min="1"
                     max="1000"
                     step="1"
-                    value="1"
+                    value={form.Quantity}
                     className="form-control"
                     id="deivice_count"
                     required
+                    onChange={OnQuantityChanged}
                   />
                 </div>
               </div>
@@ -110,10 +163,11 @@ function SourceDataForm({ form }: FormProps) {
                     min="0"
                     max="100"
                     step="1"
-                    value="0"
+                    value={form.TechReserve}
                     className="form-control"
                     id="tech_reserve"
                     required
+                    onChange={OnTechReserveChanged}
                   />
                 </div>
               </div>
@@ -126,9 +180,10 @@ function SourceDataForm({ form }: FormProps) {
                     <input
                       className="form-check-input"
                       type="checkbox"
-                      value=""
+                      checked={form.SkipResTol}
                       id="skip_res_tol"
                       required
+                      onChange={OnSkipResTolChanged}
                     />
                     <label className="form-check-label" htmlFor="skip_res_tol">
                       Пропускать точность
@@ -141,9 +196,10 @@ function SourceDataForm({ form }: FormProps) {
                     <input
                       className="form-check-input"
                       type="checkbox"
-                      value=""
+                      checked={form.SkipResPower}
                       id="skip_res_power"
                       required
+                      onChange={OnSkipResPowerChanged}
                     />
                     <label
                       className="form-check-label"
@@ -163,9 +219,10 @@ function SourceDataForm({ form }: FormProps) {
                     <input
                       className="form-check-input"
                       type="checkbox"
-                      value=""
+                      checked={form.SkipCapTol}
                       id="skip_cap_tol"
                       required
+                      onChange={OnSkipCapTolChanged}
                     />
                     <label className="form-check-label" htmlFor="skip_cap_tol">
                       Пропускать точность
@@ -178,9 +235,10 @@ function SourceDataForm({ form }: FormProps) {
                     <input
                       className="form-check-input"
                       type="checkbox"
-                      value=""
+                      checked={form.SkipCapDiel}
                       id="skip_cap_dielectric"
                       required
+                      onChange={OnSkipCapDielChanged}
                     />
                     <label
                       className="form-check-label"
@@ -196,9 +254,10 @@ function SourceDataForm({ form }: FormProps) {
                     <input
                       className="form-check-input"
                       type="checkbox"
-                      value=""
+                      checked={form.SkipCapVoltage}
                       id="skip_cap_voltage"
                       required
+                      onChange={OnSkipCapVoltageChanged}
                     />
                     <label
                       className="form-check-label"
@@ -217,6 +276,7 @@ function SourceDataForm({ form }: FormProps) {
               type="button"
               id="handle_button"
               className="btn btn-primary"
+              onClick={HandleButtonClickedCallback}
             >
               Обработать
             </button>

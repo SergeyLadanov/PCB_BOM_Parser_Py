@@ -62,9 +62,15 @@ function MainContainer() {
     }
   })
 
+
+  const OnSubmitButtonClick = () =>
+  {
+    console.log("Button clicked");
+  }
+
   return (
     <>
-      <SourceDataForm form={srcDataForm} />
+      <SourceDataForm form={srcDataForm} OnHandleButtonClick={OnSubmitButtonClick}/>
       <div className="my-3 p-3 bg-body rounded shadow-sm">
         <ModalForm form={modalListForm} />
         <TableForm form={tableForm} />

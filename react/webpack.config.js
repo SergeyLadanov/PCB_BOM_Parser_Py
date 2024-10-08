@@ -21,7 +21,14 @@ module.exports = (env, argv) => {
       static: path.resolve(__dirname, '../static'),
       port: 8080,
       hot: true,
-      open: true
+      open: true,
+      proxy: [
+        {
+          context: ['/bom_data', '/version'],
+          target: 'http://localhost:5003',
+          secure: false
+        }
+      ]
     },
     plugins: [
       new HtmlWebpackPlugin({

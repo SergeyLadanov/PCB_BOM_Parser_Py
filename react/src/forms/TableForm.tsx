@@ -42,10 +42,8 @@ export function useTableForm(): TableController {
     RowStatusArray: rowStatuses,
 
     AddRow: (value: TableRow) => {
-      formState.push(value)
-      setFormData(formState)
-      rowStatuses.push('gray')
-      setRowStatus(rowStatuses)
+      setFormData(prevItems => [...prevItems, value]);
+      setRowStatus(prevItems => [...prevItems, 'gray']);
     },
     Clear: () => {
       setFormData([])
@@ -55,12 +53,11 @@ export function useTableForm(): TableController {
     SetStatus: SetRowStatusFn,
 
     ToggleStatus: (index: number) => {
-      const newRowStates = [...rowStatuses]
 
       // Поменять цвет нажатой кнопки: gray -> yellow -> green
-      if (newRowStates[index] === 'gray') {
+      if (rowStatuses[index] === 'gray') {
         SetRowStatusFn(index, 'yellow')
-      } else if (newRowStates[index] === 'yellow') {
+      } else if (rowStatuses[index] === 'yellow') {
         SetRowStatusFn(index, 'green')
       } else {
         SetRowStatusFn(index, 'gray')

@@ -1,10 +1,36 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import '../scss/styles.scss'
 import '../css/offcanvas.css'
 import '../css/index.css'
 import { Dropdown } from 'bootstrap'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+
+interface FormData {
+  Version: string
+}
+
+interface FormController extends FormData {
+  SetVersion: (value: string) => void
+}
+
+interface FormProps {
+  form: FormController
+}
+
+export function useNavbar(): FormController {
+  const [formState, setFormData] = useState<FormData>({
+    Version: ''
+  })
+
+  const Form: FormController = {
+    ...formState,
+    SetVersion: (value: string) =>
+      setFormData(prev => ({ ...prev, Version: value }))
+  }
+
+  return Form
+}
 
 function ToogleOffcanvasClickHandler() {
   document.querySelector('.offcanvas-collapse').classList.toggle('open')
@@ -16,7 +42,7 @@ function ItemClickHandler(event: any) {
   document.querySelector('.offcanvas-collapse').classList.remove('open')
 }
 
-function Navbar() {
+function Navbar({ form }: FormProps) {
   useEffect(() => {
     // Activate dropdown
     document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(item => {
@@ -34,7 +60,7 @@ function Navbar() {
           BOM Parser
         </a>
         <span id="version_container" className="navbar-text">
-          0.0.0
+          {form.Version}
         </span>
       </div>
     </nav>

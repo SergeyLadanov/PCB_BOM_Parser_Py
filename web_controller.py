@@ -51,7 +51,10 @@ def index():
 
 @app.route("/version", methods=['GET'])
 def getversion():
-    return model.GetVersion()
+    res = { 
+        'version': model.GetVersion()
+    }
+    return res
 
     
 

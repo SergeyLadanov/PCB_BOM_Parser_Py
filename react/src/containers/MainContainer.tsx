@@ -63,7 +63,7 @@ function MainContainer() {
       cap_filter: {
         skip_tol: srcDataForm.SkipCapTol,
         skip_dielectric: srcDataForm.SkipCapDiel,
-        skip_voltage: srcDataForm.SkipCapDiel
+        skip_voltage: srcDataForm.SkipCapVoltage
       },
       res_filter: {
         skip_power: srcDataForm.SkipResPower,

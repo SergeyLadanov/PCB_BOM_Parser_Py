@@ -154,7 +154,7 @@ function ModalForm({
               ></button>
             </div>
             <div className="modal-body">
-              <form method="POST" action="/download_csv">
+              <form method="POST" action="./download_csv">
                 <div className="mb-3">
                   <label htmlFor="message-text" className="col-form-label">
                     Компоненты:

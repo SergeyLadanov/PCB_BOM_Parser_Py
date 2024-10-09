@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-from flask import Flask, render_template, request, make_response
+from flask import Flask, render_template, request, make_response, send_file
 from functools import wraps
 import json
 import os
 import sys
 import socket
 from ParamFilter import FilterObj as Filter
+
+from io import BytesIO
 
 import model
 
@@ -55,6 +57,25 @@ def getversion():
         'version': model.GetVersion()
     }
     return res
+
+
+# Маршрут для обработки POST запроса и генерации файла
+@app.route('/download_csv', methods=['POST'])
+def download():
+    # Получение данных с формы
+    name = request.form.get('bom_list')
+    # name = name.replace("\t", ";")
+    name = name.replace("\r\n", "\n")
+    # Создание текста для файла
+    file_content = f'Name\tQuantity\n{name}'
+
+    # Создание файла в памяти
+    file_stream = BytesIO()
+    file_stream.write(file_content.encode('utf-16'))
+    file_stream.seek(0)
+
+    # Отправка файла пользователю для скачивания
+    return send_file(file_stream, as_attachment=True, download_name="BOM.csv", mimetype='text/plain')
 
     
 

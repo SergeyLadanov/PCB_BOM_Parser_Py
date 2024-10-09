@@ -154,18 +154,23 @@ function ModalForm({
               ></button>
             </div>
             <div className="modal-body">
-              <form>
+              <form method="POST" action="/download_csv">
                 <div className="mb-3">
                   <label htmlFor="message-text" className="col-form-label">
                     Компоненты:
                   </label>
                   <textarea
+                    name="bom_list"
                     className="form-control"
                     rows={15}
                     id="message-text"
                     value={form.ModalText}
                     onChange={OnModalTextChanged}
                   ></textarea>
+                  <br />
+                  <button className="btn btn-primary" type="submit">
+                    Скачать список в CSV
+                  </button>
                 </div>
               </form>
             </div>

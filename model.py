@@ -1,8 +1,6 @@
 import sys, os
-sys.path.append(os.path.abspath(os.path.join('Components')))
-sys.path.append(os.path.abspath(os.path.join('Stores')))
 
-import ComponentBase as Component
+from Components import ComponentBase as Component
 
 import re
 
@@ -10,15 +8,9 @@ from ParamFilter import FilterObj as Filter
 
 import math
 
+from Stores import en_to_ru_units_decoder, ru_to_en_units_decoder
 
-import en_to_ru_units_decoder
-import ru_to_en_units_decoder
-
-
-import elitan as elitanGenerator
-import platan
-import chipdip
-import promelec
+from Stores import elitan as elitanGenerator, platan, chipdip, promelec
 
 
 import version

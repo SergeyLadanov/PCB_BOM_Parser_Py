@@ -1,21 +1,13 @@
 import sys, os
-sys.path.append(os.path.abspath(os.path.join('Components')))
-sys.path.append(os.path.abspath(os.path.join('Stores')))
 
-import ComponentBase as Component
+from  Components import ComponentBase as Component
 
 import re
 
-import elitan as elitanGenerator
-
-import chipdip
+from Stores import elitan as elitanGenerator, chipdip, platan, en_to_ru_units_decoder
 
 from ParamFilter import FilterObj as Filter
 
-
-import en_to_ru_units_decoder
-
-import platan
 
 
 testFil = Filter()

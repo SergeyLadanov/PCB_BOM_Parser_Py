@@ -25,8 +25,8 @@ def GetParametersString(component_obj, filter):
 
 
             if component_obj.GetDesignator() == 'C':
-                Value = re.sub(r'мкФ', 'u', Value)
-                Value = re.sub(r'пФ', 'p', Value)
+                Value = re.sub(r'мкФ', 'uF', Value)
+                Value = re.sub(r'пФ', 'pF', Value)
                 Value = re.sub(r'Ф', 'F', Value)
                 Value = Component.remove_trailing_zero(Value)
                 # probe = re.search(r'.[0]', Value)

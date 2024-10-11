@@ -1,10 +1,8 @@
 import sys, os
 import re
 
-sys.path.append(os.path.abspath(os.path.join('../Components')))
-sys.path.append(os.path.abspath(os.path.join('..')))
 
-import ComponentBase as Component
+from Components import ComponentBase as Component
 from ParamFilter import FilterObj as Filter
 
 
@@ -24,26 +22,25 @@ def GetParametersString(component_obj, filter):
                 Value = re.sub(r'[Oo][Hh][Mm]', 'Ом', Value)
                 Value = re.sub(r'[kK]', 'к', Value)
                 Value = re.sub(r'[M]', 'М', Value)
-                probe = re.search(r'.[0][а-яА-Я]', Value)
-                if probe:
-                    Value = Value.replace('.0','')
+                Value = Component.remove_trailing_zero(Value)
+                # probe = re.search(r'.[0][а-яА-Я]', Value)
+                # if probe:
+                #     Value = Value.replace('.0','')
 
             if component_obj.GetDesignator() == 'C':
                 Value = re.sub(r'F', 'Ф', Value)
                 Value = re.sub(r'u', 'мк', Value)
                 Value = re.sub(r'p', 'п', Value)
-                probe = re.search(r'.[0][а-яА-Я]', Value)
-                if probe:
-                    Value = Value.replace('.0','')
+                Value = Component.remove_trailing_zero(Value)
+
 
 
             if component_obj.GetDesignator() == 'L':
                 Value = re.sub(r'H', 'Гн', Value)
                 Value = re.sub(r'u', 'мк', Value)
                 Value = re.sub(r'n', 'н', Value)
-                probe = re.search(r'.[0][а-яА-Я]', Value)
-                if probe:
-                    Value = Value.replace('.0','')
+                Value = Component.remove_trailing_zero(Value)
+
 
             res = res + Value
 
@@ -55,22 +52,18 @@ def GetParametersString(component_obj, filter):
         if len(Endurance) and component_obj.GetEndurance() != 0.0:
             if component_obj.GetDesignator() == 'R':
                 Endurance = re.sub(r'[W]', 'Вт', Endurance)
-                probe = re.search(r'.[0][а-яА-Я]', Endurance)
-                if probe:
-                    Endurance = Endurance.replace('.0','')
+                Endurance = Component.remove_trailing_zero(Endurance)
+
 
             if component_obj.GetDesignator() == 'C':
                 Endurance = re.sub(r'V', 'В', Endurance)
-                probe = re.search(r'.[0][а-яА-Я]', Endurance)
-                if probe:
-                    Endurance = Endurance.replace('.0','')
+                Endurance = Component.remove_trailing_zero(Endurance)
+
 
 
             if component_obj.GetDesignator() == 'L':
                 Endurance = re.sub(r'A', 'А', Endurance)
-                probe = re.search(r'.[0][а-яА-Я]', Endurance)
-                if probe:
-                    Endurance = Endurance.replace('.0','')
+                Endurance = Component.remove_trailing_zero(Endurance)
 
             res = res + ' ' + Endurance
 

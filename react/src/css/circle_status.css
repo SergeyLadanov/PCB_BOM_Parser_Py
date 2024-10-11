@@ -1,0 +1,52 @@
+/* Стили для кнопки-кружка */
+.circle-button {
+  margin-top: 5px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s ease-in-out;
+}
+
+/* Стили для разных цветов */
+.gray {
+  background-color: gray;
+}
+
+.yellow {
+  background-color: rgb(223, 223, 0);
+}
+
+.green {
+  background-color: green;
+}
+
+/* Подсветка при наведении */
+/* .circle-button:hover {
+  box-shadow: 0 0 10px rgba(214, 207, 207, 0.733);
+} */
+
+/* Подсветка при наведении с учетом текущего цвета */
+/* Подсветка для серой кнопки */
+.gray:hover {
+  /* background-color: lightgray; */
+  box-shadow: 0 0 10px rgba(190, 190, 190, 0.7);
+}
+
+/* Подсветка для желтой кнопки */
+.yellow:hover {
+  /* background-color: lightyellow; */
+  box-shadow: 0 0 10px rgba(255, 255, 0, 0.7);
+}
+
+/* Подсветка для зеленой кнопки */
+.green:hover {
+  /* background-color: lightgreen; */
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+}
+
+/* Индикация нажатия */
+.circle-button:active {
+  transform: scale(0.9);
+}

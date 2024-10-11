@@ -1,14 +1,12 @@
 import sys, os
 import re
 
-sys.path.append(os.path.abspath(os.path.join('../Components')))
-sys.path.append(os.path.abspath(os.path.join('..')))
 
-import ComponentBase as Component
+from Components import ComponentBase as Component
 from ParamFilter import FilterObj as Filter
 
 
-import en_to_ru_units_decoder
+from Stores import en_to_ru_units_decoder
 
 
 def GenerateFindRequest(component_obj, filter):

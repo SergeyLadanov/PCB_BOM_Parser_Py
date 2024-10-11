@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Flask",
+            "name": "Flask (Python): standalone debug",
             "type": "debugpy",
             "request": "launch",
             "module": "flask",
@@ -15,11 +15,41 @@
             },
             "args": [
                 "run",
-                "--no-debugger",
+                // "--no-debugger",
                 // "--no-reload"
             ],
             "jinja": true,
-            "autoStartBrowser": false
+            "autoStartBrowser": true,
+            "preLaunchTask": "Сборка"
+        },
+        {
+            "name": "Web server debug",
+            "command": "npm start",
+            "request": "launch",
+            "type": "node-terminal",
+            "cwd": "${workspaceFolder}/react"
+        },
+        {
+            "name": "Flask (Python): Backend debug",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "web_controller.py",
+                "FLASK_DEBUG": "1"
+            },
+            "args": [
+                "run",
+            ],
+            "jinja": true,
+            "autoStartBrowser": false,
+        },
+    ],
+    "compounds": [
+        {
+          "name": "Debug application",
+          "configurations": ["Flask (Python): Backend debug", "Web server debug"],
+          "stopAll": true,
         }
-    ]
+      ]
 }

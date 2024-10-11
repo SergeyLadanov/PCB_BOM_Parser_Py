@@ -1,6 +1,22 @@
 
 import re
 
+
+def remove_trailing_zero(input_str):
+    # Ищем число с плавающей запятой
+    match = re.match(r"(\d+\.\d+)(.*)", input_str)
+    if match:
+        # Извлекаем числовую часть и единицы измерения
+        num_str, unit_str = match.groups()
+        float_num = float(num_str)
+        # Если число целое, удаляем ".0"
+        if float_num.is_integer():
+            return f"{int(float_num)}{unit_str.strip()}"  # Преобразуем в целое и возвращаем строку без пробелов
+        else:
+            return input_str  # Если есть дробная часть, возвращаем строку как есть
+    else:
+        return input_str  # Если число не найдено, возвращаем строку как есть
+
 class ComponentBase:
 
     TYPE_OTHER = 0

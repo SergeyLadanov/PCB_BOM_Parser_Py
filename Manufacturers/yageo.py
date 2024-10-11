@@ -103,7 +103,7 @@ def GenerateFindRequest(component_obj, filter):
             if component_obj.GetMountWay() == component_obj.MOUNT_WAY_SMD:
                 tolerance_str = __GenerateTolerance(component_obj) if not filter.GetFilter(component_obj.GetDesignator()).SkipTolerance else '*'
                 # Две буквы серии резистора не генерируются
-                res = f'{component_obj.GetCase():s}{tolerance_str:s}R-07{__GenerateValueForResistor(component_obj):s}L'
+                res = f'*{component_obj.GetCase():s}{tolerance_str:s}R-07{__GenerateValueForResistor(component_obj):s}L'
         if component_obj.GetDesignator() == "C":
             if component_obj.GetMountWay() == component_obj.MOUNT_WAY_SMD:
 

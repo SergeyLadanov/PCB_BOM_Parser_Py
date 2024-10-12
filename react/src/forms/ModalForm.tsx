@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import '../scss/styles.scss'
+import { Modal } from 'bootstrap'
+
 
 interface FormData {
   ModalText: string
@@ -52,6 +54,11 @@ function ModalForm({
   OnRuButtonClick,
   OnElitanButtonClick
 }: FormProps) {
+  const [modal, setModal] = useState(null) // для хранения ссылки на экземпляр модального окна
+
+  // Ссылка на элемент модального окна
+  const modalRef = React.useRef(null)
+
   const OnModalTextChanged = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -66,6 +73,7 @@ function ModalForm({
     if (OnEnButtonClick) {
       OnEnButtonClick()
     }
+    modal.show() // Открытие модального окна
   }
 
   const OnRuButtonClickedCallback = (
@@ -76,6 +84,7 @@ function ModalForm({
     if (OnRuButtonClick) {
       OnRuButtonClick()
     }
+    modal.show() // Открытие модального окна
   }
 
   const OnElitanButtonClickedCallback = (
@@ -86,7 +95,17 @@ function ModalForm({
     if (OnElitanButtonClick) {
       OnElitanButtonClick()
     }
+    modal.show() // Открытие модального окна
   }
+
+  // Эффект для инициализации модального окна с использованием Bootstrap
+  useEffect(() => {
+    if (modalRef.current) {
+      setModal(
+        new Modal(modalRef.current)
+      ) // инициализация экземпляра модального окна
+    }
+  }, [])
 
   return (
     <>
@@ -98,8 +117,6 @@ function ModalForm({
           <button
             type="button"
             className="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
             data-bs-whatever="en"
             onClick={OnEnButtonClickedCallback}
           >
@@ -110,8 +127,6 @@ function ModalForm({
           <button
             type="button"
             className="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
             data-bs-whatever="ru"
             onClick={OnRuButtonClickedCallback}
           >
@@ -122,8 +137,6 @@ function ModalForm({
           <button
             type="button"
             className="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
             data-bs-whatever="elitan"
             onClick={OnElitanButtonClickedCallback}
           >
@@ -133,9 +146,10 @@ function ModalForm({
       </div>
       <p></p>
 
+      {/* Модальное окно */}
       <div
         className="modal fade"
-        id="exampleModal"
+        ref={modalRef}
         tabIndex={-1}
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
@@ -151,6 +165,7 @@ function ModalForm({
                 className="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                onClick={() => modal.hide()} // Закрытие модального окна
               ></button>
             </div>
             <div className="modal-body">
@@ -179,6 +194,7 @@ function ModalForm({
                 type="button"
                 className="btn btn-secondary"
                 data-bs-dismiss="modal"
+                onClick={() => modal.hide()} // Закрытие модального окна
               >
                 Закрыть
               </button>

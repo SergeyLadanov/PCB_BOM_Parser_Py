@@ -1,16 +1,15 @@
 import { useState } from 'react'
 import $ from 'jquery'
 
-export function useFetching(): [
-  (url_val: string) => Promise<any>,
-  boolean,
-  string
-] {
-  const [loading, setLoading] = useState(true)
+export function useFetching(
+  initial_value: boolean = true
+): [(url_val: string) => Promise<any>, boolean, string] {
+  const [loading, setLoading] = useState(initial_value)
   const [err, setError] = useState('')
 
   const Fetching = async (url_val: string): Promise<any> => {
     return new Promise((resolve, reject) => {
+      setLoading(true)
       $.ajax({
         url: url_val,
         method: 'GET',

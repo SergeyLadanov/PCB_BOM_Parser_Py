@@ -92,3 +92,36 @@ $success: #7952b3;
 body {
   padding: 1.5rem;
 }
+
+// Color mode variables in _root.scss
+@include color-mode(dark) {
+  // CSS variable overrides here...
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.3); /* Полупрозрачный черный фон */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Высокий приоритет, чтобы блокировать весь фон */
+  }
+}
+
+@include color-mode(light) {
+  // CSS variable overrides here...
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(255, 255, 255, 0.3); /* Полупрозрачный черный фон */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Высокий приоритет, чтобы блокировать весь фон */
+  }
+}

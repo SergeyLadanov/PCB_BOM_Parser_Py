@@ -58,7 +58,6 @@ export function useModalForm(): FormController {
 }
 
 function ModalForm({ form }: FormProps) {
-
   const modalRef = React.useRef(null)
 
   const OnTextChanged = (event: React.ChangeEvent<HTMLTextAreaElement>) => {

@@ -5,6 +5,7 @@ import ModalForm, { useModalForm } from '../forms/ModalForm'
 import TableForm, { useTableForm, TableRow } from '../forms/TableForm'
 import { usePosting } from '../hooks/usePosting'
 import BomVariationsForm from '../forms/BomVariationsForm'
+import LoadingIndicator from '../components/LoadingIndicator'
 
 interface ResFilter {
   skip_tol: boolean
@@ -48,7 +49,7 @@ function MainContainer() {
   const srcDataForm = useSourceDataForm()
   const modalListForm = useModalForm()
   const tableForm = useTableForm()
-  const [SendData, post_err] = usePosting()
+  const [SendRequest, post_err_bomvariant, isLoadingPost] = usePosting(false)
 
   useEffect(() => {
     return () => {}
@@ -79,8 +80,7 @@ function MainContainer() {
 
   const OnSubmitButtonClick = () => {
     const data: BomRequest = GetRequest()
-
-    SendData(API_URL, data)
+    SendRequest(API_URL, data)
       .then((value: ParseResult[]) => {
         tableForm.Clear()
         //alert('Настройки успешно применены')
@@ -108,7 +108,7 @@ function MainContainer() {
   const OnEnButtonClick = () => {
     const data: BomRequest = GetRequest()
 
-    SendData(API_URL, data)
+    SendRequest(API_URL, data)
       .then((value: ParseResult[]) => {
         modalListForm.Clear()
         modalListForm.SetTitleText('Список для заказа (ед. измер. на англ.)')
@@ -125,7 +125,7 @@ function MainContainer() {
   const OnRuButtonClick = () => {
     const data: BomRequest = GetRequest()
 
-    SendData(API_URL, data)
+    SendRequest(API_URL, data)
       .then((value: ParseResult[]) => {
         modalListForm.Clear()
         modalListForm.SetTitleText('Список для заказа (ед. измер. на рус.)')
@@ -142,7 +142,7 @@ function MainContainer() {
   const OnElitanButtonClick = () => {
     const data: BomRequest = GetRequest()
 
-    SendData(API_URL, data)
+    SendRequest(API_URL, data)
       .then((value: ParseResult[]) => {
         modalListForm.Clear()
         modalListForm.SetTitleText('Список для заказа (магазин Элитан)')
@@ -171,6 +171,11 @@ function MainContainer() {
         <ModalForm form={modalListForm} />
         <TableForm form={tableForm} />
       </div>
+      {isLoadingPost && (
+        <div className="loading-overlay">
+          <LoadingIndicator />
+        </div>
+      )}
     </>
   )
 }

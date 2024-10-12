@@ -32,6 +32,16 @@ interface FormController extends FormData {
 interface FormProps {
   form: FormController
   OnHandleButtonClick?: () => void
+  OnBomListTextInput?: (value: string) => void
+  OnSaveBomCheckedChanged?: (value: boolean) => void
+  OnSaveFiltersCheckedChanged?: (value: boolean) => void
+
+  OnSkipResTolCheckedChanged?: (value: boolean) => void
+  OnSkipResPwrCheckedChanged?: (value: boolean) => void
+
+  OnSkipCapTolCheckedChanged?: (value: boolean) => void
+  OnSkipCapVoltCheckedChanged?: (value: boolean) => void
+  OnSkipCapDielCheckedChanged?: (value: boolean) => void
 }
 
 export function useSourceDataForm(): FormController {
@@ -78,84 +88,19 @@ export function useSourceDataForm(): FormController {
   return Form
 }
 
-function SourceDataForm({ form, OnHandleButtonClick }: FormProps) {
-  const SAVE_BOM_STORAGE_KEY = 'save_bom'
-  const SAVE_FILTERS_STORAGE_KEY = 'save_filter'
-  const BOM_STORAGE_KEY = 'bom_content'
-
-  const SKIP_RES_TOL_STORAGE_KEY = 'skip_res_tol'
-  const SKIP_RES_PWR_STORAGE_KEY = 'skip_res_pwr'
-
-  const SKIP_CAP_TOL_STORAGE_KEY = 'skip_cap_tol'
-  const SKIP_CAP_VOLT_STORAGE_KEY = 'skip_cap_volt'
-  const SKIP_CAP_DIEL_STORAGE_KEY = 'skip_cap_diel'
-
-  const [loading, setLoading] = useState(true)
-
-  const stringToBoolean = (value: string): boolean => {
-    return value.toLowerCase() === 'true'
-  }
-
+function SourceDataForm({
+  form,
+  OnHandleButtonClick,
+  OnBomListTextInput,
+  OnSaveBomCheckedChanged,
+  OnSaveFiltersCheckedChanged,
+  OnSkipResTolCheckedChanged,
+  OnSkipResPwrCheckedChanged,
+  OnSkipCapTolCheckedChanged,
+  OnSkipCapVoltCheckedChanged,
+  OnSkipCapDielCheckedChanged
+}: FormProps) {
   useEffect(() => {
-    if (loading) {
-      const saveBom = localStorage.getItem(SAVE_BOM_STORAGE_KEY)
-      const saveFilter = localStorage.getItem(SAVE_FILTERS_STORAGE_KEY)
-      const bomList = localStorage.getItem(BOM_STORAGE_KEY)
-
-      const skip_res_tol = localStorage.getItem(SKIP_RES_TOL_STORAGE_KEY)
-      const skip_res_pwr = localStorage.getItem(SKIP_RES_PWR_STORAGE_KEY)
-
-      const skip_cap_tol = localStorage.getItem(SKIP_CAP_TOL_STORAGE_KEY)
-      const skip_cap_volt = localStorage.getItem(SKIP_CAP_VOLT_STORAGE_KEY)
-      const skip_cap_diel = localStorage.getItem(SKIP_CAP_DIEL_STORAGE_KEY)
-
-      if (saveBom) {
-        form.SetSaveBom(stringToBoolean(saveBom))
-
-        if (stringToBoolean(saveBom)) {
-          if (bomList) {
-            form.SetBomList(bomList)
-          }
-        } else {
-          localStorage.removeItem(BOM_STORAGE_KEY)
-        }
-      }
-
-      if (saveFilter) {
-        form.SetSaveFilters(stringToBoolean(saveFilter))
-
-        if (stringToBoolean(saveFilter)) {
-          if (skip_res_tol) {
-            form.SetSkipResTol(stringToBoolean(skip_res_tol))
-          }
-
-          if (skip_res_pwr) {
-            form.SetSkipResPower(stringToBoolean(skip_res_pwr))
-          }
-
-          if (skip_cap_tol) {
-            form.SetSkipCapTol(stringToBoolean(skip_cap_tol))
-          }
-
-          if (skip_cap_volt) {
-            form.SetSkipCapVoltage(stringToBoolean(skip_cap_volt))
-          }
-
-          if (skip_cap_diel) {
-            form.SetSkipCapDiel(stringToBoolean(skip_cap_diel))
-          }
-        } else {
-          localStorage.removeItem(SKIP_RES_TOL_STORAGE_KEY)
-          localStorage.removeItem(SKIP_RES_PWR_STORAGE_KEY)
-
-          localStorage.removeItem(SKIP_CAP_TOL_STORAGE_KEY)
-          localStorage.removeItem(SKIP_CAP_VOLT_STORAGE_KEY)
-          localStorage.removeItem(SKIP_CAP_DIEL_STORAGE_KEY)
-        }
-      }
-
-      setLoading(false)
-    }
     return () => {}
   })
 
@@ -182,8 +127,8 @@ function SourceDataForm({ form, OnHandleButtonClick }: FormProps) {
     // Если ошибок нет
     form.SetBomListErr('')
 
-    if (form.SaveBom) {
-      localStorage.setItem(BOM_STORAGE_KEY, event.target.value)
+    if (OnBomListTextInput) {
+      OnBomListTextInput(event.target.value)
     }
   }
 
@@ -197,61 +142,57 @@ function SourceDataForm({ form, OnHandleButtonClick }: FormProps) {
 
   const OnSkipResTolChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     form.SetSkipResTol(Boolean(event.target.checked))
-    localStorage.setItem(SKIP_RES_TOL_STORAGE_KEY, String(event.target.checked))
+
+    if (OnSkipResTolCheckedChanged) {
+      OnSkipResTolCheckedChanged(event.target.checked)
+    }
   }
   const OnSkipResPowerChanged = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     form.SetSkipResPower(Boolean(event.target.checked))
-    localStorage.setItem(SKIP_RES_PWR_STORAGE_KEY, String(event.target.checked))
+
+    if (OnSkipResPwrCheckedChanged) {
+      OnSkipResPwrCheckedChanged(event.target.checked)
+    }
   }
 
   const OnSkipCapTolChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     form.SetSkipCapTol(Boolean(event.target.checked))
-    localStorage.setItem(SKIP_CAP_TOL_STORAGE_KEY, String(event.target.checked))
+
+    if (OnSkipCapTolCheckedChanged) {
+      OnSkipCapTolCheckedChanged(event.target.checked)
+    }
   }
   const OnSkipCapDielChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     form.SetSkipCapDiel(Boolean(event.target.checked))
-    localStorage.setItem(
-      SKIP_CAP_DIEL_STORAGE_KEY,
-      String(event.target.checked)
-    )
+    if (OnSkipCapDielCheckedChanged) {
+      OnSkipCapDielCheckedChanged(event.target.checked)
+    }
   }
 
   const OnSkipCapVoltageChanged = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     form.SetSkipCapVoltage(Boolean(event.target.checked))
-    localStorage.setItem(
-      SKIP_CAP_VOLT_STORAGE_KEY,
-      String(event.target.checked)
-    )
+    if (OnSkipCapVoltCheckedChanged) {
+      OnSkipCapVoltCheckedChanged(event.target.checked)
+    }
   }
 
   const OnSaveBomChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     form.SetSaveBom(Boolean(event.target.checked))
-    localStorage.setItem(SAVE_BOM_STORAGE_KEY, String(event.target.checked))
 
-    if (Boolean(event.target.checked)) {
-      localStorage.setItem(BOM_STORAGE_KEY, form.BomList)
+    if (OnSaveBomCheckedChanged) {
+      OnSaveBomCheckedChanged(event.target.checked)
     }
   }
 
   const OnSaveFiltersChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     form.SetSaveFilters(Boolean(event.target.checked))
-    localStorage.setItem(SAVE_FILTERS_STORAGE_KEY, String(event.target.checked))
 
-    if (Boolean(event.target.checked)) {
-      //localStorage.setItem(BOM_STORAGE_KEY, form.BomList)
-      localStorage.setItem(SKIP_RES_TOL_STORAGE_KEY, String(form.SkipResTol))
-      localStorage.setItem(SKIP_RES_PWR_STORAGE_KEY, String(form.SkipResPower))
-
-      localStorage.setItem(SKIP_CAP_TOL_STORAGE_KEY, String(form.SkipCapTol))
-      localStorage.setItem(SKIP_CAP_DIEL_STORAGE_KEY, String(form.SkipCapDiel))
-      localStorage.setItem(
-        SKIP_CAP_VOLT_STORAGE_KEY,
-        String(form.SkipCapVoltage)
-      )
+    if (OnSaveFiltersCheckedChanged) {
+      OnSaveFiltersCheckedChanged(event.target.checked)
     }
   }
 

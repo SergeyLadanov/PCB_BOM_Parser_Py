@@ -6,6 +6,7 @@ import TableForm, { useTableForm, TableRow } from '../forms/TableForm'
 import { usePosting } from '../hooks/usePosting'
 import BomVariationsForm from '../forms/BomVariationsForm'
 import LoadingIndicator from '../components/LoadingIndicator'
+import { StorageSettings } from '../ts/StorageSettings'
 
 interface ResFilter {
   skip_tol: boolean
@@ -50,8 +51,32 @@ function MainContainer() {
   const modalListForm = useModalForm()
   const tableForm = useTableForm()
   const [SendRequest, post_err_bomvariant, isLoadingPost] = usePosting(false)
+  const [NeedToLoad, setNeedToLoad] = useState(true)
+  const Storage: StorageSettings = new StorageSettings()
 
   useEffect(() => {
+    if (NeedToLoad) {
+      Storage.LoadConfig()
+      srcDataForm.SetSaveBom(Storage.SaveBom)
+      srcDataForm.SetSaveFilters(Storage.SaveFilter)
+
+      if (Storage.SaveBom) {
+        srcDataForm.SetBomList(Storage.Bom)
+      }
+
+      if (Storage.SaveFilter) {
+        srcDataForm.SetSkipResTol(Storage.SkipResTol)
+
+        srcDataForm.SetSkipResPower(Storage.SkipResPwr)
+
+        srcDataForm.SetSkipCapTol(Storage.SkipCapTol)
+
+        srcDataForm.SetSkipCapVoltage(Storage.SkipCapVolt)
+
+        srcDataForm.SetSkipCapDiel(Storage.SkipCapDiel)
+      }
+      setNeedToLoad(false)
+    }
     return () => {}
   })
 
@@ -76,6 +101,40 @@ function MainContainer() {
     }
 
     return data
+  }
+
+  const OnBomListTextInput = (val: string) => {
+    Storage.Bom = val
+  }
+
+  const OnSaveBomCheckedChanged = (val: boolean) => {
+    Storage.SaveBom = val
+    Storage.Bom = srcDataForm.BomList
+  }
+  const OnSaveFiltersCheckedChanged = (val: boolean) => {
+    Storage.SaveFilter = val
+
+    Storage.SkipResPwr = srcDataForm.SkipResPower
+    Storage.SkipResTol = srcDataForm.SkipResTol
+
+    Storage.SkipCapTol = srcDataForm.SkipCapTol
+    Storage.SkipCapDiel = srcDataForm.SkipCapDiel
+    Storage.SkipCapVolt = srcDataForm.SkipCapVoltage
+  }
+  const OnSkipResTolCheckedChanged = (val: boolean) => {
+    Storage.SkipResTol = val
+  }
+  const OnSkipResPwrCheckedChanged = (val: boolean) => {
+    Storage.SkipResPwr = val
+  }
+  const OnSkipCapTolCheckedChanged = (val: boolean) => {
+    Storage.SkipCapTol = val
+  }
+  const OnSkipCapVoltCheckedChanged = (val: boolean) => {
+    Storage.SkipCapVolt = val
+  }
+  const OnSkipCapDielCheckedChanged = (val: boolean) => {
+    Storage.SkipCapDiel = val
   }
 
   const OnSubmitButtonClick = () => {
@@ -161,6 +220,14 @@ function MainContainer() {
       <SourceDataForm
         form={srcDataForm}
         OnHandleButtonClick={OnSubmitButtonClick}
+        OnBomListTextInput={OnBomListTextInput}
+        OnSaveBomCheckedChanged={OnSaveBomCheckedChanged}
+        OnSaveFiltersCheckedChanged={OnSaveFiltersCheckedChanged}
+        OnSkipCapDielCheckedChanged={OnSkipCapDielCheckedChanged}
+        OnSkipCapTolCheckedChanged={OnSkipCapTolCheckedChanged}
+        OnSkipCapVoltCheckedChanged={OnSkipCapVoltCheckedChanged}
+        OnSkipResPwrCheckedChanged={OnSkipResPwrCheckedChanged}
+        OnSkipResTolCheckedChanged={OnSkipResTolCheckedChanged}
       />
       <div className="my-3 p-3 bg-body rounded shadow-sm">
         <BomVariationsForm

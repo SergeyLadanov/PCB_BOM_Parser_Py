@@ -167,6 +167,7 @@ function MainContainer() {
           OnEnButtonClick={OnEnButtonClick}
           OnRuButtonClick={OnRuButtonClick}
           OnElitanButtonClick={OnElitanButtonClick}
+          disabled={srcDataForm.BomListErr != ''}
         />
         <ModalForm form={modalListForm} />
         <TableForm form={tableForm} />

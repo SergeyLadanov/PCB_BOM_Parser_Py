@@ -3,6 +3,7 @@ import '../scss/styles.scss'
 
 interface FormData {
   BomList: string
+  BomListErr: string
   Quantity: number
   TechReserve: number
   SkipResTol: boolean
@@ -16,6 +17,7 @@ interface FormData {
 
 interface FormController extends FormData {
   SetBomList: (value: string) => void
+  SetBomListErr: (value: string) => void
   SetQuantity: (value: Number) => void
   SetTechReserve: (value: Number) => void
   SetSkipResTol: (value: boolean) => void
@@ -35,6 +37,7 @@ interface FormProps {
 export function useSourceDataForm(): FormController {
   const [formState, setFormData] = useState<FormData>({
     BomList: '',
+    BomListErr: '',
     Quantity: 1,
     TechReserve: 0,
     SkipResTol: false,
@@ -50,6 +53,8 @@ export function useSourceDataForm(): FormController {
     ...formState,
     SetBomList: (value: string) =>
       setFormData(prev => ({ ...prev, BomList: value })),
+    SetBomListErr: (value: string) =>
+      setFormData(prev => ({ ...prev, BomListErr: value })),
     SetQuantity: (value: number) =>
       setFormData(prev => ({ ...prev, Quantity: value })),
     SetTechReserve: (value: number) =>
@@ -86,10 +91,6 @@ function SourceDataForm({ form, OnHandleButtonClick }: FormProps) {
   const SKIP_CAP_DIEL_STORAGE_KEY = 'skip_cap_diel'
 
   const [loading, setLoading] = useState(true)
-
-  const SaveBomList = () => {
-    localStorage.setItem(BOM_STORAGE_KEY, form.BomList)
-  }
 
   const stringToBoolean = (value: string): boolean => {
     return value.toLowerCase() === 'true'
@@ -158,8 +159,28 @@ function SourceDataForm({ form, OnHandleButtonClick }: FormProps) {
     return () => {}
   })
 
+  // Регулярное выражение для проверки строки
+  const validateLine = (line: string) => {
+    const regex = /^(.*?)(\t|;)(\d+(\.\d+)?|\d+)$/
+    return regex.test(line.trim())
+  }
+
   const OnBomListChanged = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     form.SetBomList(event.target.value)
+    if (event.target.value != '') {
+      const lines = event.target.value.split('\n')
+
+      // Проверка каждой строки
+      for (let i = 0; i < lines.length; i++) {
+        if (!validateLine(lines[i])) {
+          form.SetBomListErr(`Ошибка в строке ${i + 1}`)
+          return
+        }
+      }
+    }
+
+    // Если ошибок нет
+    form.SetBomListErr('')
 
     if (form.SaveBom) {
       localStorage.setItem(BOM_STORAGE_KEY, event.target.value)
@@ -245,10 +266,53 @@ function SourceDataForm({ form, OnHandleButtonClick }: FormProps) {
   return (
     <>
       <div className="my-3 p-3 bg-body rounded shadow-sm">
+        {form.BomListErr && (
+          <>
+            <svg xmlns="http://www.w3.org/2000/svg" style={{ display: 'none' }}>
+              <symbol
+                id="exclamation-triangle-fill"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+              </symbol>
+            </svg>
+            <div
+              className="alert alert-danger"
+              role="alert"
+              style={{
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                zIndex: 50,
+                opacity: 0.95
+              }}
+            >
+              <svg
+                className="bi flex-shrink-0 me-2"
+                width="24"
+                height="24"
+                role="img"
+                aria-label="Info:"
+              >
+                <use xlinkHref="#exclamation-triangle-fill" />
+              </svg>
+              {form.BomListErr}: Каждая строка должна содержать наименование
+              (текст/числа/пробелы) и количество (число) через табуляцию либо
+              точку с запятой. <br />
+              Пример: <br />
+              100мкФ 10% 10В Тип D;1
+              <br />
+              LSM6DSLTR 1;1
+            </div>
+          </>
+        )}
         <div className="container text-left">
           <div className="row p-3">
             <div className="col">
               <p className="h2">Исходный список компонентов</p>
+
               <div className="input-group">
                 <textarea
                   onChange={OnBomListChanged}
@@ -442,6 +506,7 @@ function SourceDataForm({ form, OnHandleButtonClick }: FormProps) {
               id="handle_button"
               className="btn btn-primary"
               onClick={HandleButtonClickedCallback}
+              disabled={form.BomListErr != ''}
             >
               Обработать
             </button>

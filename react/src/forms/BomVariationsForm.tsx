@@ -6,12 +6,14 @@ interface FormProps {
   OnEnButtonClick?: () => void
   OnRuButtonClick?: () => void
   OnElitanButtonClick?: () => void
+  disabled?: boolean
 }
 
 function BomVariationsForm({
   OnEnButtonClick,
   OnRuButtonClick,
-  OnElitanButtonClick
+  OnElitanButtonClick,
+  disabled
 }: FormProps) {
   const OnEnButtonClickedCallback = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -49,6 +51,7 @@ function BomVariationsForm({
             className="btn btn-primary"
             data-bs-whatever="en"
             onClick={OnEnButtonClickedCallback}
+            disabled={disabled}
           >
             Список англ.
           </button>
@@ -59,6 +62,7 @@ function BomVariationsForm({
             className="btn btn-primary"
             data-bs-whatever="ru"
             onClick={OnRuButtonClickedCallback}
+            disabled={disabled}
           >
             Список рус.
           </button>
@@ -69,6 +73,7 @@ function BomVariationsForm({
             className="btn btn-primary"
             data-bs-whatever="elitan"
             onClick={OnElitanButtonClickedCallback}
+            disabled={disabled}
           >
             Список Элитан
           </button>

@@ -4,6 +4,7 @@ import $ from 'jquery'
 import ModalForm, { useModalForm } from '../forms/ModalForm'
 import TableForm, { useTableForm, TableRow } from '../forms/TableForm'
 import { usePosting } from '../hooks/usePosting'
+import BomVariationsForm from '../forms/BomVariationsForm'
 
 interface ResFilter {
   skip_tol: boolean
@@ -109,9 +110,12 @@ function MainContainer() {
 
     SendData(API_URL, data)
       .then((value: ParseResult[]) => {
+        modalListForm.Clear()
+        modalListForm.SetTitleText('Список для заказа (ед. измер. на англ.)')
         value.forEach(item => {
           modalListForm.AddModalTextRow(`${item.en}\t${item.count}`)
         })
+        modalListForm.Show()
       })
       .catch(() => {
         alert('Потеряна связь с сервером')
@@ -123,9 +127,12 @@ function MainContainer() {
 
     SendData(API_URL, data)
       .then((value: ParseResult[]) => {
+        modalListForm.Clear()
+        modalListForm.SetTitleText('Список для заказа (ед. измер. на рус.)')
         value.forEach(item => {
           modalListForm.AddModalTextRow(`${item.ru}\t${item.count}`)
         })
+        modalListForm.Show()
       })
       .catch(() => {
         alert('Потеряна связь с сервером')
@@ -137,9 +144,12 @@ function MainContainer() {
 
     SendData(API_URL, data)
       .then((value: ParseResult[]) => {
+        modalListForm.Clear()
+        modalListForm.SetTitleText('Список для заказа (магазин Элитан)')
         value.forEach(item => {
           modalListForm.AddModalTextRow(`${item.elitan}\t${item.count}`)
         })
+        modalListForm.Show()
       })
       .catch(() => {
         alert('Потеряна связь с сервером')
@@ -153,12 +163,12 @@ function MainContainer() {
         OnHandleButtonClick={OnSubmitButtonClick}
       />
       <div className="my-3 p-3 bg-body rounded shadow-sm">
-        <ModalForm
-          form={modalListForm}
+        <BomVariationsForm
           OnEnButtonClick={OnEnButtonClick}
           OnRuButtonClick={OnRuButtonClick}
           OnElitanButtonClick={OnElitanButtonClick}
         />
+        <ModalForm form={modalListForm} />
         <TableForm form={tableForm} />
       </div>
     </>

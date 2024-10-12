@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import '../scss/styles.scss'
 import { Modal } from 'bootstrap'
 
-
 interface FormData {
   ModalText: string
   TitleText: string
@@ -12,14 +11,18 @@ interface FormController extends FormData {
   SetModalText: (value: string) => void
   AddModalTextRow: (value: string) => void
   SetTitleText: (value: string) => void
+  Show: () => void
+  Close: () => void
   Clear: () => void
+}
+
+interface FormControllerExtended extends FormController {
+  ModalObj: any
+  SetModal: (value: Modal) => void
 }
 
 interface FormProps {
   form: FormController
-  OnEnButtonClick?: () => void
-  OnRuButtonClick?: () => void
-  OnElitanButtonClick?: () => void
 }
 
 export function useModalForm(): FormController {
@@ -28,7 +31,9 @@ export function useModalForm(): FormController {
     TitleText: ''
   })
 
-  const Form: FormController = {
+  const [modal, setModal] = useState(null)
+
+  const Form: FormControllerExtended = {
     ...formState,
     SetModalText: (value: string) =>
       setFormData(prev => ({ ...prev, ModalText: value })),
@@ -42,111 +47,33 @@ export function useModalForm(): FormController {
       setFormData(prev => ({ ...prev, TitleText: value })),
     Clear: () => {
       setFormData(prev => ({ ...prev, ModalText: '' }))
-    }
+    },
+    Show: () => modal.show(),
+    Close: () => modal.hide(),
+    ModalObj: modal,
+    SetModal: (value: Modal) => setModal(value)
   }
 
   return Form
 }
 
-function ModalForm({
-  form,
-  OnEnButtonClick,
-  OnRuButtonClick,
-  OnElitanButtonClick
-}: FormProps) {
-  const [modal, setModal] = useState(null) // для хранения ссылки на экземпляр модального окна
+function ModalForm({ form }: FormProps) {
 
-  // Ссылка на элемент модального окна
   const modalRef = React.useRef(null)
 
-  const OnModalTextChanged = (
-    event: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
+  const OnTextChanged = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     form.SetModalText(event.target.value)
-  }
-
-  const OnEnButtonClickedCallback = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    form.Clear()
-    form.SetTitleText('Список для заказа (ед. измер. на англ.)')
-    if (OnEnButtonClick) {
-      OnEnButtonClick()
-    }
-    modal.show() // Открытие модального окна
-  }
-
-  const OnRuButtonClickedCallback = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    form.Clear()
-    form.SetTitleText('Список для заказа (ед. измер. на рус.)')
-    if (OnRuButtonClick) {
-      OnRuButtonClick()
-    }
-    modal.show() // Открытие модального окна
-  }
-
-  const OnElitanButtonClickedCallback = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    form.Clear()
-    form.SetTitleText('Список для заказа (магазин Элитан)')
-    if (OnElitanButtonClick) {
-      OnElitanButtonClick()
-    }
-    modal.show() // Открытие модального окна
   }
 
   // Эффект для инициализации модального окна с использованием Bootstrap
   useEffect(() => {
     if (modalRef.current) {
-      setModal(
-        new Modal(modalRef.current)
-      ) // инициализация экземпляра модального окна
+      ;(form as FormControllerExtended).SetModal(new Modal(modalRef.current))
     }
   }, [])
 
   return (
     <>
-      <p className="h2">Результаты</p>
-      <p></p>
-
-      <div className="row row-cols-3">
-        <div className="col-md-2">
-          <button
-            type="button"
-            className="btn btn-primary"
-            data-bs-whatever="en"
-            onClick={OnEnButtonClickedCallback}
-          >
-            Список англ.
-          </button>
-        </div>
-        <div className="col-md-2">
-          <button
-            type="button"
-            className="btn btn-primary"
-            data-bs-whatever="ru"
-            onClick={OnRuButtonClickedCallback}
-          >
-            Список рус.
-          </button>
-        </div>
-        <div className="col-md-2">
-          <button
-            type="button"
-            className="btn btn-primary"
-            data-bs-whatever="elitan"
-            onClick={OnElitanButtonClickedCallback}
-          >
-            Список Элитан
-          </button>
-        </div>
-      </div>
-      <p></p>
-
-      {/* Модальное окно */}
       <div
         className="modal fade"
         ref={modalRef}
@@ -165,7 +92,7 @@ function ModalForm({
                 className="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
-                onClick={() => modal.hide()} // Закрытие модального окна
+                onClick={() => form.Close()} // Закрытие модального окна
               ></button>
             </div>
             <div className="modal-body">
@@ -180,7 +107,7 @@ function ModalForm({
                     rows={15}
                     id="message-text"
                     value={form.ModalText}
-                    onChange={OnModalTextChanged}
+                    onChange={OnTextChanged}
                   ></textarea>
                   <br />
                   <button className="btn btn-primary" type="submit">
@@ -194,7 +121,7 @@ function ModalForm({
                 type="button"
                 className="btn btn-secondary"
                 data-bs-dismiss="modal"
-                onClick={() => modal.hide()} // Закрытие модального окна
+                onClick={() => form.Close()} // Закрытие модального окна
               >
                 Закрыть
               </button>

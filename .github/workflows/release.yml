@@ -1,0 +1,79 @@
+name: "Build docs"
+on:
+  push:
+    tags:
+    - '*'
+env:
+  IS_PRERELEASE: 'false'
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+
+
+    - name: Change prerelease status
+      if: contains(github.ref_name, '-rc')
+      run: echo "IS_PRERELEASE=true" >> $GITHUB_ENV
+
+    - uses: actions/checkout@v4
+
+    - name: Insert firmware version
+      run: echo "Value" "=" '"'$GITHUB_REF_NAME'"' >> version.py
+
+    - name: Check version
+      run: cat version.py
+        
+
+    - name: Read changelog for pre release build
+      id: changelog_release
+      uses: embedd-actions/read_changelog_action@v3
+      with:
+        changelogfile: 'CHANGELOG.md'
+        tag: ${{ github.ref_name }}
+
+    - name: Prepare release notes
+      run: |
+        echo "## [${{ github.ref_name}}] - $(date +'%Y-%m-%d')" >> Release_Notes.md 
+        echo "" >> Release_Notes.md
+        echo "## Изменения:" >> Release_Notes.md 
+        echo "${{ steps.changelog_release.outputs.content }}" >> Release_Notes.md
+    
+
+    - name: Install npm dependencies
+      run: cd react && npm install
+
+
+    - name: Build web application
+      run: npm run build --prefix ./react
+
+    - name: Remove unused
+      run: rm -r react/node_modules && rm static/index.html 
+
+
+    - uses: ncipollo/release-action@v1
+      with:
+        bodyFile: "Release_Notes.md"
+        allowUpdates: 'true'
+        prerelease: ${{ env.IS_PRERELEASE }}
+
+
+    - name: ZIP files
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        filename: 'release.zip'
+
+    - name: Upload zip to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: release.zip
+        asset_name: RGB_WiFi_Lamp_HtmlDoc_$tag.zip
+        tag: ${{ github.ref }}
+
+
+
+      
+
+
+    

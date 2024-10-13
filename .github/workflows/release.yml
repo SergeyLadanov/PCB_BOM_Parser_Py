@@ -47,7 +47,7 @@ jobs:
       run: npm run build --prefix ./react
 
     - name: Remove unused
-      run: rm -r react/node_modules && rm static/index.html 
+      run: rm -r react/node_modules && rm -r .git && rm static/index.html 
 
 
     - uses: ncipollo/release-action@v1

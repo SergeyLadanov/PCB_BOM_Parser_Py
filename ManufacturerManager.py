@@ -1,12 +1,61 @@
 from ParamFilter import FilterObj as Filter
 from Manufacturers import yageo
 from Components import ComponentBase as Component
+import re
 
-class ManufacturerSettings:
-    def __init__(self, skip_endurance = False, skip_tolerance = False, skip_designvariant = False):
-        self.SkipEndurance = skip_endurance
-        self.SkipTolerance = skip_tolerance
-        self.SkipVariant = skip_designvariant
+class Settings:
+    def __init__(self, chip_res_man = "Yageo", chip_cap_man = "Yageo", chip_tant_cap_man = "Xiangyee"):
+        self.__ChipResMan = chip_res_man
+        self.__ChipCapMan = chip_cap_man
+        self.__ChipTantCapMan = chip_tant_cap_man
 
-class ManufacturerManager:
-    pass
+    def GetChipResMan(self):
+        return self.__ChipResMan
+    
+    def GetChipCapMan(self):
+        return self.__ChipCapMan
+    
+    def GetChipTantCapMan(self):
+        return self.__ChipTantCapMan
+    
+
+
+class NameGenerator:
+
+    def __init__(self, settings):
+        self.__Settings = settings
+        self.__Manufacturers = {
+            "yageo": yageo
+        }
+
+    def GetManufacturerName(self, component, parse_filter):
+        res = component.GetName()
+        man_name = ""
+
+        if component.GetManufacturerPartNumber() != "":
+            res = component.GetManufacturerPartNumber()
+        else:
+            if component.GetDesignator() == "R":
+                if component.GetMountWay() == component.MOUNT_WAY_SMD: # Для SMD резисторов
+                    man_name = self.__Settings.GetChipResMan()
+                    res = self.__Manufacturers[self.__Settings.GetChipResMan().lower()].GenerateFindRequest(component, parse_filter)
+
+
+            if component.GetDesignator() == "C":
+                if component.GetMountWay() == component.MOUNT_WAY_SMD:# Для SMD конденсаторов
+
+
+                    case_probe = re.search(r'[0-9][0-9][0-9][0-9]', component.GetCase())
+
+                    if case_probe: # Для керамических конденсаторов
+                        man_name = self.__Settings.GetChipCapMan()
+                        res = self.__Manufacturers[self.__Settings.GetChipCapMan().lower()].GenerateFindRequest(component, parse_filter)
+                    
+                    case_probe = re.search(r'[A-Z]', component.GetCase())
+
+                    if case_probe: # Для танталовых конденсаторов
+                        man_name = self.__Settings.GetChipTantCapMan()
+                        # res = self.__Manufacturers[self.__Settings.GetChipTantCapMan().lower()].GenerateFindRequest(component, parse_filter)
+
+
+        return res, man_name

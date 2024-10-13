@@ -6,7 +6,7 @@ on:
 env:
   IS_PRERELEASE: 'false'
 jobs:
-  docs:
+  generate_files:
     runs-on: ubuntu-latest
     steps:
 

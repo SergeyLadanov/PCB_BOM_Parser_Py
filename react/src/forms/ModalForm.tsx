@@ -23,6 +23,7 @@ interface FormControllerExtended extends FormController {
 
 interface FormProps {
   form: FormController
+  csv_link: string
 }
 
 export function useModalForm(): FormController {
@@ -57,7 +58,7 @@ export function useModalForm(): FormController {
   return Form
 }
 
-function ModalForm({ form }: FormProps) {
+function ModalForm({ form, csv_link }: FormProps) {
   const modalRef = React.useRef(null)
 
   const OnTextChanged = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -95,7 +96,7 @@ function ModalForm({ form }: FormProps) {
               ></button>
             </div>
             <div className="modal-body">
-              <form method="POST" action="./download_csv">
+              <form method="POST" action={csv_link}>
                 <div className="mb-3">
                   <label htmlFor="message-text" className="col-form-label">
                     Компоненты:

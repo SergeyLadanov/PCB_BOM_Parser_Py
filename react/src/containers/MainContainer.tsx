@@ -7,45 +7,10 @@ import { usePosting } from '../hooks/usePosting'
 import BomVariationsForm from '../forms/BomVariationsForm'
 import LoadingIndicator from '../components/LoadingIndicator'
 import { StorageSettings } from '../ts/StorageSettings'
-
-interface ResFilter {
-  skip_tol: boolean
-  skip_power: boolean
-}
-
-interface CapFilter {
-  skip_tol: boolean
-  skip_dielectric: boolean
-  skip_voltage: boolean
-}
-
-interface BomRequest {
-  bom: string
-  count: number
-  tech_res: number
-  res_filter: ResFilter
-  cap_filter: CapFilter
-}
-
-interface ResultLink {
-  order_link: string
-  order_name: string
-  store_name: string
-}
-
-interface ParseResult {
-  type: string
-  count: number
-  en: string
-  ru: string
-  elitan: string
-  params: string[]
-  name: string
-  ordering: ResultLink[]
-}
+import { BomRequest, ParseResult, ResultLink, ApiUrls } from '../ts/api'
 
 function MainContainer() {
-  const API_URL = './bom_data'
+  const API_URL = ApiUrls.API_URL
 
   const srcDataForm = useSourceDataForm()
   const modalListForm = useModalForm()
@@ -236,7 +201,7 @@ function MainContainer() {
           OnElitanButtonClick={OnElitanButtonClick}
           disabled={srcDataForm.BomListErr != ''}
         />
-        <ModalForm form={modalListForm} />
+        <ModalForm form={modalListForm} csv_link={ApiUrls.DOWNLOAD_CSV_URL} />
         <TableForm form={tableForm} />
       </div>
       {isLoadingPost && (

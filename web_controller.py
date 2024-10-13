@@ -105,7 +105,7 @@ def handle_bom():
 
         manufacturers_settings = ManufacturerManager.Settings()
 
-        parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec'], manufacturers_settings, parser_filter)
+        parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec', 'dko_electronshik'], manufacturers_settings, parser_filter)
 
         temp_item = { 
             'name': item['name'], 

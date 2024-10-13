@@ -8,6 +8,10 @@ from Stores import elitan as elitanGenerator, chipdip, platan, en_to_ru_units_de
 
 from ParamFilter import FilterObj as Filter
 
+from Manufacturers import yageo
+
+import ManufacturerManager
+
 
 
 testFil = Filter()
@@ -15,10 +19,10 @@ testFil = Filter()
 test_encode = "Ом".encode("cp1251")
 
 
-# testFil.SetSkipingEndurance('C', True)
+testFil.SetSkipingEndurance('C', True)
 # testFil.SetSkipingTolerance('R', True)
 
-testFil.SetSkipingTolerance('C', True)
+# testFil.SetSkipingTolerance('C', True)
 
 test = [
     "1001312",
@@ -79,8 +83,9 @@ for item in test:
 print("\r\n-----------------------------------\r\n")
 
 test = [
-    # "1001312",
+    "1001312",
     "12 пФ 1% 50В NP0 0603",
+    "4.7 пФ 1% 50В NP0 0603",
     "100 мкФ 10% 10В тант. тип D",
     "0.1 мкФ 1% 16В X7R 0603",
     "1 мкФ 1% 16В X7R 0603",
@@ -124,10 +129,14 @@ test = [
     ]
 
 
+settings = ManufacturerManager.Settings()
+man_name_generator = ManufacturerManager.NameGenerator(settings)
+
 for item in test:
     res = Component.ComponentBase(item)
     #print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
     #print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
+    print(man_name_generator.GetManufacturerName(res, testFil))
+    # print(yageo.GenerateFindRequest(res, testFil))
     
-    
-    res.PrintInfo()
+    #res.PrintInfo()

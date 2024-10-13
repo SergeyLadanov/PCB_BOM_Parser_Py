@@ -10,7 +10,7 @@ import math
 
 from Stores import en_to_ru_units_decoder, ru_to_en_units_decoder
 
-from Stores import elitan as elitanGenerator, platan, chipdip, promelec
+from Stores import elitan as elitanGenerator, platan, chipdip, promelec, dko_electronshik
 
 import ManufacturerManager
 
@@ -105,7 +105,7 @@ def __GetParamArray(spec_component):
 
 
 
-def __GetOrderName(spec_component, store_name, filter = None):
+def __GetOrderName(spec_component, store_name, filter = None, manufacturer_settings = None):
     res = '-'
     if store_name == 'elitan':
         res = elitanGenerator.GenerateFindRequest(spec_component, filter)
@@ -119,10 +119,13 @@ def __GetOrderName(spec_component, store_name, filter = None):
     if store_name == 'promelec':
         res = promelec.GenerateFindRequest(spec_component, filter)
 
+    if store_name == 'dko_electronshik':
+        res = dko_electronshik.GenerateFindRequest(spec_component, filter, manufacturer_settings)
+
     return res
 
 
-def __GetOrderLink(spec_component, store_name, filter = None):
+def __GetOrderLink(spec_component, store_name, filter = None, manufacturer_settings = None):
 
     res = '-'
 
@@ -137,6 +140,9 @@ def __GetOrderLink(spec_component, store_name, filter = None):
 
     if store_name == 'promelec':
         res = promelec.GenerateFindLink(spec_component, filter)
+
+    if store_name == 'dko_electronshik':
+        res = dko_electronshik.GenerateFindLink(spec_component, filter, manufacturer_settings)
 
     return res
 
@@ -168,8 +174,8 @@ def HandleRowBOM(spec_item, store_array, manufacturers_settings, filter = None):
     for store in store_array:
         store_item = {
             'store_name': store,
-            'order_name': __GetOrderName(parse_res, store, ParamFilter),
-            'order_link':  __GetOrderLink(parse_res, store, ParamFilter)
+            'order_name': __GetOrderName(parse_res, store, ParamFilter, manufacturers_settings),
+            'order_link':  __GetOrderLink(parse_res, store, ParamFilter, manufacturers_settings)
         }
 
         res['ordering'].append(store_item)

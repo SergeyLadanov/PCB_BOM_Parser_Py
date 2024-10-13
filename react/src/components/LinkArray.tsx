@@ -15,6 +15,11 @@ interface LinkArrayProps {
 const LinkArray = ({ Links, HandleClick }: LinkArrayProps) => {
   const [selectedLinkIndex, setSelectedLinkIndex] = useState(null)
 
+
+  useEffect(() => {
+    setSelectedLinkIndex(null)
+  }, [Links])
+
   // Обработчик клика по кнопке
   const handleLinkClick = (index: any) => {
     if (HandleClick) {

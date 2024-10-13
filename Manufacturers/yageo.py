@@ -63,6 +63,8 @@ def __GenerateTolerance(component_obj):
 
     return res
 
+def __count_divisions_by_10(n):
+    return len(str(abs(int(n))))
 
 def __GenerateValueForCapacitor(component_obj):
     res = ""
@@ -74,27 +76,58 @@ def __GenerateValueForCapacitor(component_obj):
 
     if probe:
         units_str = re.sub(r'[фФ]', '', units_str)
-        units_str = re.sub(r'[мк]', '', units_str)
+        units_str = re.sub(r'мк', 'u', units_str)
         units_str = re.sub(r'[нН]', 'n', units_str)
         units_str = re.sub(r'[пП]', 'p', units_str)
 
-    units_str = re.sub(r'[fF]', '', units_str)
-    units_str = re.sub(r'[uU]', '', units_str)
+    cap_val_factors = {
+        'u': 1000000,
+        'n': 1000,    
+        'p': 1,   
+    }
 
-
-    res = re.sub(r'\.[0][0]?[0]?', '', str(val)) + units_str.upper()
-
+    value_pf = cap_val_factors[units_str] * val
+    zero_count = __count_divisions_by_10(value_pf)
+    if (zero_count >= 2):
+        value_pf = value_pf / (10 ** (zero_count-2))
+        zero_count = zero_count - 2
+        res = str(value_pf)
+        res = f'{Component.remove_trailing_zero(res)}{zero_count}' 
+    else:
+        res = str(value_pf)
+        if res.find('.') != -1:
+            res = res.replace('.', 'R')
+        # res = f'{Component.remove_trailing_zero(res)}{zero_count}' 
     
-    
+       
     return res
 
 
 def __GenerateEnduranceForCapacitor(component_obj):
-    res = re.sub(r'\.[0][0]?[0]?', '', str(component_obj.GetEndurance()))
+    res = "*"
+    if component_obj.GetEndurance() == 6.3:
+        res = "5"
+
+    if component_obj.GetEndurance() == 10.0:
+        res = "6"
+
+    if component_obj.GetEndurance() == 16.0:
+        res = "7"
+
+    if component_obj.GetEndurance() == 25.0:
+        res = "8"
+    
+    if component_obj.GetEndurance() == 50.0:
+        res = "9"
+
+    if component_obj.GetEndurance() == 100.0:
+        res = "0"
+
     return res
 
+
 def GenerateFindRequest(component_obj, filter):
-    res = ""
+    res = component_obj.GetName()
 
     if component_obj.GetManufacturerPartNumber() != "":
         res = component_obj.GetManufacturerPartNumber()
@@ -111,15 +144,14 @@ def GenerateFindRequest(component_obj, filter):
                 tolerance_str = __GenerateTolerance(component_obj) if not filter.GetFilter(component_obj.GetDesignator()).SkipTolerance else '*'
                 designvar_str = component_obj.GetDesignVariant().upper() if not filter.GetFilter(component_obj.GetDesignator()).SkipVariant else '*'
 
+                if designvar_str.upper() == "NP0":
+                    designvar_str = "NPO"
+
                 case_probe = re.search(r'[0-9][0-9][0-9][0-9]', component_obj.GetCase())
-
-                if case_probe:
-                    res = f'SMCCAP/{component_obj.GetCase():s}-{endurance_str:s}-{__GenerateValueForCapacitor(component_obj):s}-{tolerance_str:s}-{designvar_str:s}'
                 
-                case_probe = re.search(r'[A-Z]', component_obj.GetCase())
-
                 if case_probe:
-                    res = f'SMTCAP/{component_obj.GetCase():s}-{endurance_str:s}-{__GenerateValueForCapacitor(component_obj):s}-{tolerance_str:s}-*'
+                    res = f'CC{component_obj.GetCase():s}{tolerance_str:s}R{designvar_str:s}{endurance_str:s}*{__GenerateValueForCapacitor(component_obj):s}'
+
 
 
     return res

@@ -7,6 +7,8 @@ import sys
 import socket
 from ParamFilter import FilterObj as Filter
 
+import ManufacturerManager
+
 from io import BytesIO
 
 import model
@@ -101,7 +103,9 @@ def handle_bom():
 
         model.CorrectionCount(item, device_count, tech_reseve)
 
-        parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec'], parser_filter)
+        manufacturers_settings = ManufacturerManager.Settings()
+
+        parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec'], manufacturers_settings, parser_filter)
 
         temp_item = { 
             'name': item['name'], 

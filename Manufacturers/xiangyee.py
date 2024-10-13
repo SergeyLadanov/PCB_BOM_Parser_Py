@@ -46,6 +46,8 @@ def __GenerateValueForCapacitor(component_obj):
         units_str = re.sub(r'[нН]', 'n', units_str)
         units_str = re.sub(r'[пП]', 'p', units_str)
 
+    units_str = re.sub(r'[fF]', '', units_str)
+
     cap_val_factors = {
         'u': 1000000,
         'n': 1000,    

@@ -12,6 +12,8 @@ from Stores import en_to_ru_units_decoder, ru_to_en_units_decoder
 
 from Stores import elitan as elitanGenerator, platan, chipdip, promelec
 
+import ManufacturerManager
+
 
 import version
 
@@ -139,7 +141,7 @@ def __GetOrderLink(spec_component, store_name, filter = None):
     return res
 
 
-def HandleRowBOM(spec_item, store_array, filter = None):
+def HandleRowBOM(spec_item, store_array, manufacturers_settings, filter = None):
 
     res = { 
         'type': "-",
@@ -148,8 +150,10 @@ def HandleRowBOM(spec_item, store_array, filter = None):
         'ru_text_item': "-",
         'en_text_item': "-",
         'elitan_text_item': "-",
+        'manufacturer_name': "-",
         }
     
+    manNameGenerator = ManufacturerManager.NameGenerator(manufacturers_settings)
 
     parse_res = Component.ComponentBase(spec_item['name'])
 
@@ -173,5 +177,12 @@ def HandleRowBOM(spec_item, store_array, filter = None):
     res['ru_text_item'] = en_to_ru_units_decoder.GetParametersString(parse_res, filter)
     res['en_text_item'] = ru_to_en_units_decoder.GetParametersString(parse_res, filter)
     res['elitan_text_item'] = elitanGenerator.GenerateFindRequest(parse_res, filter)
+
+    man_name, man = manNameGenerator.GetManufacturerName(parse_res, filter)
+
+    res['manufacturer_name'] = {
+        'manufacturer': man,
+        'name': man_name
+    }
     
     return res

@@ -4,6 +4,9 @@ import re
 from Components import ComponentBase as Component
 from ParamFilter import FilterObj as Filter
 
+def __GetNumberOfDigits(n):
+    return len(str(abs(int(n))))
+
 
 def __GenerateValueForResistor(component_obj):
     res = ""
@@ -63,8 +66,7 @@ def __GenerateTolerance(component_obj):
 
     return res
 
-def __count_divisions_by_10(n):
-    return len(str(abs(int(n))))
+
 
 def __GenerateValueForCapacitor(component_obj):
     res = ""
@@ -87,17 +89,16 @@ def __GenerateValueForCapacitor(component_obj):
     }
 
     value_pf = cap_val_factors[units_str] * val
-    zero_count = __count_divisions_by_10(value_pf)
-    if (zero_count >= 2):
-        value_pf = value_pf / (10 ** (zero_count-2))
-        zero_count = zero_count - 2
+    digits_count = __GetNumberOfDigits(value_pf)
+    if (digits_count >= 2):
+        value_pf = value_pf / (10 ** (digits_count-2))
+        digits_count = digits_count - 2
         res = str(value_pf)
-        res = f'{Component.remove_trailing_zero(res)}{zero_count}' 
+        res = f'{Component.remove_trailing_zero(res)}{digits_count}' 
     else:
         res = str(value_pf)
         if res.find('.') != -1:
             res = res.replace('.', 'R')
-        # res = f'{Component.remove_trailing_zero(res)}{zero_count}' 
     
        
     return res

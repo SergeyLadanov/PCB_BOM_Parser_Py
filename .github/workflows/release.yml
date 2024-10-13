@@ -68,7 +68,7 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: release.zip
-        asset_name: RGB_WiFi_Lamp_HtmlDoc_$tag.zip
+        asset_name: BOM_Parser_$tag.zip
         tag: ${{ github.ref }}
 
 

@@ -1,5 +1,5 @@
 from ParamFilter import FilterObj as Filter
-from Manufacturers import yageo
+from Manufacturers import yageo, xiangyee
 from Components import ComponentBase as Component
 import re
 
@@ -25,7 +25,8 @@ class NameGenerator:
     def __init__(self, settings):
         self.__Settings = settings
         self.__Manufacturers = {
-            "yageo": yageo
+            "yageo": yageo,
+            "xiangyee": xiangyee
         }
 
     def GetManufacturerName(self, component, parse_filter):
@@ -55,7 +56,7 @@ class NameGenerator:
 
                     if case_probe: # Для танталовых конденсаторов
                         man_name = self.__Settings.GetChipTantCapMan()
-                        # res = self.__Manufacturers[self.__Settings.GetChipTantCapMan().lower()].GenerateFindRequest(component, parse_filter)
+                        res = self.__Manufacturers[self.__Settings.GetChipTantCapMan().lower()].GenerateFindRequest(component, parse_filter)
 
 
         return res, man_name

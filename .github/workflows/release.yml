@@ -53,6 +53,7 @@ jobs:
         rm -r .github
         rm -r .vscode
         rm PCB_BOM_Parser_Py.code-workspace
+        rm TestParser.py
         rm static/index.html 
 
 

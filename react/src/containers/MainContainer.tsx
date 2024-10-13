@@ -180,6 +180,24 @@ function MainContainer() {
       })
   }
 
+
+  const OnManufacturersNamesButtonClick = () => {
+    const data: BomRequest = GetRequest()
+
+    SendRequest(API_URL, data)
+      .then((value: ParseResult[]) => {
+        modalListForm.Clear()
+        modalListForm.SetTitleText('Список для заказа (наим. произв.)')
+        value.forEach(item => {
+          modalListForm.AddModalTextRow(`${item.manufacturer_info.component_name}\t${item.count}`)
+        })
+        modalListForm.Show()
+      })
+      .catch(() => {
+        alert('Потеряна связь с сервером')
+      })
+  }
+
   return (
     <>
       <SourceDataForm
@@ -199,6 +217,7 @@ function MainContainer() {
           OnEnButtonClick={OnEnButtonClick}
           OnRuButtonClick={OnRuButtonClick}
           OnElitanButtonClick={OnElitanButtonClick}
+          OnManufacturersNamesButtonClick={OnManufacturersNamesButtonClick}
           disabled={srcDataForm.BomListErr != ''}
         />
         <ModalForm form={modalListForm} csv_link={ApiUrls.DOWNLOAD_CSV_URL} />

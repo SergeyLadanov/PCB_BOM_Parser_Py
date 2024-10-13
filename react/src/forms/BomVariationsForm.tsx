@@ -6,6 +6,7 @@ interface FormProps {
   OnEnButtonClick?: () => void
   OnRuButtonClick?: () => void
   OnElitanButtonClick?: () => void
+  OnManufacturersNamesButtonClick?: () => void
   disabled?: boolean
 }
 
@@ -13,6 +14,7 @@ function BomVariationsForm({
   OnEnButtonClick,
   OnRuButtonClick,
   OnElitanButtonClick,
+  OnManufacturersNamesButtonClick,
   disabled
 }: FormProps) {
   const OnEnButtonClickedCallback = (
@@ -39,12 +41,20 @@ function BomVariationsForm({
     }
   }
 
+  const OnManufacturersNameButtonClickedCallback = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    if (OnManufacturersNamesButtonClick) {
+      OnManufacturersNamesButtonClick()
+    }
+  }
+
   return (
     <>
       <p className="h2">Результаты</p>
       <p></p>
 
-      <div className="row row-cols-3">
+      <div className="row row-cols-4">
         <div className="col-md-2">
           <button
             type="button"
@@ -76,6 +86,17 @@ function BomVariationsForm({
             disabled={disabled}
           >
             Список Элитан
+          </button>
+        </div>
+        <div className="col-md-2">
+          <button
+            type="button"
+            className="btn btn-primary"
+            data-bs-whatever="manufacturers"
+            onClick={OnManufacturersNameButtonClickedCallback}
+            disabled={disabled}
+          >
+            Список наим. произв.
           </button>
         </div>
       </div>

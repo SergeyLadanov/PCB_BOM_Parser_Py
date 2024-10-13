@@ -156,7 +156,7 @@ def HandleRowBOM(spec_item, store_array, manufacturers_settings, filter = None):
         'ru_text_item': "-",
         'en_text_item': "-",
         'elitan_text_item': "-",
-        'manufacturer_name': "-",
+        'manufacturer_info': "-",
         }
     
     manNameGenerator = ManufacturerManager.NameGenerator(manufacturers_settings)
@@ -186,9 +186,9 @@ def HandleRowBOM(spec_item, store_array, manufacturers_settings, filter = None):
 
     man_name, man = manNameGenerator.GetManufacturerName(parse_res, filter)
 
-    res['manufacturer_name'] = {
-        'manufacturer': man,
-        'name': man_name
+    res['manufacturer_info'] = {
+        'manufacturer_name': man,
+        'component_name': man_name
     }
     
     return res

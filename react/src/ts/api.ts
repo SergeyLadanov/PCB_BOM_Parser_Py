@@ -28,6 +28,11 @@ export interface ResultLink {
   store_name: string
 }
 
+export interface ManufacturerInfo {
+  manufacturer_name: string,
+  component_name: string
+}
+
 export interface ParseResult {
   type: string
   count: number
@@ -36,5 +41,6 @@ export interface ParseResult {
   elitan: string
   params: string[]
   name: string
-  ordering: ResultLink[]
+  ordering: ResultLink[], 
+  manufacturer_info: ManufacturerInfo
 }

@@ -180,7 +180,6 @@ function MainContainer() {
       })
   }
 
-
   const OnManufacturersNamesButtonClick = () => {
     const data: BomRequest = GetRequest()
 
@@ -189,7 +188,9 @@ function MainContainer() {
         modalListForm.Clear()
         modalListForm.SetTitleText('Список для заказа (наим. произв.)')
         value.forEach(item => {
-          modalListForm.AddModalTextRow(`${item.manufacturer_info.component_name}\t${item.count}`)
+          modalListForm.AddModalTextRow(
+            `${item.manufacturer_info.component_name}\t${item.count}\t${item.manufacturer_info.manufacturer_name}`
+          )
         })
         modalListForm.Show()
       })

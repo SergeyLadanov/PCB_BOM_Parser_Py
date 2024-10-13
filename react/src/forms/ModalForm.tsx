@@ -60,10 +60,34 @@ export function useModalForm(): FormController {
 
 function ModalForm({ form, csv_link }: FormProps) {
   const modalRef = React.useRef(null)
+  const [ShowDeleteButton, SetShowDeleteButton] = useState(false)
 
-  const OnTextChanged = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    form.SetModalText(event.target.value)
+  const OnDeleteManufacturersClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault()
+    const lines = form.ModalText.trim().split('\n')
+    form.Clear()
+    // Проверка каждой строки
+    for (let i = 0; i < lines.length; i++) {
+      const parameters = lines[i].split('\t')
+      const new_row = `${parameters[0]}\t${parameters[1]}`
+      form.AddModalTextRow(new_row)
+    }
   }
+
+  // Обработчик события после добавления текста
+  useEffect(() => {
+    if (form.ModalText) {
+      const lines = form.ModalText.trim().split('\n')
+      const parameters = lines[0].split('\t')
+      if (parameters.length > 2) {
+        SetShowDeleteButton(true)
+      } else {
+        SetShowDeleteButton(false)
+      }
+    }
+  }, [form.ModalText]) // вызовется каждый раз, когда текст изменяется
 
   // Эффект для инициализации модального окна с использованием Bootstrap
   useEffect(() => {
@@ -107,12 +131,26 @@ function ModalForm({ form, csv_link }: FormProps) {
                     rows={15}
                     id="message-text"
                     value={form.ModalText}
-                    onChange={OnTextChanged}
+                    readOnly
                   ></textarea>
                   <br />
-                  <button className="btn btn-primary" type="submit">
-                    Скачать список в CSV
-                  </button>
+                  <div className="row row-cols-2">
+                    <div className="col-md-5">
+                      <button className="btn btn-primary" type="submit">
+                        Скачать спис. в CSV
+                      </button>
+                    </div>
+                    {ShowDeleteButton && (
+                      <div className="col-md-5">
+                        <button
+                          className="btn btn-secondary"
+                          onClick={OnDeleteManufacturersClick}
+                        >
+                          Удал. назв. произв.
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </form>
             </div>

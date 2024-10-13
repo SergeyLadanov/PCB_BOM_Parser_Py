@@ -68,8 +68,14 @@ def download():
     name = request.form.get('bom_list')
     # name = name.replace("\t", ";")
     name = name.replace("\r\n", "\n")
+
+    columns = len(name.split("\n")[0].split("\t"))
     # Создание текста для файла
-    file_content = f'Name\tQuantity\n{name}'
+
+    if (columns < 3):
+        file_content = f'Name\tQuantity\n{name}'
+    else:
+        file_content = f'Name\tQuantity\tManufacturer\n{name}'
 
     # Создание файла в памяти
     file_stream = BytesIO()

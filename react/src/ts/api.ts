@@ -29,7 +29,7 @@ export interface ResultLink {
 }
 
 export interface ManufacturerInfo {
-  manufacturer_name: string,
+  manufacturer_name: string
   component_name: string
 }
 
@@ -41,6 +41,6 @@ export interface ParseResult {
   elitan: string
   params: string[]
   name: string
-  ordering: ResultLink[], 
+  ordering: ResultLink[]
   manufacturer_info: ManufacturerInfo
 }

@@ -251,7 +251,7 @@ function SourceDataForm({
         )}
         <div className="container text-left">
           <div className="row p-3">
-            <div className="col">
+            <div className="col mb-3">
               <p className="h2">Исходный список компонентов</p>
 
               <div className="input-group">
@@ -265,7 +265,7 @@ function SourceDataForm({
                 ></textarea>
               </div>
             </div>
-            <div className="col">
+            <div className="col mb-3">
               <p className="h2">Параметры</p>
               <div className="row p-3">
                 <p className="h4">Масштабирование</p>

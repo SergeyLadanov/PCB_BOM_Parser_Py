@@ -17,6 +17,7 @@ function MainContainer() {
   const modalListForm = useModalForm()
   const tableForm = useTableForm()
   const [SendRequest, post_err_bomvariant, isLoadingPost] = usePosting(false)
+  const [isLoadingExcel, SetIsLoadingExcel] = useState(false)
   const [NeedToLoad, setNeedToLoad] = useState(true)
   const Storage: StorageSettings = new StorageSettings()
 
@@ -202,7 +203,7 @@ function MainContainer() {
 
   const OnDownloadExcelClick = () => {
     const data: BomRequest = GetRequest()
-
+    SetIsLoadingExcel(true)
     // Отправляем POST-запрос
     $.ajax({
       url: API_EXCEL,
@@ -222,8 +223,10 @@ function MainContainer() {
         document.body.appendChild(link)
         link.click()
         link.parentNode.removeChild(link)
+        SetIsLoadingExcel(false)
       },
       error: function (xhr, status, error) {
+        SetIsLoadingExcel(false)
         alert('Потеряна связь с сервером')
       }
     })
@@ -257,7 +260,7 @@ function MainContainer() {
           OnDownloadExcelClick={OnDownloadExcelClick}
         />
       </div>
-      {isLoadingPost && (
+      {isLoadingPost || isLoadingExcel && (
         <div className="loading-overlay">
           <LoadingIndicator />
         </div>

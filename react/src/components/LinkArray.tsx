@@ -15,7 +15,6 @@ interface LinkArrayProps {
 const LinkArray = ({ Links, HandleClick }: LinkArrayProps) => {
   const [selectedLinkIndex, setSelectedLinkIndex] = useState(null)
 
-
   useEffect(() => {
     setSelectedLinkIndex(null)
   }, [Links])

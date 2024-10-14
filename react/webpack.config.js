@@ -24,7 +24,7 @@ module.exports = (env, argv) => {
       open: true,
       proxy: [
         {
-          context: ['/bom_data', '/version', '/download'],
+          context: ['/bom_data', '/version', '/download', '/download_excel'],
           target: 'http://localhost:5000',
           secure: false
         }

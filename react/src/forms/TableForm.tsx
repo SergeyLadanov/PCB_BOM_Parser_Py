@@ -69,9 +69,10 @@ export function useTableForm(): TableController {
 
 interface TableFormProps {
   form: TableController
+  OnDownloadExcelClick?: () => void
 }
 
-function TableForm({ form }: TableFormProps) {
+function TableForm({ form, OnDownloadExcelClick }: TableFormProps) {
   const handleButtonClick = (index: number) => {
     form.ToggleStatus(index)
   }
@@ -80,9 +81,32 @@ function TableForm({ form }: TableFormProps) {
     form.SetStatus(index, 'yellow')
   }
 
+  const handleDownloadExcelLink = (
+    event: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+  ) => {
+    event.preventDefault()
+
+    if (OnDownloadExcelClick) {
+      OnDownloadExcelClick()
+    }
+  }
+
   return (
     <>
-      <p className="h3">Таблица для заказа</p>
+      <div className="row p-2">
+        <div className="col-md-5 d-flex flex-column justify-content-end">
+          <p className="h3">Таблица для заказа</p>
+        </div>
+        <div className="col-md-2 ms-auto d-flex flex-column justify-content-end">
+          <a
+            className="h6 text-info"
+            href="#"
+            onClick={handleDownloadExcelLink}
+          >
+            Скачать в Excel
+          </a>
+        </div>
+      </div>
       <div className="bd-example-snippet bd-code-snippet">
         <div className="bd-example m-0 border-0 table-responsive-md">
           <table id="res_table" className="table table-striped table-hover">

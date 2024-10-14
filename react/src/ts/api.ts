@@ -1,6 +1,7 @@
 export enum ApiUrls {
   API_URL = './bom_data',
-  DOWNLOAD_CSV_URL = './download_csv'
+  DOWNLOAD_CSV_URL = './download_csv',
+  DOWNLOAD_EXCEL_URL = './download_excel'
 }
 
 export interface ResFilter {

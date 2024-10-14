@@ -11,6 +11,7 @@ import { BomRequest, ParseResult, ResultLink, ApiUrls } from '../ts/api'
 
 function MainContainer() {
   const API_URL = ApiUrls.API_URL
+  const API_EXCEL = ApiUrls.DOWNLOAD_EXCEL_URL
 
   const srcDataForm = useSourceDataForm()
   const modalListForm = useModalForm()
@@ -199,6 +200,35 @@ function MainContainer() {
       })
   }
 
+  const OnDownloadExcelClick = () => {
+    const data: BomRequest = GetRequest()
+
+    // Отправляем POST-запрос
+    $.ajax({
+      url: API_EXCEL,
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(data),
+      xhrFields: {
+        responseType: 'blob' // Важный момент, чтобы получить файл
+      },
+      success: function (blob) {
+        // Создаем URL для скачивания файла
+        // Создаем ссылку на скачивание файла
+        const url = window.URL.createObjectURL(new Blob([blob]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'ResultTable.xlsx') // Имя файла
+        document.body.appendChild(link)
+        link.click()
+        link.parentNode.removeChild(link)
+      },
+      error: function (xhr, status, error) {
+        alert('Потеряна связь с сервером')
+      }
+    })
+  }
+
   return (
     <>
       <SourceDataForm
@@ -222,7 +252,10 @@ function MainContainer() {
           disabled={srcDataForm.BomListErr != ''}
         />
         <ModalForm form={modalListForm} csv_link={ApiUrls.DOWNLOAD_CSV_URL} />
-        <TableForm form={tableForm} />
+        <TableForm
+          form={tableForm}
+          OnDownloadExcelClick={OnDownloadExcelClick}
+        />
       </div>
       {isLoadingPost && (
         <div className="loading-overlay">

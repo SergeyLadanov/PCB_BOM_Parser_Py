@@ -93,13 +93,13 @@ function TableForm({ form, OnDownloadExcelClick }: TableFormProps) {
 
   return (
     <>
-      <div className="row p-2">
+      <div className="row p-1">
         <div className="col-md-5 d-flex flex-column justify-content-end">
           <p className="h3">Таблица для заказа</p>
         </div>
         <div className="col-md-2 ms-auto d-flex flex-column justify-content-end">
           <a
-            className="h6 text-info"
+            className="h6 link-info"
             href="#"
             onClick={handleDownloadExcelLink}
           >

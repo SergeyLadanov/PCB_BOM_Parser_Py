@@ -54,7 +54,7 @@ function BomVariationsForm({
       <p className="h2">Результаты</p>
       <p></p>
 
-      <div className="row p-4">
+      <div className="row p-2">
         <div className="col-md-3 mb-3">
           <button
             type="button"

@@ -11,11 +11,13 @@ import { BomRequest, ParseResult, ResultLink, ApiUrls } from '../ts/api'
 
 function MainContainer() {
   const API_URL = ApiUrls.API_URL
+  const API_EXCEL = ApiUrls.DOWNLOAD_EXCEL_URL
 
   const srcDataForm = useSourceDataForm()
   const modalListForm = useModalForm()
   const tableForm = useTableForm()
   const [SendRequest, post_err_bomvariant, isLoadingPost] = usePosting(false)
+  const [isLoadingExcel, SetIsLoadingExcel] = useState(false)
   const [NeedToLoad, setNeedToLoad] = useState(true)
   const Storage: StorageSettings = new StorageSettings()
 
@@ -108,7 +110,7 @@ function MainContainer() {
       .then((value: ParseResult[]) => {
         tableForm.Clear()
         //alert('Настройки успешно применены')
-        console.log(value)
+        //console.log(value)
         value.forEach(item => {
           const Row: TableRow = {
             Links: item.ordering.map((link: ResultLink) => ({
@@ -199,6 +201,37 @@ function MainContainer() {
       })
   }
 
+  const OnDownloadExcelClick = () => {
+    const data: BomRequest = GetRequest()
+    SetIsLoadingExcel(true)
+    // Отправляем POST-запрос
+    $.ajax({
+      url: API_EXCEL,
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(data),
+      xhrFields: {
+        responseType: 'blob' // Важный момент, чтобы получить файл
+      },
+      success: function (blob) {
+        // Создаем URL для скачивания файла
+        // Создаем ссылку на скачивание файла
+        const url = window.URL.createObjectURL(new Blob([blob]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'ResultTable.xlsx') // Имя файла
+        document.body.appendChild(link)
+        link.click()
+        link.parentNode.removeChild(link)
+        SetIsLoadingExcel(false)
+      },
+      error: function (xhr, status, error) {
+        SetIsLoadingExcel(false)
+        alert('Потеряна связь с сервером')
+      }
+    })
+  }
+
   return (
     <>
       <SourceDataForm
@@ -222,9 +255,12 @@ function MainContainer() {
           disabled={srcDataForm.BomListErr != ''}
         />
         <ModalForm form={modalListForm} csv_link={ApiUrls.DOWNLOAD_CSV_URL} />
-        <TableForm form={tableForm} />
+        <TableForm
+          form={tableForm}
+          OnDownloadExcelClick={OnDownloadExcelClick}
+        />
       </div>
-      {isLoadingPost && (
+      {(isLoadingPost || isLoadingExcel) && (
         <div className="loading-overlay">
           <LoadingIndicator />
         </div>

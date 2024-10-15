@@ -104,6 +104,7 @@ function ModalForm({ form, csv_link }: FormProps) {
         tabIndex={-1}
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
+        style={{zIndex:1500}}
       >
         <div className="modal-dialog">
           <div className="modal-content">

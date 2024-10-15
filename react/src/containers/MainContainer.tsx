@@ -110,7 +110,7 @@ function MainContainer() {
       .then((value: ParseResult[]) => {
         tableForm.Clear()
         //alert('Настройки успешно применены')
-        console.log(value)
+        //console.log(value)
         value.forEach(item => {
           const Row: TableRow = {
             Links: item.ordering.map((link: ResultLink) => ({

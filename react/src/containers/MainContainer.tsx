@@ -260,7 +260,7 @@ function MainContainer() {
           OnDownloadExcelClick={OnDownloadExcelClick}
         />
       </div>
-      {isLoadingPost || isLoadingExcel && (
+      {(isLoadingPost || isLoadingExcel) && (
         <div className="loading-overlay">
           <LoadingIndicator />
         </div>

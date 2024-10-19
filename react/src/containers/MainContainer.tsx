@@ -103,7 +103,12 @@ function MainContainer() {
         skip_tol: srcDataForm.SkipResTol
       },
       count: srcDataForm.Quantity,
-      tech_res: srcDataForm.TechReserve * 0.01 + 1.0
+      tech_res: srcDataForm.TechReserve * 0.01 + 1.0,
+      man_settings: {
+        smd_cer_cap: ManSettingsForm.SmdCerCapMan[ManSettingsForm.SmdCerCapManIndex],
+        smd_res: ManSettingsForm.SmdResMan[ManSettingsForm.SmdResManIndex],
+        smd_tant_cap: ManSettingsForm.SmdTantCapMan[ManSettingsForm.SmdTantCapManIndex]
+      }
     }
 
     return data

@@ -16,12 +16,19 @@ export interface CapFilter {
   skip_voltage: boolean
 }
 
+export interface ManufacturersSettings {
+  smd_res: string
+  smd_cer_cap: string
+  smd_tant_cap: string
+}
+
 export interface BomRequest {
   bom: string
   count: number
   tech_res: number
   res_filter: ResFilter
   cap_filter: CapFilter
+  man_settings: ManufacturersSettings
 }
 
 export interface ResultLink {

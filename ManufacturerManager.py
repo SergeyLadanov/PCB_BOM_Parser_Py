@@ -28,7 +28,19 @@ class NameGenerator:
             "yageo": yageo,
             "xiangyee": xiangyee
         }
+    
+    def GetSmdResManufacturers(self):
+        res = ["Yageo"]
+        return res
 
+    def GetSmdCerCapManufacturers(self):
+        res = ["Yageo"]
+        return res
+    
+    def GetSmdTantCapManufacturers(self):
+        res = ["Xiangyee"]
+        return res
+    
     def GetManufacturerName(self, component, parse_filter):
         res = component.GetName()
         man_name = ""

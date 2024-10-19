@@ -3,17 +3,23 @@ import '../scss/styles.scss'
 import { Modal } from 'bootstrap'
 
 interface FormData {
-  ModalText: string
-  TitleText: string
+  SmdResMan: string[]
+  SmdCerCapMan: string[]
+  SmdTantCapMan: string[]
+  SmdResManIndex: number
+  SmdCerCapManIndex: number
+  SmdTantCapManIndex: number
 }
 
 interface FormController extends FormData {
-  SetModalText: (value: string) => void
-  AddModalTextRow: (value: string) => void
-  SetTitleText: (value: string) => void
+  SetSmdResMan: (value: string[]) => void
+  SetSmdCerCapMan: (value: string[]) => void
+  SetSmdTantCapMan: (value: string[]) => void
+  SetSmdResManIndex: (value: number) => void
+  SetSmdCerCapManIndex: (value: number) => void
+  SetSmdTantCapManIndex: (value: number) => void
   Show: () => void
   Close: () => void
-  Clear: () => void
 }
 
 interface FormControllerExtended extends FormController {
@@ -23,32 +29,49 @@ interface FormControllerExtended extends FormController {
 
 interface FormProps {
   form: FormController
-  csv_link: string
+  OnSmdResManChanged?: (index: number) => void
+  OnSmdCerCapManChanged?: (index: number) => void
+  OnSmdTantCapManChanged?: (index: number) => void
 }
 
 export function useManufacturerSettingsForm(): FormController {
   const [formState, setFormData] = useState<FormData>({
-    ModalText: '',
-    TitleText: ''
+    SmdResMan: [],
+    SmdCerCapMan: [],
+    SmdTantCapMan: [],
+    SmdResManIndex: 0,
+    SmdCerCapManIndex: 0,
+    SmdTantCapManIndex: 0
   })
 
   const [modal, setModal] = useState(null)
 
   const Form: FormControllerExtended = {
     ...formState,
-    SetModalText: (value: string) =>
-      setFormData(prev => ({ ...prev, ModalText: value })),
-    AddModalTextRow: (value: string) => {
+    SetSmdResMan: (value: string[]) =>
+      setFormData(prev => ({ ...prev, SmdResMan: value })),
+    SetSmdCerCapMan: (value: string[]) => {
       setFormData(prev => ({
         ...prev,
-        ModalText: `${prev.ModalText}${value}\n`
+        SmdCerCapMan: value
       }))
     },
-    SetTitleText: (value: string) =>
-      setFormData(prev => ({ ...prev, TitleText: value })),
-    Clear: () => {
-      setFormData(prev => ({ ...prev, ModalText: '' }))
+    SetSmdTantCapMan: (value: string[]) => {
+      setFormData(prev => ({
+        ...prev,
+        SmdTantCapMan: value
+      }))
     },
+
+    SetSmdResManIndex: (value: number) =>
+      setFormData(prev => ({ ...prev, SmdResManIndex: value })),
+
+    SetSmdCerCapManIndex: (value: number) =>
+      setFormData(prev => ({ ...prev, SmdCerCapManIndex: value })),
+
+    SetSmdTantCapManIndex: (value: number) =>
+      setFormData(prev => ({ ...prev, SmdTantCapManIndex: value })),
+
     Show: () => modal.show(),
     Close: () => modal.hide(),
     ModalObj: modal,
@@ -58,36 +81,13 @@ export function useManufacturerSettingsForm(): FormController {
   return Form
 }
 
-function ManufacturerSettingsForm({ form, csv_link }: FormProps) {
+function ManufacturerSettingsForm({
+  form,
+  OnSmdResManChanged,
+  OnSmdCerCapManChanged,
+  OnSmdTantCapManChanged
+}: FormProps) {
   const modalRef = React.useRef(null)
-  const [ShowDeleteButton, SetShowDeleteButton] = useState(false)
-
-  const OnDeleteManufacturersClick = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    event.preventDefault()
-    const lines = form.ModalText.trim().split('\n')
-    form.Clear()
-    // Проверка каждой строки
-    for (let i = 0; i < lines.length; i++) {
-      const parameters = lines[i].split('\t')
-      const new_row = `${parameters[0]}\t${parameters[1]}`
-      form.AddModalTextRow(new_row)
-    }
-  }
-
-  // Обработчик события после добавления текста
-  useEffect(() => {
-    if (form.ModalText) {
-      const lines = form.ModalText.trim().split('\n')
-      const parameters = lines[0].split('\t')
-      if (parameters.length > 2) {
-        SetShowDeleteButton(true)
-      } else {
-        SetShowDeleteButton(false)
-      }
-    }
-  }, [form.ModalText]) // вызовется каждый раз, когда текст изменяется
 
   // Эффект для инициализации модального окна с использованием Bootstrap
   useEffect(() => {
@@ -95,6 +95,34 @@ function ManufacturerSettingsForm({ form, csv_link }: FormProps) {
       ;(form as FormControllerExtended).SetModal(new Modal(modalRef.current))
     }
   }, [])
+
+  const SmdResManChangedCallback = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    form.SetSmdResManIndex(Number(event.target.value))
+
+    if (OnSmdResManChanged) {
+      OnSmdResManChanged(Number(event.target.value))
+    }
+  }
+
+  const SmdCerCapManChangedCallback = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    form.SetSmdCerCapManIndex(Number(event.target.value))
+    if (OnSmdCerCapManChanged) {
+      OnSmdCerCapManChanged(Number(event.target.value))
+    }
+  }
+
+  const SmdTantCapManChangedCallback = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    form.SetSmdTantCapManIndex(Number(event.target.value))
+    if (OnSmdTantCapManChanged) {
+      OnSmdTantCapManChanged(Number(event.target.value))
+    }
+  }
 
   return (
     <>
@@ -110,7 +138,7 @@ function ManufacturerSettingsForm({ form, csv_link }: FormProps) {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Натсройки производителей
+                Настройки производителей
               </h1>
               <button
                 type="button"
@@ -131,9 +159,14 @@ function ManufacturerSettingsForm({ form, csv_link }: FormProps) {
                     <select
                       className="form-select"
                       aria-label="Default select example"
+                      value={form.SmdResManIndex}
+                      onChange={SmdResManChangedCallback}
                     >
-                      <option value="0">Yageo</option>
-                      <option value="1">Vishay</option>
+                      {/* <option value="0">Yageo</option>
+                      <option value="1">Vishay</option> */}
+                    {form.SmdResMan.map((item, index) => (
+                        <option key={index} value={index}>{item}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -146,9 +179,14 @@ function ManufacturerSettingsForm({ form, csv_link }: FormProps) {
                     <select
                       className="form-select"
                       aria-label="Default select example"
+                      value={form.SmdCerCapManIndex}
+                      onChange={SmdCerCapManChangedCallback}
                     >
-                      <option value="0">Yageo</option>
-                      <option value="1">Vishay</option>
+                      {/* <option value="0">Yageo</option>
+                      <option value="1">Vishay</option> */}
+                      {form.SmdCerCapMan.map((item, index) => (
+                        <option key={index} value={index}>{item}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="row p-1">
@@ -156,9 +194,14 @@ function ManufacturerSettingsForm({ form, csv_link }: FormProps) {
                     <select
                       className="form-select"
                       aria-label="Default select example"
+                      value={form.SmdTantCapManIndex}
+                      onChange={SmdTantCapManChangedCallback}
                     >
-                      <option value="0">Xiangyee</option>
-                      <option value="1">Panasonic</option>
+                      {/* <option value="0">Xiangyee</option>
+                      <option value="1">Panasonic</option> */}
+                      {form.SmdTantCapMan.map((item, index) => (
+                        <option key={index} value={index}>{item}</option>
+                      ))}
                     </select>
                   </div>
                 </div>

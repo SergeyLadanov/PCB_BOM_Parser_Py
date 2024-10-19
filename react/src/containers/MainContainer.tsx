@@ -11,6 +11,7 @@ import { BomRequest, ParseResult, ResultLink, ApiUrls } from '../ts/api'
 import ManufacturerSettingsForm, {
   useManufacturerSettingsForm
 } from '../forms/ManufacturerSettingsForm'
+import { useFetching } from '../hooks/useFetching'
 
 function MainContainer() {
   const API_URL = ApiUrls.API_URL
@@ -21,12 +22,21 @@ function MainContainer() {
   const tableForm = useTableForm()
   const ManSettingsForm = useManufacturerSettingsForm()
   const [SendRequest, post_err_bomvariant, isLoadingPost] = usePosting(false)
+  const [GetData, get_err] = useFetching(false)
   const [isLoadingExcel, SetIsLoadingExcel] = useState(false)
   const [NeedToLoad, setNeedToLoad] = useState(true)
   const Storage: StorageSettings = new StorageSettings()
 
   useEffect(() => {
     if (NeedToLoad) {
+
+      // GetData("./get_manufacturers_info").then(value)
+      // ManSettingsForm.SetSmdResMan(["Test1", "Test2"])
+      // ManSettingsForm.SetSmdCerCapMan(["Test11", "Test12"])
+      // ManSettingsForm.SetSmdTantCapMan(["Test21", "Test22"])
+      ManSettingsForm.SetSmdResManIndex(0)
+      ManSettingsForm.SetSmdCerCapManIndex(0)
+      ManSettingsForm.SetSmdTantCapManIndex(0)
       Storage.LoadConfig()
       srcDataForm.SetSaveBom(Storage.SaveBom)
       srcDataForm.SetSaveFilters(Storage.SaveFilter)
@@ -240,6 +250,12 @@ function MainContainer() {
     ManSettingsForm.Show()
   }
 
+  const OnSmdResManChanged = (index: number) => {}
+
+  const OnSmdCerCapManChanged = (index: number) => {}
+
+  const OnSmdTantCapManChanged = (index: number) => {}
+
   return (
     <>
       <SourceDataForm
@@ -264,7 +280,12 @@ function MainContainer() {
           disabled={srcDataForm.BomListErr != ''}
         />
         <ModalForm form={modalListForm} csv_link={ApiUrls.DOWNLOAD_CSV_URL} />
-        <ManufacturerSettingsForm form={ManSettingsForm} csv_link="" />
+        <ManufacturerSettingsForm
+          form={ManSettingsForm}
+          OnSmdCerCapManChanged={OnSmdCerCapManChanged}
+          OnSmdResManChanged={OnSmdResManChanged}
+          OnSmdTantCapManChanged={OnSmdTantCapManChanged}
+        />
         <TableForm
           form={tableForm}
           OnDownloadExcelClick={OnDownloadExcelClick}

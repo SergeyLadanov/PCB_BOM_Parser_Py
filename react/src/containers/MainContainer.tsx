@@ -8,7 +8,9 @@ import BomVariationsForm from '../forms/BomVariationsForm'
 import LoadingIndicator from '../components/LoadingIndicator'
 import { StorageSettings } from '../ts/StorageSettings'
 import { BomRequest, ParseResult, ResultLink, ApiUrls } from '../ts/api'
-import ManufacturerSettingsForm, { useManufacturerSettingsForm } from '../forms/ManufacturerSettingsForm'
+import ManufacturerSettingsForm, {
+  useManufacturerSettingsForm
+} from '../forms/ManufacturerSettingsForm'
 
 function MainContainer() {
   const API_URL = ApiUrls.API_URL
@@ -234,7 +236,6 @@ function MainContainer() {
     })
   }
 
-
   const OnManufacturerSettingsClick = () => {
     ManSettingsForm.Show()
   }
@@ -263,7 +264,7 @@ function MainContainer() {
           disabled={srcDataForm.BomListErr != ''}
         />
         <ModalForm form={modalListForm} csv_link={ApiUrls.DOWNLOAD_CSV_URL} />
-        <ManufacturerSettingsForm form = {ManSettingsForm} csv_link='' />
+        <ManufacturerSettingsForm form={ManSettingsForm} csv_link="" />
         <TableForm
           form={tableForm}
           OnDownloadExcelClick={OnDownloadExcelClick}

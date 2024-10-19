@@ -104,13 +104,13 @@ function ManufacturerSettingsForm({ form, csv_link }: FormProps) {
         tabIndex={-1}
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
-        style={{zIndex:1500}}
+        style={{ zIndex: 1500 }}
       >
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                {form.TitleText}
+                Натсройки производителей
               </h1>
               <button
                 type="button"
@@ -121,39 +121,48 @@ function ManufacturerSettingsForm({ form, csv_link }: FormProps) {
               ></button>
             </div>
             <div className="modal-body">
-              <form method="POST" action={csv_link}>
-                <div className="mb-3">
-                  <label htmlFor="message-text" className="col-form-label">
-                    Компоненты:
-                  </label>
-                  <textarea
-                    name="bom_list"
-                    className="form-control"
-                    rows={15}
-                    id="message-text"
-                    value={form.ModalText}
-                    readOnly
-                  ></textarea>
-                  <br />
-                  <div className="row row-cols-2">
-                    <div className="col-md-5">
-                      <button className="btn btn-primary" type="submit">
-                        Скачать спис. в CSV
-                      </button>
-                    </div>
-                    {ShowDeleteButton && (
-                      <div className="col-md-5">
-                        <button
-                          className="btn btn-secondary"
-                          onClick={OnDeleteManufacturersClick}
-                        >
-                          Удал. назв. произв.
-                        </button>
-                      </div>
-                    )}
+              <div className="row p-1">
+                <div className="col-md-8 mb-3">
+                  <div className="row p-1">
+                    <h2 className="fs-5">Для резисторов</h2>
+                  </div>
+                  <div className="row p-1">
+                    <label>SMD</label>
+                    <select
+                      className="form-select"
+                      aria-label="Default select example"
+                    >
+                      <option value="0">Yageo</option>
+                      <option value="1">Vishay</option>
+                    </select>
                   </div>
                 </div>
-              </form>
+                <div className="col-md-8 mb-3">
+                  <div className="row p-1">
+                    <h2 className="fs-5">Для конденсаторов</h2>
+                  </div>
+                  <div className="row p-1">
+                    <label>Керамические SMD</label>
+                    <select
+                      className="form-select"
+                      aria-label="Default select example"
+                    >
+                      <option value="0">Yageo</option>
+                      <option value="1">Vishay</option>
+                    </select>
+                  </div>
+                  <div className="row p-1">
+                    <label>Тант. SMD</label>
+                    <select
+                      className="form-select"
+                      aria-label="Default select example"
+                    >
+                      <option value="0">Xiangyee</option>
+                      <option value="1">Panasonic</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="modal-footer">
               <button

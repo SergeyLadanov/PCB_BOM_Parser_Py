@@ -32,6 +32,7 @@ interface FormController extends FormData {
 interface FormProps {
   form: FormController
   OnHandleButtonClick?: () => void
+  OnManufacturerSettingsClick?: ()=>void
   OnBomListTextInput?: (value: string) => void
   OnSaveBomCheckedChanged?: (value: boolean) => void
   OnSaveFiltersCheckedChanged?: (value: boolean) => void
@@ -98,7 +99,8 @@ function SourceDataForm({
   OnSkipResPwrCheckedChanged,
   OnSkipCapTolCheckedChanged,
   OnSkipCapVoltCheckedChanged,
-  OnSkipCapDielCheckedChanged
+  OnSkipCapDielCheckedChanged,
+  OnManufacturerSettingsClick
 }: FormProps) {
   useEffect(() => {
     return () => {}
@@ -204,6 +206,16 @@ function SourceDataForm({
     }
   }
 
+  const OpenManufacturersSettingsClickedCallBack = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) =>
+  {
+    if (OnManufacturerSettingsClick)
+    {
+      OnManufacturerSettingsClick()
+    }
+  }
+
   return (
     <>
       <div className="my-3 p-3 bg-body rounded shadow-sm">
@@ -304,6 +316,17 @@ function SourceDataForm({
                     onChange={OnTechReserveChanged}
                   />
                 </div>
+              </div>
+
+              <div className="row p-3">
+                {/* <p className="h4">Настройки производителей</p> */}
+
+                <div className="col-md-5">
+                  <button  type="button"
+                className="btn btn-secondary" onClick={OpenManufacturersSettingsClickedCallBack}>Настр. производ.</button>
+                </div>
+
+
               </div>
 
               <div className="row p-3">

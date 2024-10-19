@@ -8,6 +8,7 @@ import BomVariationsForm from '../forms/BomVariationsForm'
 import LoadingIndicator from '../components/LoadingIndicator'
 import { StorageSettings } from '../ts/StorageSettings'
 import { BomRequest, ParseResult, ResultLink, ApiUrls } from '../ts/api'
+import ManufacturerSettingsForm, { useManufacturerSettingsForm } from '../forms/ManufacturerSettingsForm'
 
 function MainContainer() {
   const API_URL = ApiUrls.API_URL
@@ -16,6 +17,7 @@ function MainContainer() {
   const srcDataForm = useSourceDataForm()
   const modalListForm = useModalForm()
   const tableForm = useTableForm()
+  const ManSettingsForm = useManufacturerSettingsForm()
   const [SendRequest, post_err_bomvariant, isLoadingPost] = usePosting(false)
   const [isLoadingExcel, SetIsLoadingExcel] = useState(false)
   const [NeedToLoad, setNeedToLoad] = useState(true)
@@ -232,6 +234,11 @@ function MainContainer() {
     })
   }
 
+
+  const OnManufacturerSettingsClick = () => {
+    ManSettingsForm.Show()
+  }
+
   return (
     <>
       <SourceDataForm
@@ -245,6 +252,7 @@ function MainContainer() {
         OnSkipCapVoltCheckedChanged={OnSkipCapVoltCheckedChanged}
         OnSkipResPwrCheckedChanged={OnSkipResPwrCheckedChanged}
         OnSkipResTolCheckedChanged={OnSkipResTolCheckedChanged}
+        OnManufacturerSettingsClick={OnManufacturerSettingsClick}
       />
       <div className="my-3 p-3 bg-body rounded shadow-sm">
         <BomVariationsForm
@@ -255,6 +263,7 @@ function MainContainer() {
           disabled={srcDataForm.BomListErr != ''}
         />
         <ModalForm form={modalListForm} csv_link={ApiUrls.DOWNLOAD_CSV_URL} />
+        <ManufacturerSettingsForm form = {ManSettingsForm} csv_link='' />
         <TableForm
           form={tableForm}
           OnDownloadExcelClick={OnDownloadExcelClick}

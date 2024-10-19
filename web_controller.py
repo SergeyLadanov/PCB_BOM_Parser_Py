@@ -70,11 +70,11 @@ def getversion():
 # Маршрут для обработки POST запроса и генерации файла
 @app.route('/get_manufacturers_info', methods=['GET'])
 def get_manufacturers_info():
-    info = ManufacturerManager.NameGenerator()
+
     res = { 
-        'res_smd': info.GetSmdResManufacturers(), 
-        'cer_cap_smd': info.GetSmdCerCapManufacturers(), 
-        'tant_cap_smd': info.GetSmdTantCapManufacturers(), 
+        'res_smd': ManufacturerManager.GetSmdResManufacturers(), 
+        'cer_cap_smd': ManufacturerManager.GetSmdCerCapManufacturers(), 
+        'tant_cap_smd': ManufacturerManager.GetSmdTantCapManufacturers(), 
         }
     return res
 

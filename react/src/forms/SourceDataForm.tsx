@@ -268,7 +268,7 @@ function SourceDataForm({
                 <textarea
                   onChange={OnBomListChanged}
                   id="input_list"
-                  rows={23}
+                  rows={26}
                   className="form-control"
                   aria-label="With textarea"
                   value={form.BomList}

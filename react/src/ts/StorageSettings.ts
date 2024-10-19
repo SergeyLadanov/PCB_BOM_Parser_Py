@@ -13,6 +13,10 @@ export class StorageSettings {
   private _SkipCapVolt: StorageValue<boolean>
   private _SkipCapDiel: StorageValue<boolean>
 
+  private _ManSmdResIndex: StorageValue<number>
+  private _ManSmdCerCapIndex: StorageValue<number>
+  private _ManSmdTantCapIndex: StorageValue<number>
+
   constructor() {
     const SAVE_BOM_STORAGE_KEY = 'save_bom'
     const SAVE_FILTERS_STORAGE_KEY = 'save_filter'
@@ -24,6 +28,23 @@ export class StorageSettings {
     const SKIP_CAP_TOL_STORAGE_KEY = 'skip_cap_tol'
     const SKIP_CAP_VOLT_STORAGE_KEY = 'skip_cap_volt'
     const SKIP_CAP_DIEL_STORAGE_KEY = 'skip_cap_diel'
+
+    const MAN_SMDRES_INDEX_STORAGE_KEY = 'man_smdres_ind'
+    const MAN_SMDCERCAP_INDEX_STORAGE_KEY = 'man_cercap_ind'
+    const MAN_SMDTANTCAP_INDEX_STORAGE_KEY = 'man_tantcap_ind'
+
+    this._ManSmdResIndex = new StorageValue<number>(
+      MAN_SMDRES_INDEX_STORAGE_KEY,
+      0
+    )
+    this._ManSmdCerCapIndex = new StorageValue<number>(
+      MAN_SMDCERCAP_INDEX_STORAGE_KEY,
+      0
+    )
+    this._ManSmdTantCapIndex = new StorageValue<number>(
+      MAN_SMDTANTCAP_INDEX_STORAGE_KEY,
+      0
+    )
 
     this._SaveBom = new StorageValue<boolean>(SAVE_BOM_STORAGE_KEY, false)
     this._SaveFilter = new StorageValue<boolean>(
@@ -53,6 +74,30 @@ export class StorageSettings {
       SKIP_CAP_DIEL_STORAGE_KEY,
       false
     )
+  }
+
+  get ManSmdResIndex() {
+    return this._ManSmdResIndex.Val
+  }
+
+  set ManSmdResIndex(val) {
+    this._ManSmdResIndex.Val = val
+  }
+
+  get ManSmdCerCapIndex() {
+    return this._ManSmdCerCapIndex.Val
+  }
+
+  set ManSmdCerCapIndex(val) {
+    this._ManSmdCerCapIndex.Val = val
+  }
+
+  get ManSmdTantCapIndex() {
+    return this._ManSmdTantCapIndex.Val
+  }
+
+  set ManSmdTantCapIndex(val) {
+    this._ManSmdTantCapIndex.Val = val
   }
 
   get SaveBom() {

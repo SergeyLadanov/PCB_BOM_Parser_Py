@@ -164,8 +164,10 @@ function ManufacturerSettingsForm({
                     >
                       {/* <option value="0">Yageo</option>
                       <option value="1">Vishay</option> */}
-                    {form.SmdResMan.map((item, index) => (
-                        <option key={index} value={index}>{item}</option>
+                      {form.SmdResMan.map((item, index) => (
+                        <option key={index} value={index}>
+                          {item}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -185,7 +187,9 @@ function ManufacturerSettingsForm({
                       {/* <option value="0">Yageo</option>
                       <option value="1">Vishay</option> */}
                       {form.SmdCerCapMan.map((item, index) => (
-                        <option key={index} value={index}>{item}</option>
+                        <option key={index} value={index}>
+                          {item}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -200,7 +204,9 @@ function ManufacturerSettingsForm({
                       {/* <option value="0">Xiangyee</option>
                       <option value="1">Panasonic</option> */}
                       {form.SmdTantCapMan.map((item, index) => (
-                        <option key={index} value={index}>{item}</option>
+                        <option key={index} value={index}>
+                          {item}
+                        </option>
                       ))}
                     </select>
                   </div>

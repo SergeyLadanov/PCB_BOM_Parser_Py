@@ -7,7 +7,13 @@ import { usePosting } from '../hooks/usePosting'
 import BomVariationsForm from '../forms/BomVariationsForm'
 import LoadingIndicator from '../components/LoadingIndicator'
 import { StorageSettings } from '../ts/StorageSettings'
-import { BomRequest, ParseResult, ResultLink, ApiUrls } from '../ts/api'
+import {
+  BomRequest,
+  ParseResult,
+  ResultLink,
+  ApiUrls,
+  ManufacturersList
+} from '../ts/api'
 import ManufacturerSettingsForm, {
   useManufacturerSettingsForm
 } from '../forms/ManufacturerSettingsForm'
@@ -16,6 +22,7 @@ import { useFetching } from '../hooks/useFetching'
 function MainContainer() {
   const API_URL = ApiUrls.API_URL
   const API_EXCEL = ApiUrls.DOWNLOAD_EXCEL_URL
+  const API_MANUFACTURERS = ApiUrls.MANUFACTURERS_LIST_URL
 
   const srcDataForm = useSourceDataForm()
   const modalListForm = useModalForm()
@@ -29,15 +36,33 @@ function MainContainer() {
 
   useEffect(() => {
     if (NeedToLoad) {
-
-      // GetData("./get_manufacturers_info").then(value)
-      // ManSettingsForm.SetSmdResMan(["Test1", "Test2"])
-      // ManSettingsForm.SetSmdCerCapMan(["Test11", "Test12"])
-      // ManSettingsForm.SetSmdTantCapMan(["Test21", "Test22"])
       ManSettingsForm.SetSmdResManIndex(0)
       ManSettingsForm.SetSmdCerCapManIndex(0)
       ManSettingsForm.SetSmdTantCapManIndex(0)
       Storage.LoadConfig()
+
+      GetData(API_MANUFACTURERS)
+        .then((value: ManufacturersList) => {
+          ManSettingsForm.SetSmdResMan(value.res_smd)
+          ManSettingsForm.SetSmdCerCapMan(value.cer_cap_smd)
+          ManSettingsForm.SetSmdTantCapMan(value.tant_cap_smd)
+
+          if (Storage.ManSmdResIndex < value.res_smd.length) {
+            ManSettingsForm.SetSmdResManIndex(Storage.ManSmdResIndex)
+          }
+
+          if (Storage.ManSmdCerCapIndex < value.cer_cap_smd.length) {
+            ManSettingsForm.SetSmdCerCapManIndex(Storage.ManSmdCerCapIndex)
+          }
+
+          if (Storage.ManSmdTantCapIndex < value.tant_cap_smd.length) {
+            ManSettingsForm.SetSmdTantCapManIndex(Storage.ManSmdTantCapIndex)
+          }
+        })
+        .catch((err: any) => {
+          alert('Не удалось загрузить список производителей')
+        })
+
       srcDataForm.SetSaveBom(Storage.SaveBom)
       srcDataForm.SetSaveFilters(Storage.SaveFilter)
 
@@ -250,11 +275,17 @@ function MainContainer() {
     ManSettingsForm.Show()
   }
 
-  const OnSmdResManChanged = (index: number) => {}
+  const OnSmdResManChanged = (index: number) => {
+    Storage.ManSmdResIndex = index
+  }
 
-  const OnSmdCerCapManChanged = (index: number) => {}
+  const OnSmdCerCapManChanged = (index: number) => {
+    Storage.ManSmdCerCapIndex = index
+  }
 
-  const OnSmdTantCapManChanged = (index: number) => {}
+  const OnSmdTantCapManChanged = (index: number) => {
+    Storage.ManSmdTantCapIndex = index
+  }
 
   return (
     <>

@@ -1,7 +1,8 @@
 export enum ApiUrls {
   API_URL = './bom_data',
   DOWNLOAD_CSV_URL = './download_csv',
-  DOWNLOAD_EXCEL_URL = './download_excel'
+  DOWNLOAD_EXCEL_URL = './download_excel',
+  MANUFACTURERS_LIST_URL = './get_manufacturers_info'
 }
 
 export interface ResFilter {
@@ -44,4 +45,10 @@ export interface ParseResult {
   name: string
   ordering: ResultLink[]
   manufacturer_info: ManufacturerInfo
+}
+
+export interface ManufacturersList {
+  res_smd: string[]
+  cer_cap_smd: string[]
+  tant_cap_smd: string[]
 }

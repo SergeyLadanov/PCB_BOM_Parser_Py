@@ -17,7 +17,21 @@ class Settings:
     
     def GetChipTantCapMan(self):
         return self.__ChipTantCapMan
-    
+
+
+
+
+def GetSmdResManufacturers():
+    res = ["Yageo"]
+    return res
+
+def GetSmdCerCapManufacturers():
+    res = ["Yageo"]
+    return res
+
+def GetSmdTantCapManufacturers():
+    res = ["Xiangyee"]
+    return res   
 
 
 class NameGenerator:

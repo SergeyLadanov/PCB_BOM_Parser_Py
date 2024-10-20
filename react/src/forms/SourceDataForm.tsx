@@ -268,7 +268,7 @@ function SourceDataForm({
                 <textarea
                   onChange={OnBomListChanged}
                   id="input_list"
-                  rows={24}
+                  rows={23}
                   className="form-control"
                   aria-label="With textarea"
                   value={form.BomList}
@@ -277,7 +277,7 @@ function SourceDataForm({
             </div>
             <div className="col-md-6 mb-3">
               <p className="h4">Параметры</p>
-              <div className="row p-3">
+              <div className="row p-2">
                 <p className="h5">Масштабирование</p>
                 <div className="col-md-4">
                   <label htmlFor="deivice_count" className="form-label">
@@ -297,7 +297,7 @@ function SourceDataForm({
                 </div>
               </div>
 
-              <div className="row p-3">
+              <div className="row p-2">
                 <div className="col-md-4">
                   <label htmlFor="tech_reserve" className="form-label">
                     Технолог. запас, %

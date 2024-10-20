@@ -1,5 +1,5 @@
 from ParamFilter import FilterObj as Filter
-from Manufacturers import yageo, xiangyee, kemet
+from Manufacturers import yageo, xiangyee, kemet, murata
 from Components import ComponentBase as Component
 import re
 
@@ -26,7 +26,7 @@ def GetSmdResManufacturers():
     return res
 
 def GetSmdCerCapManufacturers():
-    res = ["Yageo"]
+    res = ["Yageo", "Murata"]
     return res
 
 def GetSmdTantCapManufacturers():
@@ -41,20 +41,10 @@ class NameGenerator:
         self.__Manufacturers = {
             "yageo": yageo,
             "xiangyee": xiangyee,
-            "kemet": kemet
+            "kemet": kemet,
+            "murata": murata
         }
     
-    def GetSmdResManufacturers(self):
-        res = ["Yageo"]
-        return res
-
-    def GetSmdCerCapManufacturers(self):
-        res = ["Yageo"]
-        return res
-    
-    def GetSmdTantCapManufacturers(self):
-        res = ["Xiangyee"]
-        return res
     
     def GetManufacturerName(self, component, parse_filter):
         res = component.GetName()

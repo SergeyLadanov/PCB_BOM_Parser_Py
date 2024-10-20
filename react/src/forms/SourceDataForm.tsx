@@ -261,24 +261,24 @@ function SourceDataForm({
         )}
         <div className="container text-left">
           <div className="row p-3">
-            <div className="col mb-3">
-              <p className="h2">Исходный список компонентов</p>
+            <div className="col-md-6 mb-3">
+              <p className="h4">Исходный список компонентов</p>
 
               <div className="input-group">
                 <textarea
                   onChange={OnBomListChanged}
                   id="input_list"
-                  rows={26}
+                  rows={24}
                   className="form-control"
                   aria-label="With textarea"
                   value={form.BomList}
                 ></textarea>
               </div>
             </div>
-            <div className="col mb-3">
-              <p className="h2">Параметры</p>
+            <div className="col-md-6 mb-3">
+              <p className="h4">Параметры</p>
               <div className="row p-3">
-                <p className="h4">Масштабирование</p>
+                <p className="h5">Масштабирование</p>
                 <div className="col-md-4">
                   <label htmlFor="deivice_count" className="form-label">
                     Кол. устройств, шт.
@@ -316,22 +316,22 @@ function SourceDataForm({
                 </div>
               </div>
 
-              <div className="row p-3">
-                {/* <p className="h4">Настройки производителей</p> */}
+              <div className="row p-2">
+                <p className="h5">Настройки производителей</p>
 
                 <div className="col-md-5">
                   <button
                     type="button"
-                    className="btn btn-secondary"
+                    className="btn btn-secondary btn-sm"
                     onClick={OpenManufacturersSettingsClickedCallBack}
                   >
-                    Настр. производ.
+                    Откр. окно настр.
                   </button>
                 </div>
               </div>
 
-              <div className="row p-3">
-                <p className="h4">Настройки сохранения данных</p>
+              <div className="row p-2">
+                <p className="h5">Настройки сохранения данных</p>
 
                 <div className="col-md-5">
                   <div className="form-check">
@@ -366,8 +366,8 @@ function SourceDataForm({
                 </div>
               </div>
 
-              <div className="row p-3">
-                <p className="h4">Коррекция параметров резисторов</p>
+              <div className="row p-2">
+                <p className="h5">Коррекция параметров резисторов</p>
 
                 <div className="col-md-5">
                   <div className="form-check">
@@ -405,8 +405,8 @@ function SourceDataForm({
                 </div>
               </div>
 
-              <div className="row p-3">
-                <p className="h4">Коррекция параметров конденсаторов</p>
+              <div className="row p-2">
+                <p className="h5">Коррекция параметров конденсаторов</p>
 
                 <div className="col-md-5">
                   <div className="form-check">

@@ -327,7 +327,7 @@ function SourceDataForm({
                     className="btn btn-secondary btn-sm"
                     onClick={OpenManufacturersSettingsClickedCallBack}
                   >
-                    Откр. окно настр.
+                    Открыть окно настроек
                   </button>
                 </div>
               </div>

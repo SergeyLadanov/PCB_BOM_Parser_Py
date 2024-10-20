@@ -36,6 +36,11 @@ const LinkArray = ({ Links, HandleClick }: LinkArrayProps) => {
             href={link.OrderLink}
             target="_blank"
             onClick={() => handleLinkClick(index)}
+            onMouseUp={(event: any) => {
+              if (event.button === 1) {
+                handleLinkClick(index)
+              }
+            }}
           >
             {link.StoreName}
           </a>

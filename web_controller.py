@@ -125,6 +125,13 @@ def download_excel():
     parser_filter.SetSkipingEndurance('C', data['cap_filter']['skip_voltage'])
     parser_filter.SetSkipingVariant('C', data['cap_filter']['skip_dielectric'])
 
+
+    man_res_settings = data['man_settings']['smd_res']
+    man_cercap_settings = data['man_settings']['smd_cer_cap']
+    man_tantcap_settings = data['man_settings']['smd_tant_cap']
+
+    manufacturers_settings = ManufacturerManager.Settings(chip_res_man=man_res_settings, chip_cap_man=man_cercap_settings, chip_tant_cap_man=man_tantcap_settings)
+
     res_data = {
         '#': [],
         'Исходное наименование': [],
@@ -141,8 +148,6 @@ def download_excel():
     for item in spec_list:
 
         model.CorrectionCount(item, device_count, tech_reseve)
-
-        manufacturers_settings = ManufacturerManager.Settings()
 
         parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec', 'dko_electronshik'], manufacturers_settings, parser_filter)
 

@@ -108,21 +108,20 @@ function SourceDataForm({
 
   // Регулярное выражение для проверки строки
   const validateLine = (line: string) => {
-    const regex = /^(.*?)(\t|;)(\d+(\.\d+)?|\d+)$/
+    const regex = /^$|^(.*?)(\t|;)(\d+(\.\d+)?|\d+)$/
     return regex.test(line.trim())
   }
 
   const OnBomListChanged = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     form.SetBomList(event.target.value)
-    if (event.target.value != '') {
-      const lines = event.target.value.split('\n')
 
-      // Проверка каждой строки
-      for (let i = 0; i < lines.length; i++) {
-        if (!validateLine(lines[i])) {
-          form.SetBomListErr(`Ошибка в строке ${i + 1}`)
-          return
-        }
+    const lines = event.target.value.split('\n')
+
+    // Проверка каждой строки
+    for (let i = 0; i < lines.length; i++) {
+      if (!validateLine(lines[i])) {
+        form.SetBomListErr(`Ошибка в строке ${i + 1}`)
+        return
       }
     }
 

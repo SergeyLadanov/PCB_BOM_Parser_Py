@@ -68,6 +68,18 @@ def getversion():
 
 
 # Маршрут для обработки POST запроса и генерации файла
+@app.route('/get_manufacturers_info', methods=['GET'])
+def get_manufacturers_info():
+
+    res = { 
+        'res_smd': ManufacturerManager.GetSmdResManufacturers(), 
+        'cer_cap_smd': ManufacturerManager.GetSmdCerCapManufacturers(), 
+        'tant_cap_smd': ManufacturerManager.GetSmdTantCapManufacturers(), 
+        }
+    return res
+
+
+# Маршрут для обработки POST запроса и генерации файла
 @app.route('/download_csv', methods=['POST'])
 def download():
     # Получение данных с формы
@@ -113,6 +125,13 @@ def download_excel():
     parser_filter.SetSkipingEndurance('C', data['cap_filter']['skip_voltage'])
     parser_filter.SetSkipingVariant('C', data['cap_filter']['skip_dielectric'])
 
+
+    man_res_settings = data['man_settings']['smd_res']
+    man_cercap_settings = data['man_settings']['smd_cer_cap']
+    man_tantcap_settings = data['man_settings']['smd_tant_cap']
+
+    manufacturers_settings = ManufacturerManager.Settings(chip_res_man=man_res_settings, chip_cap_man=man_cercap_settings, chip_tant_cap_man=man_tantcap_settings)
+
     res_data = {
         '#': [],
         'Исходное наименование': [],
@@ -129,8 +148,6 @@ def download_excel():
     for item in spec_list:
 
         model.CorrectionCount(item, device_count, tech_reseve)
-
-        manufacturers_settings = ManufacturerManager.Settings()
 
         parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec', 'dko_electronshik'], manufacturers_settings, parser_filter)
 
@@ -276,12 +293,17 @@ def handle_bom():
     parser_filter.SetSkipingVariant('C', request.form.get('cap_filter[skip_dielectric]') == 'true')
 
 
+    man_res_settings = request.form.get('man_settings[smd_res]')
+    man_cercap_settings = request.form.get('man_settings[smd_cer_cap]')
+    man_tantcap_settings = request.form.get('man_settings[smd_tant_cap]')
+
+
     res_list = []
     for item in spec_list:
 
         model.CorrectionCount(item, device_count, tech_reseve)
 
-        manufacturers_settings = ManufacturerManager.Settings()
+        manufacturers_settings = ManufacturerManager.Settings(chip_res_man=man_res_settings, chip_cap_man=man_cercap_settings, chip_tant_cap_man=man_tantcap_settings)
 
         parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec', 'dko_electronshik'], manufacturers_settings, parser_filter)
 

@@ -32,6 +32,7 @@ interface FormController extends FormData {
 interface FormProps {
   form: FormController
   OnHandleButtonClick?: () => void
+  OnManufacturerSettingsClick?: () => void
   OnBomListTextInput?: (value: string) => void
   OnSaveBomCheckedChanged?: (value: boolean) => void
   OnSaveFiltersCheckedChanged?: (value: boolean) => void
@@ -98,7 +99,8 @@ function SourceDataForm({
   OnSkipResPwrCheckedChanged,
   OnSkipCapTolCheckedChanged,
   OnSkipCapVoltCheckedChanged,
-  OnSkipCapDielCheckedChanged
+  OnSkipCapDielCheckedChanged,
+  OnManufacturerSettingsClick
 }: FormProps) {
   useEffect(() => {
     return () => {}
@@ -204,6 +206,14 @@ function SourceDataForm({
     }
   }
 
+  const OpenManufacturersSettingsClickedCallBack = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    if (OnManufacturerSettingsClick) {
+      OnManufacturerSettingsClick()
+    }
+  }
+
   return (
     <>
       <div className="my-3 p-3 bg-body rounded shadow-sm">
@@ -251,24 +261,25 @@ function SourceDataForm({
         )}
         <div className="container text-left">
           <div className="row p-3">
-            <div className="col mb-3">
-              <p className="h2">Исходный список компонентов</p>
+            <div className="col-md-6 mb-3">
+              <p className="h4">Исходный список компонентов</p>
 
               <div className="input-group">
                 <textarea
                   onChange={OnBomListChanged}
                   id="input_list"
-                  rows={23}
+                  rows={24}
                   className="form-control"
                   aria-label="With textarea"
                   value={form.BomList}
                 ></textarea>
               </div>
             </div>
-            <div className="col mb-3">
-              <p className="h2">Параметры</p>
-              <div className="row p-3">
-                <p className="h4">Масштабирование</p>
+            <div className="col-md-6 mb-3">
+              <p className="h4">Параметры</p>
+              <div className="row p-2">
+                {/* <hr className="mt-1 mb-1"/> */}
+                <p className="h5">Масштабирование</p>
                 <div className="col-md-4">
                   <label htmlFor="deivice_count" className="form-label">
                     Кол. устройств, шт.
@@ -287,7 +298,7 @@ function SourceDataForm({
                 </div>
               </div>
 
-              <div className="row p-3">
+              <div className="row p-2">
                 <div className="col-md-4">
                   <label htmlFor="tech_reserve" className="form-label">
                     Технолог. запас, %
@@ -306,8 +317,24 @@ function SourceDataForm({
                 </div>
               </div>
 
-              <div className="row p-3">
-                <p className="h4">Настройки сохранения данных</p>
+              <div className="row p-2">
+                <hr className="mt-1 mb-1" />
+                <p className="h5">Настройки производителей</p>
+
+                <div className="col-md-5">
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={OpenManufacturersSettingsClickedCallBack}
+                  >
+                    Открыть окно настроек
+                  </button>
+                </div>
+              </div>
+
+              <div className="row p-2">
+                <hr className="mt-1 mb-1" />
+                <p className="h5">Настройки сохранения данных</p>
 
                 <div className="col-md-5">
                   <div className="form-check">
@@ -342,8 +369,9 @@ function SourceDataForm({
                 </div>
               </div>
 
-              <div className="row p-3">
-                <p className="h4">Коррекция параметров резисторов</p>
+              <div className="row p-2">
+                <hr className="mt-1 mb-1" />
+                <p className="h5">Коррекция параметров резисторов</p>
 
                 <div className="col-md-5">
                   <div className="form-check">
@@ -381,8 +409,9 @@ function SourceDataForm({
                 </div>
               </div>
 
-              <div className="row p-3">
-                <p className="h4">Коррекция параметров конденсаторов</p>
+              <div className="row p-2">
+                <hr className="mt-1 mb-1" />
+                <p className="h5">Коррекция параметров конденсаторов</p>
 
                 <div className="col-md-5">
                   <div className="form-check">

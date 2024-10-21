@@ -7,23 +7,62 @@ import { usePosting } from '../hooks/usePosting'
 import BomVariationsForm from '../forms/BomVariationsForm'
 import LoadingIndicator from '../components/LoadingIndicator'
 import { StorageSettings } from '../ts/StorageSettings'
-import { BomRequest, ParseResult, ResultLink, ApiUrls } from '../ts/api'
+import {
+  BomRequest,
+  ParseResult,
+  ResultLink,
+  ApiUrls,
+  ManufacturersList
+} from '../ts/api'
+import ManufacturerSettingsForm, {
+  useManufacturerSettingsForm
+} from '../forms/ManufacturerSettingsForm'
+import { useFetching } from '../hooks/useFetching'
 
 function MainContainer() {
   const API_URL = ApiUrls.API_URL
   const API_EXCEL = ApiUrls.DOWNLOAD_EXCEL_URL
+  const API_MANUFACTURERS = ApiUrls.MANUFACTURERS_LIST_URL
 
   const srcDataForm = useSourceDataForm()
   const modalListForm = useModalForm()
   const tableForm = useTableForm()
+  const ManSettingsForm = useManufacturerSettingsForm()
   const [SendRequest, post_err_bomvariant, isLoadingPost] = usePosting(false)
+  const [GetData, get_err] = useFetching(false)
   const [isLoadingExcel, SetIsLoadingExcel] = useState(false)
   const [NeedToLoad, setNeedToLoad] = useState(true)
   const Storage: StorageSettings = new StorageSettings()
 
   useEffect(() => {
     if (NeedToLoad) {
+      ManSettingsForm.SetSmdResManIndex(0)
+      ManSettingsForm.SetSmdCerCapManIndex(0)
+      ManSettingsForm.SetSmdTantCapManIndex(0)
       Storage.LoadConfig()
+
+      GetData(API_MANUFACTURERS)
+        .then((value: ManufacturersList) => {
+          ManSettingsForm.SetSmdResMan(value.res_smd)
+          ManSettingsForm.SetSmdCerCapMan(value.cer_cap_smd)
+          ManSettingsForm.SetSmdTantCapMan(value.tant_cap_smd)
+
+          if (Storage.ManSmdResIndex < value.res_smd.length) {
+            ManSettingsForm.SetSmdResManIndex(Storage.ManSmdResIndex)
+          }
+
+          if (Storage.ManSmdCerCapIndex < value.cer_cap_smd.length) {
+            ManSettingsForm.SetSmdCerCapManIndex(Storage.ManSmdCerCapIndex)
+          }
+
+          if (Storage.ManSmdTantCapIndex < value.tant_cap_smd.length) {
+            ManSettingsForm.SetSmdTantCapManIndex(Storage.ManSmdTantCapIndex)
+          }
+        })
+        .catch((err: any) => {
+          alert('Не удалось загрузить список производителей')
+        })
+
       srcDataForm.SetSaveBom(Storage.SaveBom)
       srcDataForm.SetSaveFilters(Storage.SaveFilter)
 
@@ -64,7 +103,14 @@ function MainContainer() {
         skip_tol: srcDataForm.SkipResTol
       },
       count: srcDataForm.Quantity,
-      tech_res: srcDataForm.TechReserve * 0.01 + 1.0
+      tech_res: srcDataForm.TechReserve * 0.01 + 1.0,
+      man_settings: {
+        smd_cer_cap:
+          ManSettingsForm.SmdCerCapMan[ManSettingsForm.SmdCerCapManIndex],
+        smd_res: ManSettingsForm.SmdResMan[ManSettingsForm.SmdResManIndex],
+        smd_tant_cap:
+          ManSettingsForm.SmdTantCapMan[ManSettingsForm.SmdTantCapManIndex]
+      }
     }
 
     return data
@@ -232,6 +278,22 @@ function MainContainer() {
     })
   }
 
+  const OnManufacturerSettingsClick = () => {
+    ManSettingsForm.Show()
+  }
+
+  const OnSmdResManChanged = (index: number) => {
+    Storage.ManSmdResIndex = index
+  }
+
+  const OnSmdCerCapManChanged = (index: number) => {
+    Storage.ManSmdCerCapIndex = index
+  }
+
+  const OnSmdTantCapManChanged = (index: number) => {
+    Storage.ManSmdTantCapIndex = index
+  }
+
   return (
     <>
       <SourceDataForm
@@ -245,6 +307,7 @@ function MainContainer() {
         OnSkipCapVoltCheckedChanged={OnSkipCapVoltCheckedChanged}
         OnSkipResPwrCheckedChanged={OnSkipResPwrCheckedChanged}
         OnSkipResTolCheckedChanged={OnSkipResTolCheckedChanged}
+        OnManufacturerSettingsClick={OnManufacturerSettingsClick}
       />
       <div className="my-3 p-3 bg-body rounded shadow-sm">
         <BomVariationsForm
@@ -255,6 +318,12 @@ function MainContainer() {
           disabled={srcDataForm.BomListErr != ''}
         />
         <ModalForm form={modalListForm} csv_link={ApiUrls.DOWNLOAD_CSV_URL} />
+        <ManufacturerSettingsForm
+          form={ManSettingsForm}
+          OnSmdCerCapManChanged={OnSmdCerCapManChanged}
+          OnSmdResManChanged={OnSmdResManChanged}
+          OnSmdTantCapManChanged={OnSmdTantCapManChanged}
+        />
         <TableForm
           form={tableForm}
           OnDownloadExcelClick={OnDownloadExcelClick}

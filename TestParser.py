@@ -19,7 +19,7 @@ testFil = Filter()
 test_encode = "Ом".encode("cp1251")
 
 
-testFil.SetSkipingEndurance('C', True)
+# testFil.SetSkipingEndurance('C', True)
 # testFil.SetSkipingTolerance('R', True)
 
 # testFil.SetSkipingTolerance('C', True)
@@ -77,7 +77,7 @@ for item in test:
     #print(f'Translated string: {en_to_ru_units_decoder.GetParametersString(res, testFil):s}')
     # print(f'Chipdip: {chipdip.GenerateFindRequest(res, testFil):s}')
     # print(f'Platan link: {platan.GenerateFindLink(res, testFil):s}')
-    # res.PrintInfo()
+    res.PrintInfo()
     
 
 print("\r\n-----------------------------------\r\n")
@@ -85,7 +85,7 @@ print("\r\n-----------------------------------\r\n")
 test = [
     "1001312",
     "12 пФ 1% 50В NP0 0603",
-    "4.7 пФ 1% 50В NP0 0603",
+    "4.7 пФ 1% 25В NP0 0603",
     "100 мкФ 10% 10В тант. тип D",
     "0.1 мкФ 1% 16В X7R 0603",
     "1 мкФ 1% 16В X7R 0603",
@@ -125,18 +125,19 @@ test = [
     "PLS-3",
     "1054500101 Molex",
     "32.768 кГц KX-327S 32.768 кГц",
-    "32 МГц KX-7 32 МГц"
+    "32 МГц KX-7 32 МГц",
+    "HC-49S 8 МГц"
     ]
 
 
-settings = ManufacturerManager.Settings()
+settings = ManufacturerManager.Settings(chip_res_man="Viking")
 man_name_generator = ManufacturerManager.NameGenerator(settings)
 
 for item in test:
     res = Component.ComponentBase(item)
     #print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
     #print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
-    print(man_name_generator.GetManufacturerName(res, testFil))
+    # print(man_name_generator.GetManufacturerName(res, testFil))
     # print(yageo.GenerateFindRequest(res, testFil))
     
-    #res.PrintInfo()
+    res.PrintInfo()

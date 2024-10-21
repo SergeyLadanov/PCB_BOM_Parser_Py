@@ -73,6 +73,16 @@ def GetParametersString(component_obj, filter):
             res = res + ' ' + Case
 
     else:
+        probe = re.search(r'[Мк]Гц(?:\s|$)', ManufacturerPartNumber)
+
+        if probe:
+            temp = probe[0]
+            temp = re.sub(r'М', 'M', temp)
+            temp = re.sub(r'к', 'k', temp)
+            temp = re.sub(r'Гц', 'Hz', temp)
+            ManufacturerPartNumber = ManufacturerPartNumber.replace(probe[0], temp) #re.sub(probe[0], temp, ManufacturerPartNumber)
+
         res = ManufacturerPartNumber
+        
 
     return res

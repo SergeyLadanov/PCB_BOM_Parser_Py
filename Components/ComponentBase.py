@@ -269,9 +269,10 @@ class ComponentBase:
         return True
 
     def __Parse(self, name):
-
-        res = re.search(r'\s*\s', name)
-
+        # res = re.search(r'\s*\s', name)
+        # res = re.search(r'^(?!.*(?:Гц|Hz))(?=.*\s)[\wА-Яа-яёЁ0-9.\s]+', name)
+        # res = re.search(r'^(?!.*(?:Гц|Hz))(?=.*\s)(?=.*\d\s*(?:u|p|uF|mF|k|kOhm|MOhm|H|nH|uH|M|W|мкФ|мФ|пФ|Гн|Ом|кОм|мОм|Вт))[\wА-Яа-яёЁ0-9.\s]+', name)
+        res = re.search(r'^(?!.*(?:Гц|Hz))(?=.*\s)(?=.*(?:\d{4}|\d\s*(?:u|p|uF|mF|k|kOhm|MOhm|H|nH|uH|M|W|мкФ|мФ|пФ|Гн|Ом|кОм|мОм|Вт)))[\wА-Яа-яёЁ0-9.\s]+', name)
         if (res):
             self.__ParseEndurance(name)
             self.__ParseUnits(name)

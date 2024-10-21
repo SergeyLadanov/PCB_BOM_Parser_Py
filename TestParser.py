@@ -77,30 +77,30 @@ for item in test:
     #print(f'Translated string: {en_to_ru_units_decoder.GetParametersString(res, testFil):s}')
     # print(f'Chipdip: {chipdip.GenerateFindRequest(res, testFil):s}')
     # print(f'Platan link: {platan.GenerateFindLink(res, testFil):s}')
-    # res.PrintInfo()
+    res.PrintInfo()
     
 
 print("\r\n-----------------------------------\r\n")
 
 test = [
-    # "1001312",
-    # "12 пФ 1% 50В NP0 0603",
-    # "4.7 пФ 1% 25В NP0 0603",
-    # "100 мкФ 10% 10В тант. тип D",
-    # "0.1 мкФ 1% 16В X7R 0603",
-    # "1 мкФ 1% 16В X7R 0603",
-    # "4.7 мкФ 1% 16В X7R 0603",
-    # "1 пФ 1% 50В NP0 0603",
-    # "820 пФ 1% 50В NP0 0603",
-    # "4.7 мкФ 10% 10В тант. тип A",
-    # "ME6211C33M5G",
-    # "MCP73831T-2ACI/OT",
-    # "DWM1000",
-    # "nRF52840-QIAA nRF52840-QIAA",
-    # "RA-08H",
-    # "MAX16054AZT+T",
-    # "LSM6DSLTR STMicroelectronics",
-    # "4.7 нГн 0.1 А BLM18HG102SN1D",
+    "1001312",
+    "12 пФ 1% 50В NP0 0603",
+    "4.7 пФ 1% 25В NP0 0603",
+    "100 мкФ 10% 10В тант. тип D",
+    "0.1 мкФ 1% 16В X7R 0603",
+    "1 мкФ 1% 16В X7R 0603",
+    "4.7 мкФ 1% 16В X7R 0603",
+    "1 пФ 1% 50В NP0 0603",
+    "820 пФ 1% 50В NP0 0603",
+    "4.7 мкФ 10% 10В тант. тип A",
+    "ME6211C33M5G",
+    "MCP73831T-2ACI/OT",
+    "DWM1000",
+    "nRF52840-QIAA nRF52840-QIAA",
+    "RA-08H",
+    "MAX16054AZT+T",
+    "LSM6DSLTR STMicroelectronics",
+    "4.7 нГн 0.1 А BLM18HG102SN1D",
     "0 Ом 1% 0.063 Вт 0603",
     "5.1 кОм 1% 0.063 Вт 0603",
     "1.5 кОм 1% 0.063 Вт 0603",
@@ -113,19 +113,20 @@ test = [
     "100 Ом 1% 0.063 Вт 0603",
     "4.7 кОм 1% 0.063 Вт 0603",
     "470 Ом 1% 0.063 Вт 0603",
-    # "B3U-3100PM",
-    # "SP0503BAHTG Littelfuse",
-    # "VS-10BQ100TRPbF Vishay",
-    # "GNL-3012GD",
-    # "GNL-3012HD",
-    # "IRLML2244TRPBF",
-    # "IRLML2502TRPBF",
-    # "WF-2R",
-    # "PLS-6",
-    # "PLS-3",
-    # "1054500101 Molex",
-    # "32.768 кГц KX-327S 32.768 кГц",
-    # "32 МГц KX-7 32 МГц"
+    "B3U-3100PM",
+    "SP0503BAHTG Littelfuse",
+    "VS-10BQ100TRPbF Vishay",
+    "GNL-3012GD",
+    "GNL-3012HD",
+    "IRLML2244TRPBF",
+    "IRLML2502TRPBF",
+    "WF-2R",
+    "PLS-6",
+    "PLS-3",
+    "1054500101 Molex",
+    "32.768 кГц KX-327S 32.768 кГц",
+    "32 МГц KX-7 32 МГц",
+    "HC-49S 8 МГц"
     ]
 
 
@@ -136,7 +137,7 @@ for item in test:
     res = Component.ComponentBase(item)
     #print(f'Elitan name: {elitanGenerator.GenerateFindRequest(res, testFil):s}')
     #print(f'Elitan link: {elitanGenerator.GenerateFindLink(res, testFil):s}')
-    print(man_name_generator.GetManufacturerName(res, testFil))
+    # print(man_name_generator.GetManufacturerName(res, testFil))
     # print(yageo.GenerateFindRequest(res, testFil))
     
-    #res.PrintInfo()
+    res.PrintInfo()

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import '../scss/styles.scss'
 import { Modal } from 'bootstrap'
 
@@ -61,6 +61,8 @@ export function useModalForm(): FormController {
 function ModalForm({ form, csv_link }: FormProps) {
   const modalRef = React.useRef(null)
   const [ShowDeleteButton, SetShowDeleteButton] = useState(false)
+  const [CopyStatus, SetCopyStatus] = useState(false)
+  const timeoutRef = useRef(null)
 
   const OnDeleteManufacturersClick = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -74,6 +76,29 @@ function ModalForm({ form, csv_link }: FormProps) {
       const new_row = `${parameters[0]}\t${parameters[1]}`
       form.AddModalTextRow(new_row)
     }
+  }
+
+  const OnCopiedButtonClickCallBack = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault()
+    // Копируем текст из textarea в буфер обмена
+    navigator.clipboard
+      .writeText(form.ModalText)
+      .then(() => {
+        SetCopyStatus(true)
+
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current)
+        }
+
+        timeoutRef.current = setTimeout(() => {
+          SetCopyStatus(false)
+        }, 2000)
+      })
+      .catch(err => {
+        console.error('Ошибка при копировании текста: ', err)
+      })
   }
 
   // Обработчик события после добавления текста
@@ -135,14 +160,15 @@ function ModalForm({ form, csv_link }: FormProps) {
                     readOnly
                   ></textarea>
                   <br />
-                  <div className="row row-cols-2">
-                    <div className="col-md-5">
+                  <div className="row p-2">
+                    <div className="col-md-5 mb-2">
                       <button className="btn btn-primary" type="submit">
                         Скачать спис. в CSV
                       </button>
                     </div>
+
                     {ShowDeleteButton && (
-                      <div className="col-md-5">
+                      <div className="col-md-5 mb-2">
                         <button
                           className="btn btn-secondary"
                           onClick={OnDeleteManufacturersClick}
@@ -151,6 +177,55 @@ function ModalForm({ form, csv_link }: FormProps) {
                         </button>
                       </div>
                     )}
+
+                    <div className="col-md-2 mb-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="d-none"
+                      >
+                        <symbol
+                          id="copied_status"
+                          width="24"
+                          height="24"
+                          fill="currentColor"
+                          className="bi bi-check"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z" />
+                        </symbol>
+                        <symbol
+                          id="copy_btn"
+                          width="24"
+                          height="24"
+                          fill="currentColor"
+                          className="bi bi-copy"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"
+                          />
+                        </symbol>
+                      </svg>
+
+                      <button
+                        className="btn btn-link link-body-emphasis"
+                        style={{
+                          padding: 0, // убираем отступы
+                          width: '2em', // ширина равна ширине SVG
+                          height: '2em', // высота равна высоте SVG
+                          display: 'inline-block', // для корректного отображения как инлайн-блок элемента
+                          marginTop: '5px'
+                        }}
+                        onClick={OnCopiedButtonClickCallBack}
+                      >
+                        <svg width="2em" height="2em">
+                          <use
+                            href={`${CopyStatus ? '#copied_status' : '#copy_btn'}`}
+                          ></use>
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </form>

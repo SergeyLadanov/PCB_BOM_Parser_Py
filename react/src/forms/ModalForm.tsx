@@ -135,9 +135,8 @@ function ModalForm({ form, csv_link }: FormProps) {
     }
   }, [])
 
-  const DelayedResetCopyStatus = ()=>
-  {
-    setTimeout(()=>{
+  const DelayedResetCopyStatus = () => {
+    setTimeout(() => {
       SetCopyStatus(false)
     }, 200)
   }
@@ -151,7 +150,7 @@ function ModalForm({ form, csv_link }: FormProps) {
     }
   }
 
-  const HanldeCloseButtonClick = ()=>{
+  const HanldeCloseButtonClick = () => {
     DelayedResetCopyStatus()
     form.Close()
   }

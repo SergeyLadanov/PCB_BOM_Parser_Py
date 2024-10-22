@@ -135,12 +135,25 @@ function ModalForm({ form, csv_link }: FormProps) {
     }
   }, [])
 
+  const DelayedResetCopyStatus = ()=>
+  {
+    setTimeout(()=>{
+      SetCopyStatus(false)
+    }, 200)
+  }
+
   const HandleBackdropClick = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
     if (event.target === event.currentTarget) {
+      DelayedResetCopyStatus()
       OnModalClosed()
     }
+  }
+
+  const HanldeCloseButtonClick = ()=>{
+    DelayedResetCopyStatus()
+    form.Close()
   }
 
   return (
@@ -165,7 +178,7 @@ function ModalForm({ form, csv_link }: FormProps) {
                 className="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
-                onClick={() => form.Close()} // Закрытие модального окна
+                onClick={HanldeCloseButtonClick} // Закрытие модального окна
               ></button>
             </div>
             <div className="modal-body">
@@ -258,7 +271,7 @@ function ModalForm({ form, csv_link }: FormProps) {
                 type="button"
                 className="btn btn-secondary"
                 data-bs-dismiss="modal"
-                onClick={() => form.Close()} // Закрытие модального окна
+                onClick={HanldeCloseButtonClick} // Закрытие модального окна
               >
                 Закрыть
               </button>

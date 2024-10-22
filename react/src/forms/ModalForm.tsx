@@ -26,6 +26,14 @@ interface FormProps {
   csv_link: string
 }
 
+const OnModalOpened = () => {
+  document.documentElement.style.overflow = 'hidden'
+}
+
+const OnModalClosed = () => {
+  document.documentElement.style.removeProperty('overflow')
+}
+
 export function useModalForm(): FormController {
   const [formState, setFormData] = useState<FormData>({
     ModalText: '',
@@ -49,8 +57,14 @@ export function useModalForm(): FormController {
     Clear: () => {
       setFormData(prev => ({ ...prev, ModalText: '' }))
     },
-    Show: () => modal.show(),
-    Close: () => modal.hide(),
+    Show: () => {
+      OnModalOpened()
+      modal.show()
+    },
+    Close: () => {
+      OnModalClosed()
+      modal.hide()
+    },
     ModalObj: modal,
     SetModal: (value: Modal) => setModal(value)
   }
@@ -121,6 +135,14 @@ function ModalForm({ form, csv_link }: FormProps) {
     }
   }, [])
 
+  const HandleBackdropClick = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    if (event.target === event.currentTarget) {
+      OnModalClosed()
+    }
+  }
+
   return (
     <>
       <div
@@ -130,8 +152,9 @@ function ModalForm({ form, csv_link }: FormProps) {
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
         style={{ zIndex: 1500 }}
+        onClick={HandleBackdropClick}
       >
-        <div className="modal-dialog">
+        <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">

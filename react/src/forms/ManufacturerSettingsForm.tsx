@@ -34,6 +34,14 @@ interface FormProps {
   OnSmdTantCapManChanged?: (index: number) => void
 }
 
+const OnModalOpened = () => {
+  document.documentElement.style.overflow = 'hidden'
+}
+
+const OnModalClosed = () => {
+  document.documentElement.style.removeProperty('overflow')
+}
+
 export function useManufacturerSettingsForm(): FormController {
   const [formState, setFormData] = useState<FormData>({
     SmdResMan: [],
@@ -72,8 +80,14 @@ export function useManufacturerSettingsForm(): FormController {
     SetSmdTantCapManIndex: (value: number) =>
       setFormData(prev => ({ ...prev, SmdTantCapManIndex: value })),
 
-    Show: () => modal.show(),
-    Close: () => modal.hide(),
+    Show: () => {
+      OnModalOpened()
+      modal.show()
+    },
+    Close: () => {
+      OnModalClosed()
+      modal.hide()
+    },
     ModalObj: modal,
     SetModal: (value: Modal) => setModal(value)
   }
@@ -124,6 +138,14 @@ function ManufacturerSettingsForm({
     }
   }
 
+  const HandleBackdropClick = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    if (event.target === event.currentTarget) {
+      OnModalClosed()
+    }
+  }
+
   return (
     <>
       <div
@@ -133,8 +155,9 @@ function ManufacturerSettingsForm({
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
         style={{ zIndex: 1500 }}
+        onClick={HandleBackdropClick}
       >
-        <div className="modal-dialog">
+        <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">

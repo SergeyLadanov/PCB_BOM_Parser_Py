@@ -129,3 +129,10 @@ body {
 html {
   scrollbar-gutter: stable;
 }
+
+body.modal-open .scrollbar-offset-correction {
+  // padding-right: 15px;
+  padding-right: var(
+    --scrollbar-width
+  ); /* scrollbar-width расчитывается в App.tsx (useEffect) */
+}

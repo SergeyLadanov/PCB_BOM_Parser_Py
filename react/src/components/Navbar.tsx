@@ -59,7 +59,10 @@ function Navbar({ form }: FormProps) {
         <a className="navbar-brand" href="/">
           BOM Parser
         </a>
-        <span id="version_container" className="navbar-text">
+        <span
+          id="version_container"
+          className="navbar-text scrollbar-offset-correction"
+        >
           {form.Version}
         </span>
       </div>

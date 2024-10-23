@@ -39,7 +39,9 @@ const OnModalOpened = () => {
 }
 
 const OnModalClosed = () => {
-  document.documentElement.style.removeProperty('overflow')
+  setTimeout(() => {
+    document.documentElement.style.removeProperty('overflow')
+  }, 200)
 }
 
 export function useManufacturerSettingsForm(): FormController {

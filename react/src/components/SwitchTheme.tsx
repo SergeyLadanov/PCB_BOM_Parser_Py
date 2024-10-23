@@ -53,7 +53,7 @@ function SwitchTheme() {
         </symbol>
       </svg>
 
-      <div className="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
+      <div className="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle scrollbar-offset-correction">
         <button
           className="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center"
           id="bd-theme"

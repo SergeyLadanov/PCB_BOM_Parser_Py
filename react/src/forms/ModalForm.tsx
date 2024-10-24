@@ -28,6 +28,7 @@ interface FormProps {
 
 const OnModalOpened = () => {
   document.documentElement.style.overflow = 'hidden'
+  document.documentElement.style.scrollbarGutter = 'stable'
 }
 
 const OnModalClosed = () => {

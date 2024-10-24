@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect } from 'react'
+import React, { useEffect } from 'react'
 import Navbar from '../containers/NavbarContainer'
 import SwitchTheme from '../components/SwitchTheme'
 import MainContainer from '../containers/MainContainer'
@@ -25,7 +25,7 @@ function getScrollbarWidth() {
 }
 
 function App() {
-  useLayoutEffect(() => {
+  useEffect(() => {
     const scrollbarWidth = getScrollbarWidth()
     document.documentElement.style.setProperty(
       '--scrollbar-width',

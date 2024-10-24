@@ -97,7 +97,7 @@ function TableForm({ form, OnDownloadExcelClick }: TableFormProps) {
         <div className="col-md-5 d-flex flex-column justify-content-end">
           <p className="h5">Таблица для заказа</p>
         </div>
-        <div className="col-md-2 ms-auto d-flex flex-column justify-content-end">
+        <div className="col-md-2 ms-auto d-flex flex-column justify-content-end text-md-end">
           <a href="#" onClick={handleDownloadExcelLink}>
             Скачать в Excel
           </a>

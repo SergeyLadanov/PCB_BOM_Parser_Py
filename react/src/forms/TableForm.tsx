@@ -104,7 +104,7 @@ function TableForm({ form, OnDownloadExcelClick }: TableFormProps) {
         </div>
       </div>
       <div className="bd-example-snippet bd-code-snippet">
-        <div className="bd-example m-0 border-0 table-responsive-md">
+        <div className="bd-example m-0 border-0 table-responsive-lg">
           <table id="res_table" className="table table-striped table-hover">
             <thead>
               <tr>

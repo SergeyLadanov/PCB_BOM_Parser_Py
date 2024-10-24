@@ -91,7 +91,7 @@ $border-radius: 0.4rem;
 
 body {
   padding: 1.5rem;
-  scrollbar-gutter: stable;
+  // scrollbar-gutter: stable;
 }
 
 // Color mode variables in _root.scss
@@ -127,9 +127,9 @@ body {
   }
 }
 
-html {
-  scrollbar-gutter: stable;
-}
+// html {
+//   scrollbar-gutter: stable;
+// }
 
 body.modal-open .scrollbar-offset-correction {
   // padding-right: 15px;

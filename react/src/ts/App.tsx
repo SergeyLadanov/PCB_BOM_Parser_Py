@@ -25,7 +25,7 @@ function getScrollbarWidth() {
 }
 
 function App() {
-  useLayoutEffect(() => {
+  useEffect(() => {
     const scrollbarWidth = getScrollbarWidth()
     document.documentElement.style.setProperty(
       '--scrollbar-width',

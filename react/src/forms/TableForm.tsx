@@ -69,7 +69,7 @@ export function useTableForm(): TableController {
 
 interface TableFormProps {
   form: TableController
-  disabled:boolean
+  disabled: boolean
   OnDownloadExcelClick?: () => void
 }
 
@@ -98,13 +98,13 @@ function TableForm({ form, disabled, OnDownloadExcelClick }: TableFormProps) {
         <div className="col-md-5 d-flex flex-column justify-content-end">
           <p className="h5">Таблица для заказа</p>
         </div>
-        {!disabled &&
-        <div className="col-md-2 ms-auto d-flex flex-column justify-content-end text-md-end">
-          <a href="#" onClick={handleDownloadExcelLink}>
-            Скачать в Excel
-          </a>
-        </div>
-      }
+        {!disabled && (
+          <div className="col-md-2 ms-auto d-flex flex-column justify-content-end text-md-end">
+            <a href="#" onClick={handleDownloadExcelLink}>
+              Скачать в Excel
+            </a>
+          </div>
+        )}
       </div>
       <div className="bd-example-snippet bd-code-snippet">
         <div className="bd-example m-0 border-0 table-responsive-lg">

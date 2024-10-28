@@ -87,6 +87,11 @@ function MainContainer() {
     return () => {}
   })
 
+  const ResetResulState = () => {
+    SetBomParseResult([])
+    tableForm.Clear()
+  }
+
   const replaceAll = (str: string, find: string, replace: string) => {
     return str.replace(new RegExp(find, 'g'), replace)
   }
@@ -119,8 +124,7 @@ function MainContainer() {
 
   const OnBomListTextInput = (val: string) => {
     Storage.Bom = val
-    SetBomParseResult([])
-    tableForm.Clear()
+    ResetResulState()
   }
 
   const OnSaveBomCheckedChanged = (val: boolean) => {
@@ -139,18 +143,23 @@ function MainContainer() {
   }
   const OnSkipResTolCheckedChanged = (val: boolean) => {
     Storage.SkipResTol = val
+    ResetResulState()
   }
   const OnSkipResPwrCheckedChanged = (val: boolean) => {
     Storage.SkipResPwr = val
+    ResetResulState()
   }
   const OnSkipCapTolCheckedChanged = (val: boolean) => {
     Storage.SkipCapTol = val
+    ResetResulState()
   }
   const OnSkipCapVoltCheckedChanged = (val: boolean) => {
     Storage.SkipCapVolt = val
+    ResetResulState()
   }
   const OnSkipCapDielCheckedChanged = (val: boolean) => {
     Storage.SkipCapDiel = val
+    ResetResulState()
   }
 
   const OnSubmitButtonClick = () => {
@@ -182,13 +191,12 @@ function MainContainer() {
   }
 
   const OnEnButtonClick = () => {
-
-        modalListForm.Clear()
-        modalListForm.SetTitleText('Список для заказа (ед. измер. на англ.)')
-        BomParseResult.forEach(item => {
-        modalListForm.AddModalTextRow(`${item.en}\t${item.count}`)
-        })
-        modalListForm.Show()
+    modalListForm.Clear()
+    modalListForm.SetTitleText('Список для заказа (ед. измер. на англ.)')
+    BomParseResult.forEach(item => {
+      modalListForm.AddModalTextRow(`${item.en}\t${item.count}`)
+    })
+    modalListForm.Show()
   }
 
   const OnRuButtonClick = () => {
@@ -257,14 +265,17 @@ function MainContainer() {
 
   const OnSmdResManChanged = (index: number) => {
     Storage.ManSmdResIndex = index
+    ResetResulState()
   }
 
   const OnSmdCerCapManChanged = (index: number) => {
     Storage.ManSmdCerCapIndex = index
+    ResetResulState()
   }
 
   const OnSmdTantCapManChanged = (index: number) => {
     Storage.ManSmdTantCapIndex = index
+    ResetResulState()
   }
 
   return (
@@ -288,7 +299,7 @@ function MainContainer() {
           OnRuButtonClick={OnRuButtonClick}
           OnElitanButtonClick={OnElitanButtonClick}
           OnManufacturersNamesButtonClick={OnManufacturersNamesButtonClick}
-          disabled={(srcDataForm.BomListErr != '') || (BomParseResult.length === 0)}
+          disabled={srcDataForm.BomListErr != '' || BomParseResult.length === 0}
         />
         <ModalForm form={modalListForm} csv_link={ApiUrls.DOWNLOAD_CSV_URL} />
         <ManufacturerSettingsForm
@@ -299,7 +310,7 @@ function MainContainer() {
         />
         <TableForm
           form={tableForm}
-          disabled = {(BomParseResult.length === 0)}
+          disabled={BomParseResult.length === 0}
           OnDownloadExcelClick={OnDownloadExcelClick}
         />
       </div>

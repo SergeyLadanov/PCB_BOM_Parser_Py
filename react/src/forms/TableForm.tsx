@@ -69,10 +69,11 @@ export function useTableForm(): TableController {
 
 interface TableFormProps {
   form: TableController
+  disabled: boolean
   OnDownloadExcelClick?: () => void
 }
 
-function TableForm({ form, OnDownloadExcelClick }: TableFormProps) {
+function TableForm({ form, disabled, OnDownloadExcelClick }: TableFormProps) {
   const handleButtonClick = (index: number) => {
     form.ToggleStatus(index)
   }
@@ -97,11 +98,13 @@ function TableForm({ form, OnDownloadExcelClick }: TableFormProps) {
         <div className="col-md-5 d-flex flex-column justify-content-end">
           <p className="h5">Таблица для заказа</p>
         </div>
-        <div className="col-md-2 ms-auto d-flex flex-column justify-content-end text-md-end">
-          <a href="#" onClick={handleDownloadExcelLink}>
-            Скачать в Excel
-          </a>
-        </div>
+        {!disabled && (
+          <div className="col-md-2 ms-auto d-flex flex-column justify-content-end text-md-end">
+            <a href="#" onClick={handleDownloadExcelLink}>
+              Скачать в Excel
+            </a>
+          </div>
+        )}
       </div>
       <div className="bd-example-snippet bd-code-snippet">
         <div className="bd-example m-0 border-0 table-responsive-lg">
@@ -120,34 +123,41 @@ function TableForm({ form, OnDownloadExcelClick }: TableFormProps) {
               </tr>
             </thead>
             <tbody id="res_table_body">
-              {form.RowArray.map((item, index) => (
-                <tr key={index.toString()} style={{ verticalAlign: 'middle' }}>
-                  <th scope="row">{(index + 1).toString()}</th>
-                  <td>{item.Name}</td>
-                  <td>{item.Type}</td>
-                  <td style={{ fontSize: '12px' }}>
-                    {item.Parameters.map((parameter, index) => (
-                      <span key={index}>
-                        {parameter}
-                        <br />
-                      </span>
-                    ))}
-                  </td>
-                  <td>{item.Quantity.toString()}</td>
-                  <td>
-                    <LinkArray
-                      Links={item.Links}
-                      HandleClick={() => handleLinkClick(index)}
-                    />
-                  </td>
-                  <td className="text-center">
-                    <button
-                      className={`circle-button ${form.RowStatusArray[index]}`}
-                      onClick={() => handleButtonClick(index)}
-                    />
-                  </td>
-                </tr>
-              ))}
+              {!disabled && (
+                <>
+                  {form.RowArray.map((item, index) => (
+                    <tr
+                      key={index.toString()}
+                      style={{ verticalAlign: 'middle' }}
+                    >
+                      <th scope="row">{(index + 1).toString()}</th>
+                      <td>{item.Name}</td>
+                      <td>{item.Type}</td>
+                      <td style={{ fontSize: '12px' }}>
+                        {item.Parameters.map((parameter, index) => (
+                          <span key={index}>
+                            {parameter}
+                            <br />
+                          </span>
+                        ))}
+                      </td>
+                      <td>{item.Quantity.toString()}</td>
+                      <td>
+                        <LinkArray
+                          Links={item.Links}
+                          HandleClick={() => handleLinkClick(index)}
+                        />
+                      </td>
+                      <td className="text-center">
+                        <button
+                          className={`circle-button ${form.RowStatusArray[index]}`}
+                          onClick={() => handleButtonClick(index)}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </>
+              )}
             </tbody>
           </table>
         </div>

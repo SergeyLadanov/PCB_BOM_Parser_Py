@@ -33,6 +33,7 @@ const LinkArray = ({ Links, HandleClick }: LinkArrayProps) => {
         <span key={index}>
           <a
             id="store_link"
+            className={`${selectedLinkIndex === index ? 'text-bg-warning badge' : ''}`}
             href={link.OrderLink}
             target="_blank"
             onClick={() => handleLinkClick(index)}
@@ -44,9 +45,9 @@ const LinkArray = ({ Links, HandleClick }: LinkArrayProps) => {
           >
             {link.StoreName}
           </a>
-          {selectedLinkIndex === index && (
+          {/* {selectedLinkIndex === index && (
             <span style={{ color: 'green', marginLeft: '8px' }}>&#10004;</span>
-          )}
+          )} */}
           <br />
         </span>
       ))}

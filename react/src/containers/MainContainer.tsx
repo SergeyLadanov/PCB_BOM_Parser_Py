@@ -33,6 +33,7 @@ function MainContainer() {
   const [isLoadingExcel, SetIsLoadingExcel] = useState(false)
   const [NeedToLoad, setNeedToLoad] = useState(true)
   const Storage: StorageSettings = new StorageSettings()
+  const [BomParseResult, SetBomParseResult] = useState<ParseResult[]>([])
 
   useEffect(() => {
     if (NeedToLoad) {
@@ -118,6 +119,8 @@ function MainContainer() {
 
   const OnBomListTextInput = (val: string) => {
     Storage.Bom = val
+    SetBomParseResult([])
+    tableForm.Clear()
   }
 
   const OnSaveBomCheckedChanged = (val: boolean) => {
@@ -154,6 +157,7 @@ function MainContainer() {
     const data: BomRequest = GetRequest()
     SendRequest(API_URL, data)
       .then((value: ParseResult[]) => {
+        SetBomParseResult(value)
         tableForm.Clear()
         //alert('Настройки успешно применены')
         //console.log(value)
@@ -178,73 +182,42 @@ function MainContainer() {
   }
 
   const OnEnButtonClick = () => {
-    const data: BomRequest = GetRequest()
 
-    SendRequest(API_URL, data)
-      .then((value: ParseResult[]) => {
         modalListForm.Clear()
         modalListForm.SetTitleText('Список для заказа (ед. измер. на англ.)')
-        value.forEach(item => {
-          modalListForm.AddModalTextRow(`${item.en}\t${item.count}`)
+        BomParseResult.forEach(item => {
+        modalListForm.AddModalTextRow(`${item.en}\t${item.count}`)
         })
         modalListForm.Show()
-      })
-      .catch(() => {
-        alert('Потеряна связь с сервером')
-      })
   }
 
   const OnRuButtonClick = () => {
-    const data: BomRequest = GetRequest()
-
-    SendRequest(API_URL, data)
-      .then((value: ParseResult[]) => {
-        modalListForm.Clear()
-        modalListForm.SetTitleText('Список для заказа (ед. измер. на рус.)')
-        value.forEach(item => {
-          modalListForm.AddModalTextRow(`${item.ru}\t${item.count}`)
-        })
-        modalListForm.Show()
-      })
-      .catch(() => {
-        alert('Потеряна связь с сервером')
-      })
+    modalListForm.Clear()
+    modalListForm.SetTitleText('Список для заказа (ед. измер. на рус.)')
+    BomParseResult.forEach(item => {
+      modalListForm.AddModalTextRow(`${item.ru}\t${item.count}`)
+    })
+    modalListForm.Show()
   }
 
   const OnElitanButtonClick = () => {
-    const data: BomRequest = GetRequest()
-
-    SendRequest(API_URL, data)
-      .then((value: ParseResult[]) => {
-        modalListForm.Clear()
-        modalListForm.SetTitleText('Список для заказа (магазин Элитан)')
-        value.forEach(item => {
-          modalListForm.AddModalTextRow(`${item.elitan}\t${item.count}`)
-        })
-        modalListForm.Show()
-      })
-      .catch(() => {
-        alert('Потеряна связь с сервером')
-      })
+    modalListForm.Clear()
+    modalListForm.SetTitleText('Список для заказа (магазин Элитан)')
+    BomParseResult.forEach(item => {
+      modalListForm.AddModalTextRow(`${item.elitan}\t${item.count}`)
+    })
+    modalListForm.Show()
   }
 
   const OnManufacturersNamesButtonClick = () => {
-    const data: BomRequest = GetRequest()
-
-    SendRequest(API_URL, data)
-      .then((value: ParseResult[]) => {
-        modalListForm.Clear()
-        modalListForm.SetTitleText('Список для заказа (наим. произв.)')
-        value.forEach(item => {
-          modalListForm.AddModalTextRow(
-            `${item.manufacturer_info.component_name}\t${item.count}\t${item.manufacturer_info.manufacturer_name}`
-          )
-        })
-        modalListForm.Show()
-      })
-      .catch(() => {
-        alert('Потеряна связь с сервером')
-      })
+    modalListForm.Clear()
+    modalListForm.SetTitleText('Список для заказа (наим. произв.)')
+    BomParseResult.forEach(item => {
+      modalListForm.AddModalTextRow(
+        `${item.manufacturer_info.component_name}\t${item.count}\t${item.manufacturer_info.manufacturer_name}`
+      )
+    })
+    modalListForm.Show()
   }
 
   const OnDownloadExcelClick = () => {
@@ -315,7 +288,7 @@ function MainContainer() {
           OnRuButtonClick={OnRuButtonClick}
           OnElitanButtonClick={OnElitanButtonClick}
           OnManufacturersNamesButtonClick={OnManufacturersNamesButtonClick}
-          disabled={srcDataForm.BomListErr != ''}
+          disabled={(srcDataForm.BomListErr != '') || (BomParseResult.length === 0)}
         />
         <ModalForm form={modalListForm} csv_link={ApiUrls.DOWNLOAD_CSV_URL} />
         <ManufacturerSettingsForm
@@ -326,6 +299,7 @@ function MainContainer() {
         />
         <TableForm
           form={tableForm}
+          disabled = {(BomParseResult.length === 0)}
           OnDownloadExcelClick={OnDownloadExcelClick}
         />
       </div>

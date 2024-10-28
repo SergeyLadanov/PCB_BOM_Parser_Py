@@ -232,6 +232,15 @@ class ComponentBase:
                 if res:
                     self.__DesignVariant = res[0]
 
+                else:
+
+                    res = re.search(r'[A-Z]', self.__Case)
+                    if res:
+                        self.__DesignVariant = "Тантал."
+
+        if (self.GetDesignator() == "R"):
+            self.__DesignVariant = "-"
+
 
     def __ParseManufacturerPartNumber(self, name):
         tmp = name.split(" ")

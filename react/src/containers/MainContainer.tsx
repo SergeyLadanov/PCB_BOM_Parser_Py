@@ -34,6 +34,7 @@ function MainContainer() {
   const [NeedToLoad, setNeedToLoad] = useState(true)
   const Storage: StorageSettings = new StorageSettings()
   const [BomParseResult, SetBomParseResult] = useState<ParseResult[]>([])
+  const [LastBomRequest, SetLastBomRequest] = useState<BomRequest>()
 
   useEffect(() => {
     if (NeedToLoad) {
@@ -87,10 +88,6 @@ function MainContainer() {
     return () => {}
   })
 
-  const ResetResulState = () => {
-    SetBomParseResult([])
-    tableForm.Clear()
-  }
 
   const replaceAll = (str: string, find: string, replace: string) => {
     return str.replace(new RegExp(find, 'g'), replace)
@@ -124,7 +121,6 @@ function MainContainer() {
 
   const OnBomListTextInput = (val: string) => {
     Storage.Bom = val
-    ResetResulState()
   }
 
   const OnSaveBomCheckedChanged = (val: boolean) => {
@@ -143,33 +139,27 @@ function MainContainer() {
   }
   const OnSkipResTolCheckedChanged = (val: boolean) => {
     Storage.SkipResTol = val
-    ResetResulState()
   }
   const OnSkipResPwrCheckedChanged = (val: boolean) => {
     Storage.SkipResPwr = val
-    ResetResulState()
   }
   const OnSkipCapTolCheckedChanged = (val: boolean) => {
     Storage.SkipCapTol = val
-    ResetResulState()
   }
   const OnSkipCapVoltCheckedChanged = (val: boolean) => {
     Storage.SkipCapVolt = val
-    ResetResulState()
   }
   const OnSkipCapDielCheckedChanged = (val: boolean) => {
     Storage.SkipCapDiel = val
-    ResetResulState()
   }
 
   const OnSubmitButtonClick = () => {
     const data: BomRequest = GetRequest()
     SendRequest(API_URL, data)
       .then((value: ParseResult[]) => {
+        SetLastBomRequest(data)
         SetBomParseResult(value)
         tableForm.Clear()
-        //alert('Настройки успешно применены')
-        //console.log(value)
         value.forEach(item => {
           const Row: TableRow = {
             Links: item.ordering.map((link: ResultLink) => ({
@@ -229,7 +219,7 @@ function MainContainer() {
   }
 
   const OnDownloadExcelClick = () => {
-    const data: BomRequest = GetRequest()
+    const data: BomRequest = LastBomRequest
     SetIsLoadingExcel(true)
     // Отправляем POST-запрос
     $.ajax({
@@ -265,17 +255,14 @@ function MainContainer() {
 
   const OnSmdResManChanged = (index: number) => {
     Storage.ManSmdResIndex = index
-    ResetResulState()
   }
 
   const OnSmdCerCapManChanged = (index: number) => {
     Storage.ManSmdCerCapIndex = index
-    ResetResulState()
   }
 
   const OnSmdTantCapManChanged = (index: number) => {
     Storage.ManSmdTantCapIndex = index
-    ResetResulState()
   }
 
   return (
@@ -299,7 +286,7 @@ function MainContainer() {
           OnRuButtonClick={OnRuButtonClick}
           OnElitanButtonClick={OnElitanButtonClick}
           OnManufacturersNamesButtonClick={OnManufacturersNamesButtonClick}
-          disabled={srcDataForm.BomListErr != '' || BomParseResult.length === 0}
+          disabled={BomParseResult.length === 0}
         />
         <ModalForm form={modalListForm} csv_link={ApiUrls.DOWNLOAD_CSV_URL} />
         <ManufacturerSettingsForm
@@ -310,7 +297,7 @@ function MainContainer() {
         />
         <TableForm
           form={tableForm}
-          disabled={srcDataForm.BomListErr != '' || BomParseResult.length === 0}
+          disabled={BomParseResult.length === 0}
           OnDownloadExcelClick={OnDownloadExcelClick}
         />
       </div>

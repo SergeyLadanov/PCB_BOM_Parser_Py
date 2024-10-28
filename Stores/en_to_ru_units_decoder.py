@@ -15,6 +15,10 @@ def GetParametersString(component_obj, filter):
     DesignVariant = component_obj.GetDesignVariant() if not filter.GetFilter(component_obj.GetDesignator()).SkipVariant else ''
     Case = component_obj.GetCase()
 
+    probe = re.search(r'^(?:[А-Яа-яёЁ]+|-)', DesignVariant)
+    if probe:
+        DesignVariant = ''
+
     if ManufacturerPartNumber == "":
 
         if len(Value) > 0:

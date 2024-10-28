@@ -123,34 +123,41 @@ function TableForm({ form, disabled, OnDownloadExcelClick }: TableFormProps) {
               </tr>
             </thead>
             <tbody id="res_table_body">
-              {form.RowArray.map((item, index) => (
-                <tr key={index.toString()} style={{ verticalAlign: 'middle' }}>
-                  <th scope="row">{(index + 1).toString()}</th>
-                  <td>{item.Name}</td>
-                  <td>{item.Type}</td>
-                  <td style={{ fontSize: '12px' }}>
-                    {item.Parameters.map((parameter, index) => (
-                      <span key={index}>
-                        {parameter}
-                        <br />
-                      </span>
-                    ))}
-                  </td>
-                  <td>{item.Quantity.toString()}</td>
-                  <td>
-                    <LinkArray
-                      Links={item.Links}
-                      HandleClick={() => handleLinkClick(index)}
-                    />
-                  </td>
-                  <td className="text-center">
-                    <button
-                      className={`circle-button ${form.RowStatusArray[index]}`}
-                      onClick={() => handleButtonClick(index)}
-                    />
-                  </td>
-                </tr>
-              ))}
+              {!disabled && (
+                <>
+                  {form.RowArray.map((item, index) => (
+                    <tr
+                      key={index.toString()}
+                      style={{ verticalAlign: 'middle' }}
+                    >
+                      <th scope="row">{(index + 1).toString()}</th>
+                      <td>{item.Name}</td>
+                      <td>{item.Type}</td>
+                      <td style={{ fontSize: '12px' }}>
+                        {item.Parameters.map((parameter, index) => (
+                          <span key={index}>
+                            {parameter}
+                            <br />
+                          </span>
+                        ))}
+                      </td>
+                      <td>{item.Quantity.toString()}</td>
+                      <td>
+                        <LinkArray
+                          Links={item.Links}
+                          HandleClick={() => handleLinkClick(index)}
+                        />
+                      </td>
+                      <td className="text-center">
+                        <button
+                          className={`circle-button ${form.RowStatusArray[index]}`}
+                          onClick={() => handleButtonClick(index)}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </>
+              )}
             </tbody>
           </table>
         </div>

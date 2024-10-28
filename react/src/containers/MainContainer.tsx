@@ -310,7 +310,7 @@ function MainContainer() {
         />
         <TableForm
           form={tableForm}
-          disabled={BomParseResult.length === 0}
+          disabled={srcDataForm.BomListErr != '' || BomParseResult.length === 0}
           OnDownloadExcelClick={OnDownloadExcelClick}
         />
       </div>

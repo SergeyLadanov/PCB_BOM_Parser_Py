@@ -51,8 +51,7 @@ function BomVariationsForm({
 
   return (
     <>
-      <p className="h4">Результаты</p>
-      <p></p>
+
 
       <div className="row p-2">
         <div className="col-md-3 mb-3">
@@ -100,7 +99,6 @@ function BomVariationsForm({
           </button>
         </div>
       </div>
-      <p></p>
     </>
   )
 }

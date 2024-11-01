@@ -280,6 +280,10 @@ function MainContainer() {
         OnManufacturerSettingsClick={OnManufacturerSettingsClick}
       />
       <div className="my-3 p-3 bg-body rounded shadow-sm">
+        {/* <div className="alert alert-warning" role="alert">
+          A simple warning alert—check it out!
+        </div> */}
+        <p className="h4 mb-2">Результаты</p>
         <BomVariationsForm
           OnEnButtonClick={OnEnButtonClick}
           OnRuButtonClick={OnRuButtonClick}

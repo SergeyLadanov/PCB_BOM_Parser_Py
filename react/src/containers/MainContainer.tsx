@@ -35,6 +35,13 @@ function MainContainer() {
   const Storage: StorageSettings = new StorageSettings()
   const [BomParseResult, SetBomParseResult] = useState<ParseResult[]>([])
   const [LastBomRequest, SetLastBomRequest] = useState<BomRequest>()
+  const [ShowWarning, SetShowWarning] = useState(false)
+
+  const HandleShowWarning = () => {
+    if (BomParseResult.length > 0) {
+      SetShowWarning(true)
+    }
+  }
 
   useEffect(() => {
     if (NeedToLoad) {
@@ -120,6 +127,7 @@ function MainContainer() {
 
   const OnBomListTextInput = (val: string) => {
     Storage.Bom = val
+    HandleShowWarning()
   }
 
   const OnSaveBomCheckedChanged = (val: boolean) => {
@@ -138,18 +146,23 @@ function MainContainer() {
   }
   const OnSkipResTolCheckedChanged = (val: boolean) => {
     Storage.SkipResTol = val
+    HandleShowWarning()
   }
   const OnSkipResPwrCheckedChanged = (val: boolean) => {
     Storage.SkipResPwr = val
+    HandleShowWarning()
   }
   const OnSkipCapTolCheckedChanged = (val: boolean) => {
     Storage.SkipCapTol = val
+    HandleShowWarning()
   }
   const OnSkipCapVoltCheckedChanged = (val: boolean) => {
     Storage.SkipCapVolt = val
+    HandleShowWarning()
   }
   const OnSkipCapDielCheckedChanged = (val: boolean) => {
     Storage.SkipCapDiel = val
+    HandleShowWarning()
   }
 
   const OnSubmitButtonClick = () => {
@@ -158,6 +171,7 @@ function MainContainer() {
       .then((value: ParseResult[]) => {
         SetLastBomRequest(data)
         SetBomParseResult(value)
+        SetShowWarning(false)
         tableForm.Clear()
         value.forEach(item => {
           const Row: TableRow = {
@@ -254,14 +268,25 @@ function MainContainer() {
 
   const OnSmdResManChanged = (index: number) => {
     Storage.ManSmdResIndex = index
+    HandleShowWarning()
   }
 
   const OnSmdCerCapManChanged = (index: number) => {
     Storage.ManSmdCerCapIndex = index
+    HandleShowWarning()
   }
 
   const OnSmdTantCapManChanged = (index: number) => {
     Storage.ManSmdTantCapIndex = index
+    HandleShowWarning()
+  }
+
+  const OnQuantitySpinBoxChanged = (value: number) => {
+    HandleShowWarning()
+  }
+
+  const OnTechReserveSpinBoxChanged = (value: number) => {
+    HandleShowWarning()
   }
 
   return (
@@ -278,12 +303,17 @@ function MainContainer() {
         OnSkipResPwrCheckedChanged={OnSkipResPwrCheckedChanged}
         OnSkipResTolCheckedChanged={OnSkipResTolCheckedChanged}
         OnManufacturerSettingsClick={OnManufacturerSettingsClick}
+        OnQuantitySpinBoxChanged={OnQuantitySpinBoxChanged}
+        OnTechReserveSpinBoxChanged={OnTechReserveSpinBoxChanged}
       />
       <div className="my-3 p-3 bg-body rounded shadow-sm">
-        {/* <div className="alert alert-warning" role="alert">
-          A simple warning alert—check it out!
-        </div> */}
         <p className="h4 mb-2">Результаты</p>
+        {ShowWarning && (
+          <div className="alert alert-warning text-center" role="alert">
+            Внимание! Исходные данные были изменены, для обновления результатов
+            нажмите кнопку "Обработать"
+          </div>
+        )}
         <BomVariationsForm
           OnEnButtonClick={OnEnButtonClick}
           OnRuButtonClick={OnRuButtonClick}

@@ -43,6 +43,9 @@ interface FormProps {
   OnSkipCapTolCheckedChanged?: (value: boolean) => void
   OnSkipCapVoltCheckedChanged?: (value: boolean) => void
   OnSkipCapDielCheckedChanged?: (value: boolean) => void
+
+  OnQuantitySpinBoxChanged?: (value: number) => void
+  OnTechReserveSpinBoxChanged?: (value: number) => void
 }
 
 export function useSourceDataForm(): FormController {
@@ -100,7 +103,9 @@ function SourceDataForm({
   OnSkipCapTolCheckedChanged,
   OnSkipCapVoltCheckedChanged,
   OnSkipCapDielCheckedChanged,
-  OnManufacturerSettingsClick
+  OnManufacturerSettingsClick,
+  OnQuantitySpinBoxChanged,
+  OnTechReserveSpinBoxChanged
 }: FormProps) {
   useEffect(() => {
     return () => {}
@@ -135,10 +140,18 @@ function SourceDataForm({
 
   const OnQuantityChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     form.SetQuantity(Number(event.target.value))
+
+    if (OnQuantitySpinBoxChanged) {
+      OnQuantitySpinBoxChanged(Number(event.target.value))
+    }
   }
 
   const OnTechReserveChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     form.SetTechReserve(Number(event.target.value))
+
+    if (OnTechReserveSpinBoxChanged) {
+      OnTechReserveSpinBoxChanged(Number(event.target.value))
+    }
   }
 
   const OnSkipResTolChanged = (event: React.ChangeEvent<HTMLInputElement>) => {

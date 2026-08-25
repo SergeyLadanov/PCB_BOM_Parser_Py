@@ -40,6 +40,7 @@ class ComponentBase:
         self.__DesignVariant = ""
         self.__ManufacturerPartNumber = ""
         self.__MountWay = self.MOUNT_WAY_NOT_SET
+        self.__HasExplicitUnits = False
         self.__Parse(self.__Name)
 
 
@@ -61,9 +62,11 @@ class ComponentBase:
 
     def SetForcedDesignator(self, desValue):
         self.__Designator = desValue
-
-        if self.GetDesignator() == "R" or self.GetDesignator() == "C" or self.GetDesignator() == "L":
-            self.__Type = self.TYPE_PASSIVE
+        self.__Type = (
+            self.TYPE_PASSIVE
+            if self.GetDesignator() in {"R", "C", "L"}
+            else self.TYPE_OTHER
+        )
     
 
     def SetDesignator(self, desValue):
@@ -126,14 +129,19 @@ class ComponentBase:
         # Try to get cap value and units value in Russian
         res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?\w?\w?Ф', name)
         if res:
+            self.__HasExplicitUnits = True
             self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
             self.__UnitsValue = re.search(r'\D?\D?Ф', res[0])[0]
             self.__SetAsCapacitor()
                 
         else:
             # Try to get cap value and units in English
-            res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[munp]?F', name)
+            res = re.search(
+                r'(?<![\w.])[+-]?([0-9]*[.])?[0-9]+[\s]?[munp]?F(?![A-Za-z0-9])',
+                name,
+            )
             if res:
+                self.__HasExplicitUnits = True
                 self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
                 self.__UnitsValue = re.search(r'\s?[munp]?F', res[0])[0]
                 self.__SetAsCapacitor()
@@ -142,14 +150,19 @@ class ComponentBase:
                 # Try to get inductor value and units value in Russian
                 res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?\w?\w?Гн', name)
                 if res:
+                    self.__HasExplicitUnits = True
                     self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
                     self.__UnitsValue = re.search(r'\D?\D?Гн', res[0])[0]
                     self.__SetAsInductor()
                         
                 else:
                     # Try to get inductor value and units in English
-                    res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?[mun]?H', name)
+                    res = re.search(
+                        r'(?<![\w.])[+-]?([0-9]*[.])?[0-9]+[\s]?[mun]?H(?![A-Za-z0-9])',
+                        name,
+                    )
                     if res:
+                        self.__HasExplicitUnits = True
 
                         self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
                         self.__UnitsValue = re.search(r'\s?[mun]?H', res[0])[0]
@@ -159,6 +172,7 @@ class ComponentBase:
                         # Try to get res value and units value in Russian
                         res = re.search(r'[+-]?([0-9]*[.])?[0-9]+[\s]?\w?Ом', name)
                         if res:
+                            self.__HasExplicitUnits = True
                             self.__Value = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
                             self.__UnitsValue = re.search(r'\D?Ом', res[0])[0]
                             self.__SetAsResistor()
@@ -194,7 +208,7 @@ class ComponentBase:
 
     def __ParseCase(self, name):
         # Try to get case
-        res = re.search(r'[^A-Z0-9][0-9][0-9][0-9][0-9][^A-Z0-9]?', name)
+        res = re.search(r'(?<![A-Z0-9])[0-9]{4}(?![A-Z0-9])', name)
 
         if res:
             self.__Case = res[0].replace(' ', '')
@@ -268,10 +282,22 @@ class ComponentBase:
                     self.__ManufacturerPartNumber = probe[0]
 
     def __CheckParsing(self):
-        if self.GetMountWay() == self.MOUNT_WAY_NOT_SET and self.GetEndurance() == 0 and self.GetTolerance() == 0 and not self.GetCase():
+        if (
+            self.GetMountWay() == self.MOUNT_WAY_NOT_SET
+            and self.GetEndurance() == 0
+            and self.GetTolerance() == 0
+            and not self.GetCase()
+            and not self.__HasExplicitUnits
+        ):
             self.SetForcedDesignator(self.__Name)
             self.__UnitsValue = ""
             self.__Value = 0.0
+            self.__UnitsEndurance = ""
+            self.__Endurance = 0.0
+            self.__Tolerance = 0
+            self.__Case = ""
+            self.__DesignVariant = ""
+            self.__MountWay = self.MOUNT_WAY_NOT_SET
             if not self.GetManufacturerPartNumber():
                 return False
 

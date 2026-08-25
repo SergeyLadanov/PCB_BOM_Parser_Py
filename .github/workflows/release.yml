@@ -17,6 +17,18 @@ jobs:
 
     - uses: actions/checkout@v4
 
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+
+    - name: Install Python dependencies
+      run: python -m pip install -r requirements-dev.txt
+
+    - name: Run Python tests
+      run: python -m pytest
+
     - name: Insert firmware version
       run: echo "Value" "=" '"'$GITHUB_REF_NAME'"' >> version.py
 
@@ -52,8 +64,11 @@ jobs:
         rm -r .git
         rm -r .github
         rm -r .vscode
+        rm -r tests
         rm PCB_BOM_Parser_Py.code-workspace
         rm TestParser.py
+        rm pytest.ini
+        rm requirements-dev.txt
         rm static/index.html 
 
 

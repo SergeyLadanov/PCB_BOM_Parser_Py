@@ -31,24 +31,18 @@ def __GetSpec(data):
     rows = data.split('\n')
 
     for line_number, row in enumerate(rows, start=1):
-        try:
-            temp_item = { 
-                'name': '', 
-                'count': 1,
-                'source_line': line_number,
-                }
-            name = row.split('\t')[0]
-            if name != "":
-                temp_item['name'] = name
-
-            count = row.split('\t')[1]
-            if count != "":
-                temp_item['count'] = count
-
-
-            result.append(temp_item)
-        except:
+        separator = '\t' if '\t' in row else ';'
+        columns = row.rsplit(separator, 1)
+        if len(columns) != 2:
             continue
+
+        name, count = columns
+        temp_item = {
+            'name': name,
+            'count': count or 1,
+            'source_line': line_number,
+        }
+        result.append(temp_item)
 
     return result
 

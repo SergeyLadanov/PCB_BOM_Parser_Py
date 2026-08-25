@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import '../scss/styles.scss'
 
 interface FormData {
   BomList: string
   BomListErr: string
+  BomListErrLine: number | null
   Quantity: number
   TechReserve: number
   SkipResTol: boolean
@@ -18,6 +19,7 @@ interface FormData {
 interface FormController extends FormData {
   SetBomList: (value: string) => void
   SetBomListErr: (value: string) => void
+  SetBomListErrLine: (value: number | null) => void
   SetQuantity: (value: Number) => void
   SetTechReserve: (value: Number) => void
   SetSkipResTol: (value: boolean) => void
@@ -52,6 +54,7 @@ export function useSourceDataForm(): FormController {
   const [formState, setFormData] = useState<FormData>({
     BomList: '',
     BomListErr: '',
+    BomListErrLine: null,
     Quantity: 1,
     TechReserve: 0,
     SkipResTol: false,
@@ -69,6 +72,8 @@ export function useSourceDataForm(): FormController {
       setFormData(prev => ({ ...prev, BomList: value })),
     SetBomListErr: (value: string) =>
       setFormData(prev => ({ ...prev, BomListErr: value })),
+    SetBomListErrLine: (value: number | null) =>
+      setFormData(prev => ({ ...prev, BomListErrLine: value })),
     SetQuantity: (value: number) =>
       setFormData(prev => ({ ...prev, Quantity: value })),
     SetTechReserve: (value: number) =>
@@ -107,6 +112,14 @@ function SourceDataForm({
   OnQuantitySpinBoxChanged,
   OnTechReserveSpinBoxChanged
 }: FormProps) {
+  const lineNumbersRef = useRef<HTMLDivElement>(null)
+  const [bomListScrollTop, setBomListScrollTop] = useState(0)
+  const lineCount = Math.max(1, form.BomList.split('\n').length)
+  const lineNumberWidth = `${lineCount.toString().length + 2}ch`
+  const errorLineTop = form.BomListErrLine
+    ? `calc(0.375rem + ${(form.BomListErrLine - 1) * 1.5}em - ${bomListScrollTop}px)`
+    : undefined
+
   useEffect(() => {
     return () => {}
   })
@@ -126,15 +139,25 @@ function SourceDataForm({
     for (let i = 0; i < lines.length; i++) {
       if (!validateLine(lines[i])) {
         form.SetBomListErr(`Ошибка в строке ${i + 1}`)
+        form.SetBomListErrLine(i + 1)
         return
       }
     }
 
     // Если ошибок нет
     form.SetBomListErr('')
+    form.SetBomListErrLine(null)
 
     if (OnBomListTextInput) {
       OnBomListTextInput(event.target.value)
+    }
+  }
+
+  const OnBomListScroll = (event: React.UIEvent<HTMLTextAreaElement>) => {
+    setBomListScrollTop(event.currentTarget.scrollTop)
+
+    if (lineNumbersRef.current) {
+      lineNumbersRef.current.scrollTop = event.currentTarget.scrollTop
     }
   }
 
@@ -241,6 +264,7 @@ function SourceDataForm({
               </symbol>
             </svg>
             <div
+              id="bom-list-error-message"
               className="alert alert-danger"
               role="alert"
               style={{
@@ -276,13 +300,46 @@ function SourceDataForm({
             <div className="col-md-6 mb-3">
               <p className="h4">Исходный список компонентов</p>
 
-              <div className="input-group">
+              <div className="bom-list-editor">
+                <div
+                  ref={lineNumbersRef}
+                  className="bom-list-line-numbers"
+                  style={{ width: lineNumberWidth }}
+                  aria-hidden="true"
+                >
+                  {Array.from({ length: lineCount }, (_, index) => (
+                    <span
+                      key={index}
+                      className={
+                        form.BomListErrLine === index + 1
+                          ? 'bom-list-line-number-error'
+                          : undefined
+                      }
+                    >
+                      {index + 1}
+                    </span>
+                  ))}
+                </div>
+                {form.BomListErrLine && (
+                  <div
+                    className="bom-list-error-highlight"
+                    style={{ top: errorLineTop, left: lineNumberWidth }}
+                    aria-hidden="true"
+                  />
+                )}
                 <textarea
                   onChange={OnBomListChanged}
+                  onScroll={OnBomListScroll}
                   id="input_list"
                   rows={24}
-                  className="form-control"
-                  aria-label="With textarea"
+                  className="form-control bom-list-input"
+                  style={{ paddingLeft: `calc(${lineNumberWidth} + 0.75rem)` }}
+                  aria-label="Исходный список компонентов"
+                  aria-invalid={Boolean(form.BomListErr)}
+                  aria-describedby={
+                    form.BomListErr ? 'bom-list-error-message' : undefined
+                  }
+                  wrap="off"
                   value={form.BomList}
                 ></textarea>
               </div>

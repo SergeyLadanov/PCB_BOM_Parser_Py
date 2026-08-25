@@ -25,6 +25,21 @@
         "options": {
             "cwd": "./react"
         }
+      },
+      {
+        "type": "shell",
+        "label": "Тесты Python",
+        "command": "${command:python.interpreterPath}",
+        "args": ["-m", "pytest", "tests"],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        },
+        "problemMatcher": ["$python"],
+        "detail": "Запуск тестов Python-приложения"
       }
     ]
   }

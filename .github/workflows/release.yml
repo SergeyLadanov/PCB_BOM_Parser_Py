@@ -1,86 +1,88 @@
 name: "Generate release files"
+
 on:
-  push:
-    tags:
-    - '*'
-env:
-  IS_PRERELEASE: 'false'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
 jobs:
   generate_files:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
 
-    - name: Change prerelease status
-      if: contains(github.ref_name, '-rc')
-      run: echo "IS_PRERELEASE=true" >> $GITHUB_ENV
+      - name: Read release tag from version.py
+        id: version
+        shell: bash
+        run: |
+          tag="$(python -c 'from version import Value; print(Value)')"
+          if [[ -z "$tag" ]]; then
+            echo "Version in version.py must not be empty" >&2
+            exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
-    - uses: actions/checkout@v4
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements-dev.txt
 
-    - name: Insert firmware version
-      run: echo "Value" "=" '"'$GITHUB_REF_NAME'"' >> version.py
+      - name: Run Python tests
+        run: python -m pytest
 
-    - name: Check version
-      run: cat version.py
-        
+      - name: Check version
+        run: cat version.py
 
-    - name: Read changelog for pre release build
-      id: changelog_release
-      uses: embedd-actions/read_changelog_action@v3
-      with:
-        changelogfile: 'CHANGELOG.md'
-        tag: ${{ github.ref_name }}
+      - name: Read changelog for release build
+        id: changelog_release
+        uses: embedd-actions/read_changelog_action@v3
+        with:
+          changelogfile: 'CHANGELOG.md'
+          tag: ${{ steps.version.outputs.tag }}
 
-    - name: Prepare release notes
-      run: |
-        echo "## [${{ github.ref_name}}] - $(date +'%Y-%m-%d')" >> Release_Notes.md 
-        echo "" >> Release_Notes.md
-        echo "## Изменения:" >> Release_Notes.md 
-        echo "${{ steps.changelog_release.outputs.content }}" >> Release_Notes.md
-    
+      - name: Prepare release notes
+        run: |
+          echo "## [${{ steps.version.outputs.tag }}] - $(date +'%Y-%m-%d')" >> Release_Notes.md
+          echo "" >> Release_Notes.md
+          echo "## Изменения:" >> Release_Notes.md
+          echo "${{ steps.changelog_release.outputs.content }}" >> Release_Notes.md
 
-    - name: Install npm dependencies
-      run: cd react && npm install
+      - name: Install npm dependencies
+        run: cd react && npm install
 
+      - name: Build web application
+        run: npm run build --prefix ./react
 
-    - name: Build web application
-      run: npm run build --prefix ./react
+      - name: Remove unused
+        run: |
+          rm -r react/node_modules
+          rm -r .git
+          rm -r .github
+          rm -r .vscode
+          rm -r tests
+          rm PCB_BOM_Parser_Py.code-workspace
+          rm TestParser.py
+          rm pytest.ini
+          rm requirements-dev.txt
+          rm static/index.html
 
-    - name: Remove unused
-      run: |
-        rm -r react/node_modules
-        rm -r .git
-        rm -r .github
-        rm -r .vscode
-        rm PCB_BOM_Parser_Py.code-workspace
-        rm TestParser.py
-        rm static/index.html 
+      - name: ZIP files
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          filename: 'BOM_Parser_${{ steps.version.outputs.tag }}.zip'
 
-
-    - uses: ncipollo/release-action@v1
-      with:
-        bodyFile: "Release_Notes.md"
-        allowUpdates: 'true'
-        prerelease: ${{ env.IS_PRERELEASE }}
-
-
-    - name: ZIP files
-      uses: thedoctor0/zip-release@master
-      with:
-        type: 'zip'
-        filename: 'release.zip'
-
-    - name: Upload zip to release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: release.zip
-        asset_name: BOM_Parser_$tag.zip
-        tag: ${{ github.ref }}
-
-
-
-      
-
-
-    
+      - name: Create GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.version.outputs.tag }}
+          commit: ${{ github.sha }}
+          bodyFile: 'Release_Notes.md'
+          artifacts: 'BOM_Parser_${{ steps.version.outputs.tag }}.zip'
+          artifactErrorsFailBuild: true
+          prerelease: ${{ contains(steps.version.outputs.tag, '-rc') }}

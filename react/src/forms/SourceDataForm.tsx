@@ -138,7 +138,11 @@ function SourceDataForm({
     // Проверка каждой строки
     for (let i = 0; i < lines.length; i++) {
       if (!validateLine(lines[i])) {
-        form.SetBomListErr(`Ошибка в строке ${i + 1}`)
+        form.SetBomListErr(
+          `Ошибка в строке ${i + 1}: каждая строка должна содержать ` +
+            'наименование и количество через табуляцию либо точку с запятой.\n' +
+            'Пример:\n100мкФ 10% 10В Тип D;1\nLSM6DSLTR 1;1'
+        )
         form.SetBomListErrLine(i + 1)
         return
       }
@@ -273,7 +277,8 @@ function SourceDataForm({
                 left: 0,
                 right: 0,
                 zIndex: 50,
-                opacity: 0.95
+                opacity: 0.95,
+                whiteSpace: 'pre-line'
               }}
             >
               <svg
@@ -285,13 +290,7 @@ function SourceDataForm({
               >
                 <use xlinkHref="#exclamation-triangle-fill" />
               </svg>
-              {form.BomListErr}: Каждая строка должна содержать наименование
-              (текст/числа/пробелы) и количество (число) через табуляцию либо
-              точку с запятой. <br />
-              Пример: <br />
-              100мкФ 10% 10В Тип D;1
-              <br />
-              LSM6DSLTR 1;1
+              {form.BomListErr}
             </div>
           </>
         )}

@@ -1,6 +1,23 @@
 import { useState } from 'react'
 import $ from 'jquery'
 
+interface ApiErrorResponse {
+  error?: {
+    message?: string
+    line?: number
+  }
+}
+
+export class PostingError extends Error {
+  readonly line: number | null
+
+  constructor(message: string, line: number | null = null) {
+    super(message)
+    this.name = 'PostingError'
+    this.line = line
+  }
+}
+
 export function usePosting(
   initial_value: boolean = true
 ): [(url_val: string, data: any) => Promise<any>, string, boolean] {
@@ -15,9 +32,16 @@ export function usePosting(
         setLoading(false)
       })
         // Обработчик неуспешной отправки данных
-        .fail(function (error) {
-          setError(err)
-          reject(new Error(`${err}`))
+        .fail(function (request: JQuery.jqXHR<ApiErrorResponse>) {
+          const response = request.responseJSON
+          const message =
+            response?.error?.message ?? 'Потеряна связь с сервером'
+          const line = Number.isInteger(response?.error?.line)
+            ? response.error.line
+            : null
+
+          setError(message)
+          reject(new PostingError(message, line))
           setLoading(false)
         })
     })

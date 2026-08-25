@@ -3,7 +3,7 @@ import SourceDataForm, { useSourceDataForm } from '../forms/SourceDataForm'
 import $ from 'jquery'
 import ModalForm, { useModalForm } from '../forms/ModalForm'
 import TableForm, { useTableForm, TableRow } from '../forms/TableForm'
-import { usePosting } from '../hooks/usePosting'
+import { PostingError, usePosting } from '../hooks/usePosting'
 import BomVariationsForm from '../forms/BomVariationsForm'
 import LoadingIndicator from '../components/LoadingIndicator'
 import { StorageSettings } from '../ts/StorageSettings'
@@ -188,8 +188,16 @@ function MainContainer() {
           tableForm.AddRow(Row)
         })
       })
-      .catch(() => {
-        alert('Потеряна связь с сервером')
+      .catch((error: unknown) => {
+        if (error instanceof PostingError && error.line !== null) {
+          srcDataForm.SetBomListErr(error.message)
+          srcDataForm.SetBomListErrLine(error.line)
+          return
+        }
+
+        alert(
+          error instanceof Error ? error.message : 'Потеряна связь с сервером'
+        )
       })
   }
 

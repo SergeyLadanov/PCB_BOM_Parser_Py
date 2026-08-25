@@ -30,11 +30,12 @@ def __GetSpec(data):
     result = []
     rows = data.split('\n')
 
-    for row in rows:
+    for line_number, row in enumerate(rows, start=1):
         try:
             temp_item = { 
                 'name': '', 
-                'count': 1, 
+                'count': 1,
+                'source_line': line_number,
                 }
             name = row.split('\t')[0]
             if name != "":
@@ -300,25 +301,35 @@ def handle_bom():
 
     res_list = []
     for item in spec_list:
+        try:
+            model.CorrectionCount(item, device_count, tech_reseve)
 
-        model.CorrectionCount(item, device_count, tech_reseve)
+            manufacturers_settings = ManufacturerManager.Settings(chip_res_man=man_res_settings, chip_cap_man=man_cercap_settings, chip_tant_cap_man=man_tantcap_settings)
 
-        manufacturers_settings = ManufacturerManager.Settings(chip_res_man=man_res_settings, chip_cap_man=man_cercap_settings, chip_tant_cap_man=man_tantcap_settings)
+            parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec', 'dko_electronshik'], manufacturers_settings, parser_filter)
 
-        parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec', 'dko_electronshik'], manufacturers_settings, parser_filter)
-
-        temp_item = { 
-            'name': item['name'], 
-            'type': parse_res['type'],
-            'count': item['count'],
-            'params': parse_res['params'],
-            'ordering': parse_res['ordering'],
-            'ru': parse_res['ru_text_item'],
-            'en': parse_res['en_text_item'],
-            'elitan': parse_res['elitan_text_item'],
-            'manufacturer_info': parse_res['manufacturer_info']
-            }
-        res_list.append(temp_item)
+            temp_item = {
+                'name': item['name'],
+                'type': parse_res['type'],
+                'count': item['count'],
+                'params': parse_res['params'],
+                'ordering': parse_res['ordering'],
+                'ru': parse_res['ru_text_item'],
+                'en': parse_res['en_text_item'],
+                'elitan': parse_res['elitan_text_item'],
+                'manufacturer_info': parse_res['manufacturer_info']
+                }
+            res_list.append(temp_item)
+        except Exception:
+            line_number = item['source_line']
+            app.logger.exception('Failed to process BOM item on line %s', line_number)
+            return {
+                'error': {
+                    'code': 'bom_item_processing_failed',
+                    'line': line_number,
+                    'message': f'Не удалось обработать элемент в строке {line_number}.'
+                }
+            }, 422
 
     return res_list
     

@@ -31,6 +31,49 @@ export interface BomRequest {
   man_settings: ManufacturersSettings
 }
 
+export type ExcelColumnKey =
+  | 'number'
+  | 'designator'
+  | 'source_name'
+  | 'component_type'
+  | 'parameters'
+  | 'english_name'
+  | 'russian_name'
+  | 'manufacturer_part_name'
+  | 'manufacturer'
+  | 'quantity'
+  | 'store_elitan'
+  | 'store_chipdip'
+  | 'store_platan'
+  | 'store_promelec'
+  | 'store_dko_electronshik'
+
+export const EXCEL_COLUMN_KEYS: ExcelColumnKey[] = [
+  'number',
+  'designator',
+  'source_name',
+  'component_type',
+  'parameters',
+  'english_name',
+  'russian_name',
+  'manufacturer_part_name',
+  'manufacturer',
+  'quantity',
+  'store_elitan',
+  'store_chipdip',
+  'store_platan',
+  'store_promelec',
+  'store_dko_electronshik'
+]
+
+export const REQUIRED_EXCEL_COLUMN_KEYS: ExcelColumnKey[] = [
+  'number',
+  'source_name',
+  'quantity'
+]
+
+export const DEFAULT_EXCEL_COLUMN_KEYS: ExcelColumnKey[] = EXCEL_COLUMN_KEYS
+
 export interface ResultLink {
   order_link: string
   order_name: string

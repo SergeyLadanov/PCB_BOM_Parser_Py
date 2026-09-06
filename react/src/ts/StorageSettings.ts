@@ -1,4 +1,10 @@
 import { StorageValue } from './StorageValue'
+import {
+  DEFAULT_EXCEL_COLUMN_KEYS,
+  EXCEL_COLUMN_KEYS,
+  ExcelColumnKey,
+  REQUIRED_EXCEL_COLUMN_KEYS
+} from './api'
 
 export class StorageSettings {
   private _SaveBom: StorageValue<boolean>
@@ -17,6 +23,8 @@ export class StorageSettings {
   private _ManSmdCerCapIndex: StorageValue<number>
   private _ManSmdTantCapIndex: StorageValue<number>
 
+  private _ExcelColumns: StorageValue<string>
+
   constructor() {
     const SAVE_BOM_STORAGE_KEY = 'save_bom'
     const SAVE_FILTERS_STORAGE_KEY = 'save_filter'
@@ -32,6 +40,7 @@ export class StorageSettings {
     const MAN_SMDRES_INDEX_STORAGE_KEY = 'man_smdres_ind'
     const MAN_SMDCERCAP_INDEX_STORAGE_KEY = 'man_cercap_ind'
     const MAN_SMDTANTCAP_INDEX_STORAGE_KEY = 'man_tantcap_ind'
+    const EXCEL_COLUMNS_STORAGE_KEY = 'excel_export_columns'
 
     this._ManSmdResIndex = new StorageValue<number>(
       MAN_SMDRES_INDEX_STORAGE_KEY,
@@ -44,6 +53,10 @@ export class StorageSettings {
     this._ManSmdTantCapIndex = new StorageValue<number>(
       MAN_SMDTANTCAP_INDEX_STORAGE_KEY,
       0
+    )
+    this._ExcelColumns = new StorageValue<string>(
+      EXCEL_COLUMNS_STORAGE_KEY,
+      JSON.stringify(DEFAULT_EXCEL_COLUMN_KEYS)
     )
 
     this._SaveBom = new StorageValue<boolean>(SAVE_BOM_STORAGE_KEY, false)
@@ -98,6 +111,31 @@ export class StorageSettings {
 
   set ManSmdTantCapIndex(val) {
     this._ManSmdTantCapIndex.Val = val
+  }
+
+  get ExcelColumns(): ExcelColumnKey[] {
+    try {
+      const storedColumns: unknown = JSON.parse(this._ExcelColumns.Val)
+      if (Array.isArray(storedColumns)) {
+        const selectedColumns = new Set<ExcelColumnKey>(
+          storedColumns.filter(
+            (key): key is ExcelColumnKey =>
+              typeof key === 'string' &&
+              EXCEL_COLUMN_KEYS.includes(key as ExcelColumnKey)
+          )
+        )
+        REQUIRED_EXCEL_COLUMN_KEYS.forEach(key => selectedColumns.add(key))
+        return EXCEL_COLUMN_KEYS.filter(key => selectedColumns.has(key))
+      }
+    } catch {
+      // Поврежденные настройки заменяются значениями по умолчанию.
+    }
+
+    return DEFAULT_EXCEL_COLUMN_KEYS
+  }
+
+  set ExcelColumns(val: ExcelColumnKey[]) {
+    this._ExcelColumns.Val = JSON.stringify(val)
   }
 
   get SaveBom() {

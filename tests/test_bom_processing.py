@@ -283,16 +283,60 @@ def test_excel_export_contains_reference_designator_column(client):
 
     assert response.status_code == 200
     worksheet = load_workbook(BytesIO(response.data)).active
-    assert [cell.value for cell in worksheet[1]][:4] == [
+    assert [cell.value for cell in worksheet[1]][:5] == [
         "#",
-        "Поз. обозначение",
+        "Поз. обознач.",
         "Исходное наименование",
+        "Тип элемента",
         "Параметры",
     ]
     assert worksheet["B2"].value == "DD1,DD2"
     assert worksheet["C2"].value == "STM32H743ZIT6"
-    assert worksheet["J2"].value == "ссылка"
-    assert worksheet["J2"].hyperlink is not None
+    assert worksheet["D2"].value == "Микросхема"
+    assert worksheet["K2"].value == "ссылка"
+    assert worksheet["K2"].hyperlink is not None
+
+
+def test_excel_export_uses_selected_columns_and_keeps_required_ones(client):
+    data = make_json("DD1,DD2;STM32H743ZIT6;2")
+    data["excel_columns"] = ["designator", "component_type"]
+
+    response = client.post("/download_excel", json=data)
+
+    assert response.status_code == 200
+    worksheet = load_workbook(BytesIO(response.data)).active
+    assert [cell.value for cell in worksheet[1]] == [
+        "#",
+        "Поз. обознач.",
+        "Исходное наименование",
+        "Тип элемента",
+        "Количество",
+    ]
+    assert [cell.value for cell in worksheet[2]] == [
+        1,
+        "DD1,DD2",
+        "STM32H743ZIT6",
+        "Микросхема",
+        2,
+    ]
+
+
+def test_excel_export_formats_store_link_in_any_selected_position(client):
+    data = make_json("R1;10 кОм 1% 0603;1")
+    data["excel_columns"] = ["store_chipdip"]
+
+    response = client.post("/download_excel", json=data)
+
+    assert response.status_code == 200
+    worksheet = load_workbook(BytesIO(response.data)).active
+    assert [cell.value for cell in worksheet[1]] == [
+        "#",
+        "Исходное наименование",
+        "Количество",
+        "chipdip",
+    ]
+    assert worksheet["D2"].value == "ссылка"
+    assert worksheet["D2"].hyperlink is not None
 
 
 @pytest.mark.parametrize(

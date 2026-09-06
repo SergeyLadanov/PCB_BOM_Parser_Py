@@ -175,6 +175,7 @@ function MainContainer() {
         tableForm.Clear()
         value.forEach(item => {
           const Row: TableRow = {
+            Designator: item.designator,
             Links: item.ordering.map((link: ResultLink) => ({
               OrderLink: link.order_link,
               StoreName: link.store_name

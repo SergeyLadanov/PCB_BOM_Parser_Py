@@ -12,6 +12,7 @@ import ManufacturerManager
 from io import BytesIO
 
 import model
+from Components.ReferenceDesignator import is_reference_designator
 
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
@@ -26,18 +27,37 @@ path = os.path.realpath(os.path.dirname(sys.argv[0]))
 app = Flask(__name__)
 
 
+def __ParseSpecRow(row):
+    separator = '\t' if '\t' in row else (';' if ';' in row else None)
+    if separator is None:
+        return None
+
+    columns = row.split(separator)
+    if len(columns) < 2:
+        return None
+
+    count = columns[-1]
+    content_columns = columns[:-1]
+    if len(content_columns) >= 2 and is_reference_designator(
+        content_columns[0].strip()
+    ):
+        return content_columns[0], separator.join(content_columns[1:]), count
+
+    return '', separator.join(content_columns), count
+
+
 def __GetSpec(data):
     result = []
     rows = data.split('\n')
 
     for line_number, row in enumerate(rows, start=1):
-        separator = '\t' if '\t' in row else ';'
-        columns = row.rsplit(separator, 1)
-        if len(columns) != 2:
+        columns = __ParseSpecRow(row.rstrip('\r'))
+        if columns is None:
             continue
 
-        name, count = columns
+        designator, name, count = columns
         temp_item = {
+            'designator': designator.strip(),
             'name': name,
             'count': count or 1,
             'source_line': line_number,
@@ -129,6 +149,7 @@ def download_excel():
 
     res_data = {
         '#': [],
+        'Поз. обозначение': [],
         'Исходное наименование': [],
         'Параметры': [],
         'Список на англ.': [],
@@ -147,6 +168,7 @@ def download_excel():
         parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec', 'dko_electronshik'], manufacturers_settings, parser_filter)
 
         res_data['#'].append(count)
+        res_data['Поз. обозначение'].append(item['designator'])
         res_data['Исходное наименование'].append(item['name'])
 
         param_str = ""
@@ -215,42 +237,18 @@ def download_excel():
         cell.alignment = Alignment(wrap_text=True, vertical='top')   
 
 
-    for cell in ws['I'][1:]:  # Срез, начинающийся со второй ячейки
-        cell.style = "Hyperlink"
-        cell.hyperlink = cell.value
-        cell.value = "ссылка"
-        cell.alignment = Alignment(wrap_text=True, vertical='top')  
-
-
-    for cell in ws['J'][1:]:  # Срез, начинающийся со второй ячейки
-        cell.style = "Hyperlink"
-        cell.hyperlink = cell.value
-        cell.value = "ссылка"
-        cell.alignment = Alignment(wrap_text=True, vertical='top')  
-
-    for cell in ws['K'][1:]:  # Срез, начинающийся со второй ячейки
-        cell.style = "Hyperlink"
-        cell.hyperlink = cell.value
-        cell.value = "ссылка"
-        cell.alignment = Alignment(wrap_text=True, vertical='top') 
-
-    for cell in ws['L'][1:]:  # Срез, начинающийся со второй ячейки
-        cell.style = "Hyperlink"
-        cell.hyperlink = cell.value
-        cell.value = "ссылка"
-        cell.alignment = Alignment(wrap_text=True, vertical='top')   
-
-    for cell in ws['M'][1:]:  # Срез, начинающийся со второй ячейки
-        cell.style = "Hyperlink"
-        cell.hyperlink = cell.value
-        cell.value = "ссылка"
-        cell.alignment = Alignment(wrap_text=True, vertical='top')  
+    for column in ['J', 'K', 'L', 'M', 'N']:
+        for cell in ws[column][1:]:
+            cell.style = "Hyperlink"
+            cell.hyperlink = cell.value
+            cell.value = "ссылка"
+            cell.alignment = Alignment(wrap_text=True, vertical='top')
                 
 
     # Задаем ширину столбцов
     ws.column_dimensions['A'].width = 7
-    ws.column_dimensions['B'].width = 35 
-    ws.column_dimensions['C'].width = 30 
+    ws.column_dimensions['B'].width = 20
+    ws.column_dimensions['C'].width = 35
     ws.column_dimensions['D'].width = 30 
     ws.column_dimensions['E'].width = 30 
     ws.column_dimensions['F'].width = 30 
@@ -261,6 +259,7 @@ def download_excel():
     ws.column_dimensions['K'].width = 15
     ws.column_dimensions['L'].width = 15
     ws.column_dimensions['M'].width = 15
+    ws.column_dimensions['N'].width = 15
 
     output = BytesIO()
     # Сохраняем рабочую книгу в память
@@ -303,6 +302,7 @@ def handle_bom():
             parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec', 'dko_electronshik'], manufacturers_settings, parser_filter)
 
             temp_item = {
+                'designator': item['designator'],
                 'name': item['name'],
                 'type': parse_res['type'],
                 'count': item['count'],

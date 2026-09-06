@@ -1,6 +1,8 @@
 from pathlib import Path
+from io import BytesIO
 
 import pytest
+from openpyxl import load_workbook
 
 from Components.ComponentBase import ComponentBase
 from tests.expected_components import (
@@ -12,6 +14,7 @@ from web_controller import app
 
 FIXTURE_PATH = Path(__file__).parent / "fixtures" / "bom_items.tsv"
 EXPECTED_RESULT_FIELDS = {
+    "designator",
     "name",
     "type",
     "count",
@@ -76,6 +79,7 @@ def test_bom_data_processes_all_test_parser_and_application_items(client, bom_da
         result, bom_rows, strict=True
     ):
         assert parsed_item["name"] == expected_name
+        assert parsed_item["designator"] == ""
         assert parsed_item["count"] == expected_count
         assert set(parsed_item) == EXPECTED_RESULT_FIELDS
         assert isinstance(parsed_item["params"], list)
@@ -151,3 +155,121 @@ def test_bom_data_reports_the_source_line_that_failed(client):
             "message": "Не удалось обработать элемент в строке 2.",
         }
     }
+
+
+def make_json(bom):
+    return {
+        "bom": bom,
+        "count": 1,
+        "tech_res": 1.0,
+        "res_filter": {"skip_power": False, "skip_tol": False},
+        "cap_filter": {
+            "skip_tol": False,
+            "skip_voltage": False,
+            "skip_dielectric": False,
+        },
+        "man_settings": {
+            "smd_res": "Yageo",
+            "smd_cer_cap": "Yageo",
+            "smd_tant_cap": "Xiangyee",
+        },
+    }
+
+
+@pytest.mark.parametrize(
+    ("bom", "expected_designator", "expected_name", "expected_type", "expected_count"),
+    [
+        ("DD1\tSTM32H743ZIT6\t1", "DD1", "STM32H743ZIT6", "Микросхема", 1),
+        (
+            "DD1,DD2;STM32H743ZIT6;2",
+            "DD1,DD2",
+            "STM32H743ZIT6",
+            "Микросхема",
+            2,
+        ),
+        (
+            "DD1...DD5\tSTM32H743ZIT6\t5",
+            "DD1...DD5",
+            "STM32H743ZIT6",
+            "Микросхема",
+            5,
+        ),
+        (
+            "DD1,DD2,DD3...DD7;STM32H743ZIT6;7",
+            "DD1,DD2,DD3...DD7",
+            "STM32H743ZIT6",
+            "Микросхема",
+            7,
+        ),
+        ("ZQ1;HC-49S 8 МГц;1", "ZQ1", "HC-49S 8 МГц", "Кварцевый резонатор", 1),
+        ("K1;Relay 5V SPDT;1", "K1", "Relay 5V SPDT", "Реле", 1),
+        ("VD1;1N4148;3", "VD1", "1N4148", "Диод", 3),
+    ],
+)
+def test_bom_data_uses_optional_reference_designator(
+    client, bom, expected_designator, expected_name, expected_type, expected_count
+):
+    response = client.post("/bom_data", data=make_form(bom))
+
+    assert response.status_code == 200
+    item = response.get_json()[0]
+    assert item["designator"] == expected_designator
+    assert item["name"] == expected_name
+    assert item["type"] == expected_type
+    assert item["count"] == expected_count
+
+
+def test_reference_designator_has_priority_over_name_heuristics(client):
+    response = client.post(
+        "/bom_data", data=make_form("K1\tRelay coil 5V\t1")
+    )
+
+    assert response.status_code == 200
+    item = response.get_json()[0]
+    assert item["type"] == "Реле"
+    assert item["ru"] == "Relay coil 5V"
+    assert item["en"] == "Relay coil 5V"
+    assert item["elitan"] == "Relay coil 5V"
+
+
+def test_legacy_name_with_commas_remains_supported(client):
+    response = client.post(
+        "/bom_data", data=make_form("22 Ом, 1%, 0.063 Вт 0603;9")
+    )
+
+    assert response.status_code == 200
+    item = response.get_json()[0]
+    assert item["designator"] == ""
+    assert item["name"] == "22 Ом, 1%, 0.063 Вт 0603"
+    assert item["type"] == "Резистор"
+    assert item["count"] == 9
+
+
+def test_unknown_reference_designator_does_not_guess_type_from_name(client):
+    response = client.post(
+        "/bom_data", data=make_form("ABC1;10 кОм 1% 0603;1")
+    )
+
+    assert response.status_code == 200
+    item = response.get_json()[0]
+    assert item["designator"] == "ABC1"
+    assert item["type"] == "-"
+
+
+def test_excel_export_contains_reference_designator_column(client):
+    response = client.post(
+        "/download_excel", json=make_json("DD1,DD2;STM32H743ZIT6;2")
+    )
+
+    assert response.status_code == 200
+    worksheet = load_workbook(BytesIO(response.data)).active
+    assert [cell.value for cell in worksheet[1]][:4] == [
+        "#",
+        "Поз. обозначение",
+        "Исходное наименование",
+        "Параметры",
+    ]
+    assert worksheet["B2"].value == "DD1,DD2"
+    assert worksheet["C2"].value == "STM32H743ZIT6"
+    assert worksheet["J2"].value == "ссылка"
+    assert worksheet["J2"].hyperlink is not None

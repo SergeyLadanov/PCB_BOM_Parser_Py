@@ -4,6 +4,7 @@ import '../css/circle_status.css'
 import LinkArray, { OrderLink } from '../components/LinkArray'
 
 export interface TableRow {
+  Designator: string
   Name: string
   Type: string
   Parameters: string[]
@@ -112,6 +113,7 @@ function TableForm({ form, disabled, OnDownloadExcelClick }: TableFormProps) {
             <thead>
               <tr>
                 <th scope="col">#</th>
+                <th scope="col">Поз. обозначение</th>
                 <th scope="col">Наименование</th>
                 <th scope="col">Тип</th>
                 <th scope="col">Параметры</th>
@@ -131,6 +133,7 @@ function TableForm({ form, disabled, OnDownloadExcelClick }: TableFormProps) {
                       style={{ verticalAlign: 'middle' }}
                     >
                       <th scope="row">{(index + 1).toString()}</th>
+                      <td>{item.Designator || '—'}</td>
                       <td>{item.Name}</td>
                       <td>{item.Type}</td>
                       <td style={{ fontSize: '12px' }}>

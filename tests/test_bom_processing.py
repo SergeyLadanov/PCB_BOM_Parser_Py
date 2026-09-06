@@ -5,6 +5,10 @@ import pytest
 from openpyxl import load_workbook
 
 from Components.ComponentBase import ComponentBase
+from Components.ReferenceDesignator import (
+    get_component_designator,
+    get_component_type_label,
+)
 from tests.expected_components import (
     EXPECTED_OTHER_COMPONENTS,
     EXPECTED_PASSIVE_COMPONENTS,
@@ -204,6 +208,13 @@ def make_json(bom):
         ("ZQ1;HC-49S 8 МГц;1", "ZQ1", "HC-49S 8 МГц", "Кварцевый резонатор", 1),
         ("K1;Relay 5V SPDT;1", "K1", "Relay 5V SPDT", "Реле", 1),
         ("VD1;1N4148;3", "VD1", "1N4148", "Диод", 3),
+        (
+            "L1;4.7 nH 0.1 A BLM18HG102SN1D;1",
+            "L1",
+            "4.7 nH 0.1 A BLM18HG102SN1D",
+            "Катушка индуктивности",
+            1,
+        ),
     ],
 )
 def test_bom_data_uses_optional_reference_designator(
@@ -256,6 +267,15 @@ def test_unknown_reference_designator_does_not_guess_type_from_name(client):
     assert item["type"] == "-"
 
 
+def test_legacy_inductor_type_label_remains_unchanged(client):
+    response = client.post(
+        "/bom_data", data=make_form("4.7 nH 0.1 A BLM18HG102SN1D;1")
+    )
+
+    assert response.status_code == 200
+    assert response.get_json()[0]["type"] == "Индуктивность"
+
+
 def test_excel_export_contains_reference_designator_column(client):
     response = client.post(
         "/download_excel", json=make_json("DD1,DD2;STM32H743ZIT6;2")
@@ -273,3 +293,52 @@ def test_excel_export_contains_reference_designator_column(client):
     assert worksheet["C2"].value == "STM32H743ZIT6"
     assert worksheet["J2"].value == "ссылка"
     assert worksheet["J2"].hyperlink is not None
+
+
+@pytest.mark.parametrize(
+    ("prefix", "expected_type"),
+    [
+        ("A", "Устройство"),
+        ("BAT", "Элемент питания"),
+        ("BF", "Телефон"),
+        ("BH", "Датчик Холла"),
+        ("BM", "Микрофон"),
+        ("C", "Конденсатор"),
+        ("D", "Микросхема"),
+        ("DA", "Микросхема"),
+        ("DD", "Микросхема"),
+        ("FU", "Предохранитель"),
+        ("F", "Разрядник"),
+        ("GB", "Батарея"),
+        ("G", "Генератор"),
+        ("H", "Устройство индикации"),
+        ("HG", "Устройство индикации"),
+        ("HL", "Устройство индикации"),
+        ("K", "Реле"),
+        ("KV", "Реле"),
+        ("L", "Катушка индуктивности"),
+        ("R", "Резистор"),
+        ("RK", "Терморезистор"),
+        ("RP", "Потенциометр"),
+        ("RU", "Варистор"),
+        ("S", "Переключатель"),
+        ("SA", "Переключатель"),
+        ("SB", "Переключатель"),
+        ("T", "Трансформатор"),
+        ("VD", "Диод"),
+        ("VS", "Тиристор"),
+        ("VT", "Транзистор"),
+        ("WA", "Антенна"),
+        ("X", "Соединитель"),
+        ("XP", "Соединитель"),
+        ("XS", "Соединитель"),
+        ("XW", "Соединитель"),
+        ("Z", "Кварцевый резонатор"),
+        ("ZQ", "Кварцевый резонатор"),
+        ("FP", "Термопредохранитель"),
+        ("U", "Оптопара"),
+    ],
+)
+def test_altium_template_reference_designators(prefix, expected_type):
+    designator = get_component_designator(f"{prefix}1")
+    assert get_component_type_label(designator) == expected_type

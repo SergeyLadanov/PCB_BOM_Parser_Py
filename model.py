@@ -40,6 +40,11 @@ def CorrectionCount(spec_item, device_count = 1, tech_reserve = 1.0):
 
 
 def __GetComponentClass(spec_component):
+        if (
+            not spec_component.GetReferenceDesignator()
+            and spec_component.GetDesignator() == "L"
+        ):
+            return "Индуктивность"
         return get_component_type_label(spec_component.GetDesignator())
 
 

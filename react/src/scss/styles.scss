@@ -133,6 +133,13 @@ body.modal-open .scrollbar-offset-correction {
   ); /* scrollbar-width расчитывается в App.tsx (useEffect) */
 }
 
+.export-settings-menu {
+  min-width: 19rem;
+  max-height: min(32rem, 70vh);
+  overflow-y: auto;
+  z-index: 1100;
+}
+
 .bom-list-editor {
   position: relative;
   overflow: hidden;

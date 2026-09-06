@@ -12,7 +12,8 @@ import {
   ParseResult,
   ResultLink,
   ApiUrls,
-  ManufacturersList
+  ManufacturersList,
+  ExcelColumnKey
 } from '../ts/api'
 import ManufacturerSettingsForm, {
   useManufacturerSettingsForm
@@ -175,6 +176,7 @@ function MainContainer() {
         tableForm.Clear()
         value.forEach(item => {
           const Row: TableRow = {
+            Designator: item.designator,
             Links: item.ordering.map((link: ResultLink) => ({
               OrderLink: link.order_link,
               StoreName: link.store_name
@@ -239,8 +241,11 @@ function MainContainer() {
     modalListForm.Show()
   }
 
-  const OnDownloadExcelClick = () => {
-    const data: BomRequest = LastBomRequest
+  const OnDownloadExcelClick = (excelColumns: ExcelColumnKey[]) => {
+    const data = {
+      ...LastBomRequest,
+      excel_columns: excelColumns
+    }
     SetIsLoadingExcel(true)
     // Отправляем POST-запрос
     $.ajax({

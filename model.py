@@ -1,6 +1,7 @@
 import sys, os
 
 from Components import ComponentBase as Component
+from Components.ReferenceDesignator import get_component_type_label
 
 import re
 
@@ -39,17 +40,12 @@ def CorrectionCount(spec_item, device_count = 1, tech_reserve = 1.0):
 
 
 def __GetComponentClass(spec_component):
-        res = "-"
-        if spec_component.GetDesignator() == "C":
-            res = "Конденсатор"
-
-        if spec_component.GetDesignator() == "R":
-            res = "Резистор"
-
-        if spec_component.GetDesignator() == "L":
-            res = "Индуктивность"
-
-        return res 
+        if (
+            not spec_component.GetReferenceDesignator()
+            and spec_component.GetDesignator() == "L"
+        ):
+            return "Индуктивность"
+        return get_component_type_label(spec_component.GetDesignator())
 
 
 
@@ -161,7 +157,9 @@ def HandleRowBOM(spec_item, store_array, manufacturers_settings, filter = None):
     
     manNameGenerator = ManufacturerManager.NameGenerator(manufacturers_settings)
 
-    parse_res = Component.ComponentBase(spec_item['name'])
+    parse_res = Component.ComponentBase(
+        spec_item['name'], spec_item.get('designator', '')
+    )
 
     res['type'] = __GetComponentClass(parse_res)
     res['params'] = __GetParamArray(parse_res)

@@ -7,6 +7,9 @@ from ParamFilter import FilterObj as Filter
 
 
 def GetParametersString(component_obj, filter):
+    if component_obj.GetDesignator() not in {"R", "C", "L"}:
+        return component_obj.GetName()
+
     res = ""
     ManufacturerPartNumber = component_obj.GetManufacturerPartNumber()
     Value = str(component_obj.GetValue())+component_obj.GetUnitsValue()

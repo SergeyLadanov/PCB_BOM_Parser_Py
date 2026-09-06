@@ -1,6 +1,8 @@
 
 import re
 
+from Components.ReferenceDesignator import get_component_designator
+
 
 def remove_trailing_zero(input_str):
     # Ищем число с плавающей запятой
@@ -27,8 +29,9 @@ class ComponentBase:
     MOUNT_WAY_SMD = 2
 
 
-    def __init__(self, name=""):
+    def __init__(self, name="", reference_designator=""):
         self.__Name = name.rstrip()
+        self.__ReferenceDesignator = reference_designator.strip()
         self.__Designator = ""
         self.__Value = 0.0
         self.__UnitsValue = ""
@@ -42,6 +45,15 @@ class ComponentBase:
         self.__MountWay = self.MOUNT_WAY_NOT_SET
         self.__HasExplicitUnits = False
         self.__Parse(self.__Name)
+
+        # A supplied RefDes is authoritative.  If it is valid but its prefix is
+        # unknown (or the list mixes component types), do not fall back to a guess
+        # based on units in the component name.
+        if self.__ReferenceDesignator:
+            component_designator = get_component_designator(
+                self.__ReferenceDesignator
+            )
+            self.SetForcedDesignator(component_designator or "OTHER")
 
 
     def __SetAsCapacitor(self):
@@ -370,6 +382,10 @@ class ComponentBase:
 
     def GetDesignator(self):
         return self.__Designator
+
+
+    def GetReferenceDesignator(self):
+        return self.__ReferenceDesignator
 
 
     def GetValue(self):

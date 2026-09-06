@@ -124,10 +124,38 @@ function SourceDataForm({
     return () => {}
   })
 
-  // Регулярное выражение для проверки строки
+  const referenceItem =
+    '[A-Za-zА-Яа-яЁё]+\\s*\\d+[A-Za-zА-Яа-яЁё]?(?:\\s*(?:\\.\\.\\.|…|\\.\\.)\\s*[A-Za-zА-Яа-яЁё]+\\s*\\d+[A-Za-zА-Яа-яЁё]?)?'
+  const referenceDesignatorRegex = new RegExp(
+    `^${referenceItem}(?:\\s*,\\s*${referenceItem})*$`
+  )
+
+  const isCount = (value: string) => /^\d+(\.\d+)?$/.test(value.trim())
+
   const validateLine = (line: string) => {
-    const regex = /^$|^(.*?)(\t|;)(\d+(\.\d+)?|\d+)$/
-    return regex.test(line.trim())
+    const trimmedLine = line.trim()
+    if (!trimmedLine) return true
+
+    const separator = trimmedLine.includes('\t')
+      ? '\t'
+      : trimmedLine.includes(';')
+        ? ';'
+        : null
+
+    if (!separator) return false
+
+    const columns = trimmedLine.split(separator)
+    if (columns.length === 2) {
+      return Boolean(columns[0].trim()) && isCount(columns[1])
+    }
+    if (columns.length === 3) {
+      return (
+        referenceDesignatorRegex.test(columns[0].trim()) &&
+        Boolean(columns[1].trim()) &&
+        isCount(columns[2])
+      )
+    }
+    return false
   }
 
   const OnBomListChanged = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -140,8 +168,9 @@ function SourceDataForm({
       if (!validateLine(lines[i])) {
         form.SetBomListErr(
           `Ошибка в строке ${i + 1}: каждая строка должна содержать ` +
-            'наименование и количество через табуляцию либо точку с запятой.\n' +
-            'Пример:\n100мкФ 10% 10В Тип D;1\nLSM6DSLTR 1;1'
+            'наименование и количество, а также может начинаться с позиционного обозначения. ' +
+            'Разделители столбцов: табуляция или точка с запятой.\n' +
+            'Пример:\n100мкФ 10% 10В Тип D;1\nDD1,DD2;STM32H743ZIT6;2'
         )
         form.SetBomListErrLine(i + 1)
         return

@@ -98,6 +98,9 @@ def __GenerateEnduranceForCapacitor(component_obj):
 def GenerateFindRequest(component_obj, filter):
     res = ""
 
+    if component_obj.GetDesignator() not in {"R", "C", "L"}:
+        return component_obj.GetName()
+
     if component_obj.GetManufacturerPartNumber() != "":
         res = component_obj.GetManufacturerPartNumber()
     else:

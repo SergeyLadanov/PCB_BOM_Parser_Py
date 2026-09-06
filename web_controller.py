@@ -12,12 +12,11 @@ import ManufacturerManager
 from io import BytesIO
 
 import model
+from Components.ReferenceDesignator import is_reference_designator
 
 from openpyxl import Workbook
-from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment, Font
-from openpyxl.worksheet.hyperlink import Hyperlink
-import pandas as pd
 
 
 path = os.path.realpath(os.path.dirname(sys.argv[0]))
@@ -26,18 +25,90 @@ path = os.path.realpath(os.path.dirname(sys.argv[0]))
 app = Flask(__name__)
 
 
+EXCEL_COLUMNS = (
+    {"key": "number", "title": "#", "width": 7, "required": True},
+    {"key": "designator", "title": "Поз. обознач.", "width": 20},
+    {
+        "key": "source_name",
+        "title": "Исходное наименование",
+        "width": 35,
+        "required": True,
+    },
+    {"key": "component_type", "title": "Тип элемента", "width": 24},
+    {"key": "parameters", "title": "Параметры", "width": 30},
+    {"key": "english_name", "title": "Список на англ.", "width": 30},
+    {"key": "russian_name", "title": "Список на рус.", "width": 30},
+    {
+        "key": "manufacturer_part_name",
+        "title": "Наимен. произв.",
+        "width": 30,
+    },
+    {"key": "manufacturer", "title": "Производитель", "width": 20},
+    {
+        "key": "quantity",
+        "title": "Количество",
+        "width": 12,
+        "required": True,
+    },
+    {"key": "store_elitan", "title": "elitan", "width": 15, "link": True},
+    {
+        "key": "store_chipdip",
+        "title": "chipdip",
+        "width": 15,
+        "link": True,
+    },
+    {"key": "store_platan", "title": "platan", "width": 15, "link": True},
+    {
+        "key": "store_promelec",
+        "title": "promelec",
+        "width": 15,
+        "link": True,
+    },
+    {
+        "key": "store_dko_electronshik",
+        "title": "dko_electronshik",
+        "width": 15,
+        "link": True,
+    },
+)
+
+DEFAULT_EXCEL_COLUMN_KEYS = {column["key"] for column in EXCEL_COLUMNS}
+REQUIRED_EXCEL_COLUMN_KEYS = {
+    column["key"] for column in EXCEL_COLUMNS if column.get("required")
+}
+
+
+def __ParseSpecRow(row):
+    separator = '\t' if '\t' in row else (';' if ';' in row else None)
+    if separator is None:
+        return None
+
+    columns = row.split(separator)
+    if len(columns) < 2:
+        return None
+
+    count = columns[-1]
+    content_columns = columns[:-1]
+    if len(content_columns) >= 2 and is_reference_designator(
+        content_columns[0].strip()
+    ):
+        return content_columns[0], separator.join(content_columns[1:]), count
+
+    return '', separator.join(content_columns), count
+
+
 def __GetSpec(data):
     result = []
     rows = data.split('\n')
 
     for line_number, row in enumerate(rows, start=1):
-        separator = '\t' if '\t' in row else ';'
-        columns = row.rsplit(separator, 1)
-        if len(columns) != 2:
+        columns = __ParseSpecRow(row.rstrip('\r'))
+        if columns is None:
             continue
 
-        name, count = columns
+        designator, name, count = columns
         temp_item = {
+            'designator': designator.strip(),
             'name': name,
             'count': count or 1,
             'source_line': line_number,
@@ -106,8 +177,24 @@ def download_excel():
     parser_filter = Filter()
     data = request.get_json()
     bom = data['bom']
-    filter = data['cap_filter']['skip_tol']
     spec_list = __GetSpec(bom)
+
+    requested_column_keys = data.get('excel_columns')
+    if requested_column_keys is None:
+        selected_column_keys = DEFAULT_EXCEL_COLUMN_KEYS
+    elif isinstance(requested_column_keys, list):
+        selected_column_keys = {
+            key for key in requested_column_keys if isinstance(key, str)
+        }
+    else:
+        selected_column_keys = set()
+
+    selected_column_keys = selected_column_keys | REQUIRED_EXCEL_COLUMN_KEYS
+    selected_columns = [
+        column
+        for column in EXCEL_COLUMNS
+        if column['key'] in selected_column_keys
+    ]
 
 
     device_count = int(data['count'])
@@ -127,140 +214,60 @@ def download_excel():
 
     manufacturers_settings = ManufacturerManager.Settings(chip_res_man=man_res_settings, chip_cap_man=man_cercap_settings, chip_tant_cap_man=man_tantcap_settings)
 
-    res_data = {
-        '#': [],
-        'Исходное наименование': [],
-        'Параметры': [],
-        'Список на англ.': [],
-        'Список на рус.': [],
-        'Наимен. произв.': [],
-        'Производитель': [],
-        'Количество': [], 
-    }
-
-    res_list = []
-    count = 1
-    for item in spec_list:
-
-        model.CorrectionCount(item, device_count, tech_reseve)
-
-        parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec', 'dko_electronshik'], manufacturers_settings, parser_filter)
-
-        res_data['#'].append(count)
-        res_data['Исходное наименование'].append(item['name'])
-
-        param_str = ""
-
-        for param in parse_res['params']:
-            param_str = f'{param_str}{param}\n'
-        
-        param_str = param_str[:-1]
-
-        res_data['Параметры'].append(param_str)
-        res_data['Количество'].append(int(item['count']))
-        res_data['Список на англ.'].append(parse_res['en_text_item'])
-        res_data['Список на рус.'].append(parse_res['ru_text_item'])
-        res_data['Наимен. произв.'].append(parse_res['manufacturer_info']['component_name'])
-        res_data['Производитель'].append(parse_res['manufacturer_info']['manufacturer_name'])
-
-
-        for store in parse_res['ordering']:
-
-            if store['store_name'] not in res_data:  # Проверка на уникальность ключа
-                res_data[store['store_name']] = []
-            res_data[store['store_name']].append(store['order_link'])
-
-        count = count + 1
-
-
-
-    
-    # Преобразуем данные в DataFrame
-    df = pd.DataFrame(res_data)
-
-    # Создаем Excel файл в памяти
-    
     wb = Workbook()
     ws = wb.active
+    ws.append([column['title'] for column in selected_columns])
 
-    # Заполняем рабочий лист данными
-    for r in dataframe_to_rows(df, index=False, header=True):
-        ws.append(r)
+    row_number = 1
+    for item in spec_list:
+        model.CorrectionCount(item, device_count, tech_reseve)
+        parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec', 'dko_electronshik'], manufacturers_settings, parser_filter)
 
-    
+        store_links = {
+            store['store_name']: store['order_link']
+            for store in parse_res['ordering']
+        }
+        values = {
+            'number': row_number,
+            'designator': item['designator'],
+            'source_name': item['name'],
+            'component_type': parse_res['type'],
+            'parameters': '\n'.join(parse_res['params']),
+            'english_name': parse_res['en_text_item'],
+            'russian_name': parse_res['ru_text_item'],
+            'manufacturer_part_name': parse_res['manufacturer_info']['component_name'],
+            'manufacturer': parse_res['manufacturer_info']['manufacturer_name'],
+            'quantity': int(item['count']),
+            'store_elitan': store_links.get('elitan', ''),
+            'store_chipdip': store_links.get('chipdip', ''),
+            'store_platan': store_links.get('platan', ''),
+            'store_promelec': store_links.get('promelec', ''),
+            'store_dko_electronshik': store_links.get('dko_electronshik', ''),
+        }
+        ws.append([values[column['key']] for column in selected_columns])
+        row_number += 1
 
-    # Применяем форматирование
-    for cell in ws[1]:  # Заголовки
-        cell.font = Font(bold=True)  # Жирный шрифт для заголовков
-        cell.alignment = Alignment(wrap_text=True, vertical='top') 
-
-    ws['A'][0].alignment =  Alignment(wrap_text=True, vertical='top', horizontal='right') 
-
-    # Применяем форматирование (перенос текста) и ширину столбцов
-    for cell in ws['A'][1:]:
+    for cell in ws[1]:
+        cell.font = Font(bold=True)
         cell.alignment = Alignment(wrap_text=True, vertical='top')
-    for cell in ws['B'][1:]: 
-        cell.alignment = Alignment(wrap_text=True, vertical='top')
-    for cell in ws['C'][1:]: 
-        cell.alignment = Alignment(wrap_text=True, vertical='top')
-    for cell in ws['D'][1:]: 
-        cell.alignment = Alignment(wrap_text=True, vertical='top')
-    for cell in ws['E'][1:]: 
-        cell.alignment = Alignment(wrap_text=True, vertical='top')
-    for cell in ws['F'][1:]: 
-        cell.alignment = Alignment(wrap_text=True, vertical='top') 
-    for cell in ws['G'][1:]: 
-        cell.alignment = Alignment(wrap_text=True, vertical='top') 
-    for cell in ws['H'][1:]: 
-        cell.alignment = Alignment(wrap_text=True, vertical='top')   
 
+    for column_index, column in enumerate(selected_columns, start=1):
+        column_letter = get_column_letter(column_index)
+        ws.column_dimensions[column_letter].width = column['width']
 
-    for cell in ws['I'][1:]:  # Срез, начинающийся со второй ячейки
-        cell.style = "Hyperlink"
-        cell.hyperlink = cell.value
-        cell.value = "ссылка"
-        cell.alignment = Alignment(wrap_text=True, vertical='top')  
+        for cell in ws[column_letter][1:]:
+            cell.alignment = Alignment(wrap_text=True, vertical='top')
+            if column.get('link') and cell.value:
+                cell.style = "Hyperlink"
+                cell.hyperlink = cell.value
+                cell.value = "ссылка"
 
-
-    for cell in ws['J'][1:]:  # Срез, начинающийся со второй ячейки
-        cell.style = "Hyperlink"
-        cell.hyperlink = cell.value
-        cell.value = "ссылка"
-        cell.alignment = Alignment(wrap_text=True, vertical='top')  
-
-    for cell in ws['K'][1:]:  # Срез, начинающийся со второй ячейки
-        cell.style = "Hyperlink"
-        cell.hyperlink = cell.value
-        cell.value = "ссылка"
-        cell.alignment = Alignment(wrap_text=True, vertical='top') 
-
-    for cell in ws['L'][1:]:  # Срез, начинающийся со второй ячейки
-        cell.style = "Hyperlink"
-        cell.hyperlink = cell.value
-        cell.value = "ссылка"
-        cell.alignment = Alignment(wrap_text=True, vertical='top')   
-
-    for cell in ws['M'][1:]:  # Срез, начинающийся со второй ячейки
-        cell.style = "Hyperlink"
-        cell.hyperlink = cell.value
-        cell.value = "ссылка"
-        cell.alignment = Alignment(wrap_text=True, vertical='top')  
-                
-
-    # Задаем ширину столбцов
-    ws.column_dimensions['A'].width = 7
-    ws.column_dimensions['B'].width = 35 
-    ws.column_dimensions['C'].width = 30 
-    ws.column_dimensions['D'].width = 30 
-    ws.column_dimensions['E'].width = 30 
-    ws.column_dimensions['F'].width = 30 
-    ws.column_dimensions['G'].width = 20 
-    ws.column_dimensions['H'].width = 7 
-    ws.column_dimensions['I'].width = 15
-    ws.column_dimensions['J'].width = 15
-    ws.column_dimensions['K'].width = 15
-    ws.column_dimensions['L'].width = 15
-    ws.column_dimensions['M'].width = 15
+    if selected_columns and selected_columns[0]['key'] == 'number':
+        ws['A1'].alignment = Alignment(
+            wrap_text=True,
+            vertical='top',
+            horizontal='right',
+        )
 
     output = BytesIO()
     # Сохраняем рабочую книгу в память
@@ -303,6 +310,7 @@ def handle_bom():
             parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec', 'dko_electronshik'], manufacturers_settings, parser_filter)
 
             temp_item = {
+                'designator': item['designator'],
                 'name': item['name'],
                 'type': parse_res['type'],
                 'count': item['count'],

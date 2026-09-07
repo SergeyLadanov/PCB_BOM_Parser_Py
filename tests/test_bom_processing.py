@@ -71,7 +71,7 @@ def make_form(bom, *, device_count="1", tech_reserve="1.0"):
 
 def test_bom_data_processes_all_test_parser_and_application_items(client, bom_data):
     bom, bom_rows = bom_data
-    assert len(bom_rows) == 126
+    assert len(bom_rows) == 128
 
     response = client.post("/bom_data", data=make_form(bom))
 
@@ -92,6 +92,22 @@ def test_bom_data_processes_all_test_parser_and_application_items(client, bom_da
             "manufacturer_name",
             "component_name",
         }
+
+
+@pytest.mark.parametrize(
+    ("bom_line", "expected_value"),
+    [
+        ("0.01мкФ 5% 50V NP0 0603 \t2", "0.01 мкФ"),
+        ("0.01uF 5% 50V NP0 0603 \t2", "0.01 uF"),
+    ],
+)
+def test_small_capacitance_value_is_not_truncated(client, bom_line, expected_value):
+    response = client.post("/bom_data", data=make_form(bom_line))
+
+    assert response.status_code == 200
+    item = response.get_json()[0]
+    assert item["type"] == "Конденсатор"
+    assert item["params"][1] == f"Значение: {expected_value}"
 
 
 def test_component_parser_matches_expected_results_for_entire_bom(bom_data):

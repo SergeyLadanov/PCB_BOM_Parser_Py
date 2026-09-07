@@ -19,6 +19,13 @@ def remove_trailing_zero(input_str):
     else:
         return input_str  # Если число не найдено, возвращаем строку как есть
 
+
+def format_value(value):
+    # Форматирует числовое значение без потери точности: 0.01 -> '0.01', 12.0 -> '12'
+    if float(value).is_integer():
+        return str(int(value))
+    return str(value)
+
 class ComponentBase:
 
     TYPE_OTHER = 0
@@ -359,7 +366,7 @@ class ComponentBase:
         print(f'Specname: {self.GetName():s}')
         print(f'Component: {type_str:s}')
         print(f'Mount type: {mout_way_str:s}')
-        print(f'Value: {self.GetValue():.1f} {self.GetUnitsValue():s}')
+        print(f'Value: {format_value(self.GetValue()):s} {self.GetUnitsValue():s}')
         print(f'Power/Voltage: {self.GetEndurance():.3f} {self.GetUnitsEndurance():s}')
         print(f'Case: {self.GetCase():s}')
         print(f'Tolerance: {self.GetTolerance():.1f} %')

@@ -87,7 +87,7 @@ def __GetParamArray(spec_component):
     if isParameters:
         res = [
             f'Способ монтажа: {mout_way_str:s}',
-            f'Значение: {spec_component.GetValue():.1f} {spec_component.GetUnitsValue():s}',
+            f'Значение: {Component.format_value(spec_component.GetValue())} {spec_component.GetUnitsValue():s}',
             f'Корпус: {spec_component.GetCase():s}',
             f'Точность: {spec_component.GetTolerance():.1f} %',
             f'Тип: {spec_component.GetDesignVariant():s}'

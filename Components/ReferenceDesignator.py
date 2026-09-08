@@ -108,6 +108,18 @@ COMPONENT_TYPE_LABELS = {
 }
 
 
+# Labels accepted in the optional first BOM column instead of a RefDes.  Keep the
+# lookup case-insensitive while preserving COMPONENT_TYPE_LABELS as the single
+# source of the labels displayed by the application.
+COMPONENT_TYPE_TO_DESIGNATOR = {
+    label.casefold(): designator
+    for designator, label in COMPONENT_TYPE_LABELS.items()
+}
+# The application historically displayed this shorter label for inductors whose
+# type was inferred from the component name.
+COMPONENT_TYPE_TO_DESIGNATOR["индуктивность"] = "L"
+
+
 _SINGLE_REFERENCE_RE = re.compile(
     r"^(?P<prefix>[A-Za-zА-Яа-яЁё]+)\s*\d+[A-Za-zА-Яа-яЁё]?$"
 )
@@ -167,3 +179,14 @@ def get_component_designator(value):
 
 def get_component_type_label(designator):
     return COMPONENT_TYPE_LABELS.get(designator, "-")
+
+
+def get_component_designator_from_type(value):
+    """Map a displayed component type to its canonical designator."""
+    if not isinstance(value, str):
+        return None
+    return COMPONENT_TYPE_TO_DESIGNATOR.get(value.strip().casefold())
+
+
+def is_component_type(value):
+    return get_component_designator_from_type(value) is not None

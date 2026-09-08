@@ -12,7 +12,7 @@ import ManufacturerManager
 from io import BytesIO
 
 import model
-from Components.ReferenceDesignator import is_reference_designator
+from Components.ReferenceDesignator import is_component_type, is_reference_designator
 
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
@@ -89,12 +89,24 @@ def __ParseSpecRow(row):
 
     count = columns[-1]
     content_columns = columns[:-1]
-    if len(content_columns) >= 2 and is_reference_designator(
-        content_columns[0].strip()
-    ):
-        return content_columns[0], separator.join(content_columns[1:]), count
+    if len(content_columns) >= 2:
+        first_column = content_columns[0].strip()
+        if is_reference_designator(first_column):
+            return (
+                content_columns[0],
+                '',
+                separator.join(content_columns[1:]),
+                count,
+            )
+        if is_component_type(first_column):
+            return (
+                '',
+                content_columns[0],
+                separator.join(content_columns[1:]),
+                count,
+            )
 
-    return '', separator.join(content_columns), count
+    return '', '', separator.join(content_columns), count
 
 
 def __GetSpec(data):
@@ -106,9 +118,10 @@ def __GetSpec(data):
         if columns is None:
             continue
 
-        designator, name, count = columns
+        designator, component_type, name, count = columns
         temp_item = {
             'designator': designator.strip(),
+            'component_type': component_type.strip(),
             'name': name,
             'count': count or 1,
             'source_line': line_number,

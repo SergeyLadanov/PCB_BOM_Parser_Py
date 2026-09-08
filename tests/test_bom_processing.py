@@ -7,6 +7,7 @@ from openpyxl import load_workbook
 from Components.ComponentBase import ComponentBase
 from Components.ReferenceDesignator import (
     get_component_designator,
+    get_component_designator_from_type,
     get_component_type_label,
 )
 from tests.expected_components import (
@@ -257,6 +258,48 @@ def test_reference_designator_has_priority_over_name_heuristics(client):
     assert item["ru"] == "Relay coil 5V"
     assert item["en"] == "Relay coil 5V"
     assert item["elitan"] == "Relay coil 5V"
+
+
+@pytest.mark.parametrize(
+    ("component_type", "name", "expected_type"),
+    [
+        ("Конденсатор", "0.1uF 1% 16V X7R 0603", "Конденсатор"),
+        ("резистор", "10 кОм 1% 0603", "Резистор"),
+        ("Резистор", "10 k", "Резистор"),
+        ("МИКРОСХЕМА", "STM32H743ZIT6", "Микросхема"),
+        ("Индуктивность", "4.7 nH 0.1 A", "Катушка индуктивности"),
+    ],
+)
+def test_bom_data_accepts_explicit_component_type(
+    client, component_type, name, expected_type
+):
+    response = client.post(
+        "/bom_data", data=make_form(f"{component_type};{name};2")
+    )
+
+    assert response.status_code == 200
+    item = response.get_json()[0]
+    assert item["designator"] == ""
+    assert item["name"] == name
+    assert item["type"] == expected_type
+    assert item["count"] == 2
+
+
+def test_explicit_component_type_has_priority_over_name_heuristics(client):
+    response = client.post(
+        "/bom_data", data=make_form("Микросхема;10 кОм 1% 0603;1")
+    )
+
+    assert response.status_code == 200
+    item = response.get_json()[0]
+    assert item["type"] == "Микросхема"
+    assert item["ru"] == "10 кОм 1% 0603"
+    assert item["en"] == "10 кОм 1% 0603"
+
+
+def test_component_type_label_lookup_is_case_insensitive():
+    assert get_component_designator_from_type("  кОнДеНсАтОр  ") == "C"
+    assert get_component_designator_from_type("unknown") is None
 
 
 def test_legacy_name_with_commas_remains_supported(client):

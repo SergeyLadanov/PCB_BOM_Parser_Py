@@ -1,7 +1,10 @@
 
 import re
 
-from Components.ReferenceDesignator import get_component_designator
+from Components.ReferenceDesignator import (
+    get_component_designator,
+    get_component_designator_from_type,
+)
 
 
 def remove_trailing_zero(input_str):
@@ -36,9 +39,10 @@ class ComponentBase:
     MOUNT_WAY_SMD = 2
 
 
-    def __init__(self, name="", reference_designator=""):
+    def __init__(self, name="", reference_designator="", component_type=""):
         self.__Name = name.rstrip()
         self.__ReferenceDesignator = reference_designator.strip()
+        self.__ExplicitComponentType = component_type.strip()
         self.__Designator = ""
         self.__Value = 0.0
         self.__UnitsValue = ""
@@ -51,16 +55,29 @@ class ComponentBase:
         self.__ManufacturerPartNumber = ""
         self.__MountWay = self.MOUNT_WAY_NOT_SET
         self.__HasExplicitUnits = False
-        self.__Parse(self.__Name)
-
-        # A supplied RefDes is authoritative.  If it is valid but its prefix is
-        # unknown (or the list mixes component types), do not fall back to a guess
-        # based on units in the component name.
-        if self.__ReferenceDesignator:
+        # An explicit type or RefDes is authoritative. Set it before parsing so
+        # name-based heuristics cannot replace it.
+        authoritative_designator = None
+        if self.__ExplicitComponentType:
+            component_designator = get_component_designator_from_type(
+                self.__ExplicitComponentType
+            )
+            authoritative_designator = component_designator or "OTHER"
+        elif self.__ReferenceDesignator:
             component_designator = get_component_designator(
                 self.__ReferenceDesignator
             )
-            self.SetForcedDesignator(component_designator or "OTHER")
+            authoritative_designator = component_designator or "OTHER"
+
+        if authoritative_designator:
+            self.SetForcedDesignator(authoritative_designator)
+
+        self.__Parse(self.__Name)
+
+        # Parsing can reset an otherwise unparseable component to its source name.
+        # Restore the authoritative classification in that case as well.
+        if authoritative_designator:
+            self.SetForcedDesignator(authoritative_designator)
 
 
     def __SetAsCapacitor(self):
@@ -393,6 +410,10 @@ class ComponentBase:
 
     def GetReferenceDesignator(self):
         return self.__ReferenceDesignator
+
+
+    def GetExplicitComponentType(self):
+        return self.__ExplicitComponentType
 
 
     def GetValue(self):

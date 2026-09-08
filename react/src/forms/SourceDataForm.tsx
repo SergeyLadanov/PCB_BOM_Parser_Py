@@ -1,6 +1,43 @@
 import React, { useEffect, useRef, useState } from 'react'
 import '../scss/styles.scss'
 
+const COMPONENT_TYPES = new Set(
+  [
+    'Устройство',
+    'Элемент питания',
+    'Телефон',
+    'Датчик Холла',
+    'Микрофон',
+    'Конденсатор',
+    'Резистор',
+    'Катушка индуктивности',
+    'Индуктивность',
+    'Микросхема',
+    'Предохранитель',
+    'Разрядник',
+    'Батарея',
+    'Генератор',
+    'Устройство индикации',
+    'Кварцевый резонатор',
+    'Реле',
+    'Диод',
+    'Транзистор',
+    'Тиристор',
+    'Трансформатор',
+    'Соединитель',
+    'Переключатель',
+    'Антенна',
+    'Термопредохранитель',
+    'Оптопара',
+    'Электродвигатель',
+    'Звуковой излучатель',
+    'Динамик',
+    'Варистор',
+    'Терморезистор',
+    'Потенциометр'
+  ].map(value => value.toLocaleLowerCase('ru-RU'))
+)
+
 interface FormData {
   BomList: string
   BomListErr: string
@@ -149,8 +186,10 @@ function SourceDataForm({
       return Boolean(columns[0].trim()) && isCount(columns[1])
     }
     if (columns.length === 3) {
+      const firstColumn = columns[0].trim()
       return (
-        referenceDesignatorRegex.test(columns[0].trim()) &&
+        (referenceDesignatorRegex.test(firstColumn) ||
+          COMPONENT_TYPES.has(firstColumn.toLocaleLowerCase('ru-RU'))) &&
         Boolean(columns[1].trim()) &&
         isCount(columns[2])
       )
@@ -168,9 +207,9 @@ function SourceDataForm({
       if (!validateLine(lines[i])) {
         form.SetBomListErr(
           `Ошибка в строке ${i + 1}: каждая строка должна содержать ` +
-            'наименование и количество, а также может начинаться с позиционного обозначения. ' +
+            'наименование и количество, а также может начинаться с позиционного обозначения или типа компонента. ' +
             'Разделители столбцов: табуляция или точка с запятой.\n' +
-            'Пример:\n100мкФ 10% 10В Тип D;1\nDD1,DD2;STM32H743ZIT6;2'
+            'Пример:\n100мкФ 10% 10В Тип D;1\nDD1,DD2;STM32H743ZIT6;2\nМикросхема;STM32H743ZIT6;2'
         )
         form.SetBomListErrLine(i + 1)
         return

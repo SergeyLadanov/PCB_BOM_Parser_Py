@@ -42,6 +42,7 @@ def CorrectionCount(spec_item, device_count = 1, tech_reserve = 1.0):
 def __GetComponentClass(spec_component):
         if (
             not spec_component.GetReferenceDesignator()
+            and not spec_component.GetExplicitComponentType()
             and spec_component.GetDesignator() == "L"
         ):
             return "Индуктивность"
@@ -158,7 +159,9 @@ def HandleRowBOM(spec_item, store_array, manufacturers_settings, filter = None):
     manNameGenerator = ManufacturerManager.NameGenerator(manufacturers_settings)
 
     parse_res = Component.ComponentBase(
-        spec_item['name'], spec_item.get('designator', '')
+        spec_item['name'],
+        spec_item.get('designator', ''),
+        spec_item.get('component_type', ''),
     )
 
     res['type'] = __GetComponentClass(parse_res)

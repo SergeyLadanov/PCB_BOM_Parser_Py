@@ -244,7 +244,19 @@ class ComponentBase:
 
     def __ParseCase(self, name):
         # Try to get case
-        res = re.search(r'(?<![A-Z0-9])[0-9]{4}(?![A-Z0-9])', name)
+        # A case is a separate token, not part of a value such as 2200pF.
+        # Values with a space before the unit (2200 pF) need a second check.
+        res = None
+        for candidate in re.finditer(r'(?<!\w)[0-9]{4}(?!\w)', name):
+            if re.match(
+                r'\s+(?:[munp]?F|[mun]?H|(?:мк|[мпн])?Ф|'
+                r'(?:мк|[мн])?Гн|[kKmM]?Ohm|[км]?Ом|'
+                r'[kKmM]?V|[км]?В|[kKmM]?W|[км]?Вт)\b',
+                name[candidate.end():],
+            ):
+                continue
+            res = candidate
+            break
 
         if res:
             self.__Case = res[0].replace(' ', '')

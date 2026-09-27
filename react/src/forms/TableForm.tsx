@@ -54,17 +54,17 @@ export interface TableRow {
 
 interface TableController {
   RowArray: TableRow[]
-  // RowIdArray: Number[];
-  RowStatusArray: any[]
+  RowStatusArray: string[]
   AddRow: (value: TableRow) => void
   Clear: () => void
+  RemoveRows: (indexes: number[]) => void
   ToggleStatus: (index: number) => void
   SetStatus: (index: number, value: string) => void
 }
 
 export function useTableForm(): TableController {
   const [formState, setFormData] = useState<TableRow[]>([])
-  const [rowStatuses, setRowStatus] = useState([])
+  const [rowStatuses, setRowStatus] = useState<string[]>([])
 
   const SetRowStatusFn = (index: number, value: string) => {
     const newRowStates = [...rowStatuses]
@@ -90,6 +90,13 @@ export function useTableForm(): TableController {
       setFormData([])
       setRowStatus([])
     },
+    RemoveRows: (indexes: number[]) => {
+      const removed = new Set(indexes)
+      setFormData(rows => rows.filter((_, index) => !removed.has(index)))
+      setRowStatus(statuses =>
+        statuses.filter((_, index) => !removed.has(index))
+      )
+    },
 
     SetStatus: SetRowStatusFn,
 
@@ -112,18 +119,40 @@ interface TableFormProps {
   form: TableController
   disabled: boolean
   OnDownloadExcelClick?: (columns: ExcelColumnKey[]) => void
+  OnDeleteRows?: (status: 'green' | 'gray', updateSource: boolean) => void
+  canUpdateSource: boolean
 }
 
-function TableForm({ form, disabled, OnDownloadExcelClick }: TableFormProps) {
+function TableForm({
+  form,
+  disabled,
+  OnDownloadExcelClick,
+  OnDeleteRows,
+  canUpdateSource
+}: TableFormProps) {
   const excelSettingsStorage = React.useMemo(() => new StorageSettings(), [])
   const [excelColumns, setExcelColumns] = useState<ExcelColumnKey[]>(
     () => excelSettingsStorage.ExcelColumns
   )
   const [showExcelSettings, setShowExcelSettings] = useState(false)
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
+  const [deleteStatus, setDeleteStatus] = useState<'green' | 'gray'>('green')
+  const [updateSource, setUpdateSource] = useState(false)
   const excelSettingsRef = React.useRef<HTMLDivElement>(null)
+  const deleteSettingsRef = React.useRef<HTMLDivElement>(null)
+  const matchingRows = form.RowStatusArray.filter(
+    status => status === deleteStatus
+  ).length
+
+  const confirmDelete = () => {
+    if (matchingRows === 0 || !OnDeleteRows) return
+    OnDeleteRows(deleteStatus, updateSource && canUpdateSource)
+    setShowDeleteConfirmation(false)
+    setUpdateSource(false)
+  }
 
   useEffect(() => {
-    if (!showExcelSettings) {
+    if (!showExcelSettings && !showDeleteConfirmation) {
       return
     }
 
@@ -134,10 +163,17 @@ function TableForm({ form, disabled, OnDownloadExcelClick }: TableFormProps) {
       ) {
         setShowExcelSettings(false)
       }
+      if (
+        deleteSettingsRef.current &&
+        !deleteSettingsRef.current.contains(event.target as Node)
+      ) {
+        setShowDeleteConfirmation(false)
+      }
     }
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setShowExcelSettings(false)
+        setShowDeleteConfirmation(false)
       }
     }
 
@@ -147,7 +183,7 @@ function TableForm({ form, disabled, OnDownloadExcelClick }: TableFormProps) {
       document.removeEventListener('mousedown', handleOutsideClick)
       document.removeEventListener('keydown', handleEscape)
     }
-  }, [showExcelSettings])
+  }, [showExcelSettings, showDeleteConfirmation])
 
   const handleButtonClick = (index: number) => {
     form.ToggleStatus(index)
@@ -196,7 +232,10 @@ function TableForm({ form, disabled, OnDownloadExcelClick }: TableFormProps) {
                   aria-label="Настроить столбцы Excel"
                   title="Настроить столбцы Excel"
                   aria-expanded={showExcelSettings}
-                  onClick={() => setShowExcelSettings(value => !value)}
+                  onClick={() => {
+                    setShowDeleteConfirmation(false)
+                    setShowExcelSettings(value => !value)
+                  }}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -241,6 +280,128 @@ function TableForm({ form, disabled, OnDownloadExcelClick }: TableFormProps) {
                         </label>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+              <div className="position-relative" ref={deleteSettingsRef}>
+                <button
+                  type="button"
+                  className="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center"
+                  aria-label="Удалить строки"
+                  title="Удалить строки"
+                  aria-expanded={showDeleteConfirmation}
+                  onClick={() => {
+                    setShowExcelSettings(false)
+                    setShowDeleteConfirmation(value => !value)
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M2.5 3.5h11M5 3.5V2h6v1.5M4 3.5l.5 10h7l.5-10M6.5 6v5M9.5 6v5" />
+                  </svg>
+                </button>
+                {showDeleteConfirmation && (
+                  <div
+                    className="dropdown-menu show end-0 delete-rows-menu p-3"
+                    role="group"
+                    aria-label="Удаление строк таблицы"
+                  >
+                    <p className="fw-semibold mb-2">Какие строки удалить?</p>
+                    <div className="form-check">
+                      <input
+                        className="form-check-input"
+                        type="radio"
+                        name="delete-row-status"
+                        id="delete-green-rows"
+                        checked={deleteStatus === 'green'}
+                        onChange={() => setDeleteStatus('green')}
+                      />
+                      <label
+                        className="form-check-label"
+                        htmlFor="delete-green-rows"
+                      >
+                        С зелёной отметкой (
+                        {
+                          form.RowStatusArray.filter(
+                            status => status === 'green'
+                          ).length
+                        }
+                        )
+                      </label>
+                    </div>
+                    <div className="form-check">
+                      <input
+                        className="form-check-input"
+                        type="radio"
+                        name="delete-row-status"
+                        id="delete-gray-rows"
+                        checked={deleteStatus === 'gray'}
+                        onChange={() => setDeleteStatus('gray')}
+                      />
+                      <label
+                        className="form-check-label"
+                        htmlFor="delete-gray-rows"
+                      >
+                        С серой отметкой (
+                        {
+                          form.RowStatusArray.filter(
+                            status => status === 'gray'
+                          ).length
+                        }
+                        )
+                      </label>
+                    </div>
+                    <div className="form-check mt-2">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="update-source-after-delete"
+                        checked={updateSource && canUpdateSource}
+                        disabled={!canUpdateSource}
+                        onChange={event =>
+                          setUpdateSource(event.target.checked)
+                        }
+                      />
+                      <label
+                        className="form-check-label"
+                        htmlFor="update-source-after-delete"
+                      >
+                        Также удалить эти строки из исходного списка
+                      </label>
+                    </div>
+                    {!canUpdateSource && (
+                      <p className="text-body-secondary small mb-2">
+                        Исходный список отличается от обработанного. Для его
+                        изменения сначала нажмите «Обработать».
+                      </p>
+                    )}
+                    <div className="d-flex gap-2 mt-3">
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        disabled={matchingRows === 0}
+                        onClick={confirmDelete}
+                      >
+                        Подтвердить удаление ({matchingRows})
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary btn-sm"
+                        onClick={() => setShowDeleteConfirmation(false)}
+                      >
+                        Отмена
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>

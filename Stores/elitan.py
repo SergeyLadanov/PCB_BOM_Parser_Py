@@ -34,7 +34,8 @@ def __GenerateValueForResistor(component_obj):
             if not probe:
                 res = res[:-1]
         else:
-            res = str(component_obj.GetValue()) + 'R'
+            number_str = Component.format_value(component_obj.GetValue())
+            res = number_str.replace('.', 'R') if '.' in number_str else number_str + 'R'
 
         probe = re.search(r'.0[A-Z]', res)
 

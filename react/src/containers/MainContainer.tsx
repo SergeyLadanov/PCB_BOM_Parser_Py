@@ -99,6 +99,9 @@ function MainContainer() {
   const replaceAll = (str: string, find: string, replace: string) => {
     return str.replace(new RegExp(find, 'g'), replace)
   }
+  const canUpdateSource =
+    LastBomRequest !== undefined &&
+    replaceAll(srcDataForm.BomList, ';', '\t') === LastBomRequest.bom
 
   const GetRequest = (): BomRequest => {
     var data: BomRequest = {
@@ -275,6 +278,52 @@ function MainContainer() {
     })
   }
 
+  const OnDeleteRows = (status: 'green' | 'gray', updateSource: boolean) => {
+    if (!LastBomRequest) return
+
+    const indexes = tableForm.RowStatusArray.flatMap((rowStatus, index) =>
+      rowStatus === status ? [index] : []
+    )
+    if (indexes.length === 0) return
+
+    const removedIndexes = new Set(indexes)
+    const removedSourceLines = new Set(
+      indexes.map(index => BomParseResult[index].source_line)
+    )
+    const sourceLineMap = new Map<number, number>()
+    const remainingBomLines = LastBomRequest.bom
+      .split('\n')
+      .filter((_, index) => {
+        if (removedSourceLines.has(index + 1)) return false
+        sourceLineMap.set(index + 1, sourceLineMap.size + 1)
+        return true
+      })
+    const remainingBom = remainingBomLines.join('\n')
+
+    SetBomParseResult(
+      BomParseResult.filter((_, index) => !removedIndexes.has(index)).map(
+        item => ({
+          ...item,
+          source_line: sourceLineMap.get(item.source_line)!
+        })
+      )
+    )
+    tableForm.RemoveRows(indexes)
+    SetLastBomRequest({ ...LastBomRequest, bom: remainingBom })
+
+    if (updateSource && canUpdateSource) {
+      const updatedSource = srcDataForm.BomList.split('\n')
+        .filter((_, index) => !removedSourceLines.has(index + 1))
+        .join('\n')
+      srcDataForm.SetBomList(updatedSource)
+      Storage.Bom = updatedSource
+      srcDataForm.SetBomListErr('')
+      srcDataForm.SetBomListErrLine(null)
+    } else {
+      SetShowWarning(true)
+    }
+  }
+
   const OnManufacturerSettingsClick = () => {
     ManSettingsForm.Show()
   }
@@ -323,8 +372,8 @@ function MainContainer() {
         <p className="h4 mb-2">Результаты</p>
         {ShowWarning && (
           <div className="alert alert-warning text-center" role="alert">
-            Внимание! Исходные данные были изменены, для обновления результатов
-            нажмите кнопку "Обработать"
+            Исходный список или настройки отличаются от показанных результатов.
+            Чтобы обновить результаты, нажмите «Обработать».
           </div>
         )}
         <BomVariationsForm
@@ -345,6 +394,8 @@ function MainContainer() {
           form={tableForm}
           disabled={BomParseResult.length === 0}
           OnDownloadExcelClick={OnDownloadExcelClick}
+          OnDeleteRows={OnDeleteRows}
+          canUpdateSource={canUpdateSource}
         />
       </div>
       {(isLoadingPost || isLoadingExcel) && (

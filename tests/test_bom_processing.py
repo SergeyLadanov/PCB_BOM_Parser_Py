@@ -20,6 +20,7 @@ from web_controller import app
 FIXTURE_PATH = Path(__file__).parent / "fixtures" / "bom_items.tsv"
 EXPECTED_RESULT_FIELDS = {
     "designator",
+    "source_line",
     "name",
     "type",
     "count",
@@ -80,10 +81,11 @@ def test_bom_data_processes_all_test_parser_and_application_items(client, bom_da
     result = response.get_json()
     assert len(result) == len(bom_rows)
 
-    for parsed_item, (expected_name, expected_count) in zip(
-        result, bom_rows, strict=True
+    for source_line, (parsed_item, (expected_name, expected_count)) in enumerate(
+        zip(result, bom_rows, strict=True), start=1
     ):
         assert parsed_item["name"] == expected_name
+        assert parsed_item["source_line"] == source_line
         assert parsed_item["designator"] == ""
         assert parsed_item["count"] == expected_count
         assert set(parsed_item) == EXPECTED_RESULT_FIELDS
@@ -93,6 +95,15 @@ def test_bom_data_processes_all_test_parser_and_application_items(client, bom_da
             "manufacturer_name",
             "component_name",
         }
+
+
+def test_bom_data_keeps_source_line_numbers_with_blank_lines(client):
+    bom = "10 кОм 1% 0603;1\n\n22 кОм 1% 0603\t2"
+
+    response = client.post("/bom_data", data=make_form(bom))
+
+    assert response.status_code == 200
+    assert [item["source_line"] for item in response.get_json()] == [1, 3]
 
 
 @pytest.mark.parametrize(
@@ -109,6 +120,66 @@ def test_small_capacitance_value_is_not_truncated(client, bom_line, expected_val
     item = response.get_json()[0]
     assert item["type"] == "Конденсатор"
     assert item["params"][1] == f"Значение: {expected_value}"
+
+
+@pytest.mark.parametrize(
+    ("bom_line", "expected_request"),
+    [
+        ("2.2 1% 0.063W 0603\t1", "SMRES/0603-2R2-*"),
+        ("0.47 1% 0.063W 0603\t1", "SMRES/0603-0R47-*"),
+        ("1.05 Ом 1% 0.063 Вт 0603\t1", "SMRES/0603-1R05-*"),
+        ("22 1% 0.063W 0603\t1", "SMRES/0603-22R-*"),
+        ("2.2k 1% 0.063W 0603\t1", "SMRES/0603-2K2-*"),
+    ],
+)
+def test_elitan_resistor_value_in_request_and_link(client, bom_line, expected_request):
+    form = make_form(bom_line)
+    form["res_filter[skip_tol]"] = "true"
+    response = client.post("/bom_data", data=form)
+
+    assert response.status_code == 200
+    item = response.get_json()[0]
+    assert item["type"] == "Резистор"
+    assert item["elitan"] == expected_request
+    elitan_order = next(
+        order for order in item["ordering"] if order["store_name"] == "elitan"
+    )
+    assert elitan_order["order_name"] == expected_request
+    assert elitan_order["order_link"] == (
+        "https://www.elitan.ru/price/index.php?find="
+        f"{expected_request.replace('/', '%2F')}&delay=-1&mfg=all&seenform=y"
+    )
+
+
+@pytest.mark.parametrize(
+    ("name", "units", "voltage_units", "expected_case"),
+    [
+        ("2200pF 1% 50V NP0 0603", "pF", "V", "0603"),
+        ("2200пФ 1% 50В NP0 0603", "пФ", "В", "0603"),
+        ("2200 pF 1% 50V NP0 0603", "pF", "V", "0603"),
+        ("2200 пФ 1% 50В NP0 0603", "пФ", "В", "0603"),
+        ("2200pF 1% 50V NP0", "pF", "V", ""),
+    ],
+)
+def test_four_digit_capacitance_is_not_mistaken_for_case(
+    client, name, units, voltage_units, expected_case
+):
+    component = ComponentBase(name)
+    assert component.GetDesignator() == "C"
+    assert component.GetValue() == 2200.0
+    assert component.GetUnitsValue() == units
+    assert component.GetEndurance() == 50.0
+    assert component.GetUnitsEndurance() == voltage_units
+    assert component.GetTolerance() == 1.0
+    assert component.GetDesignVariant() == "NP0"
+    assert component.GetCase() == expected_case
+
+    response = client.post("/bom_data", data=make_form(f"{name}\t1"))
+    assert response.status_code == 200
+    item = response.get_json()[0]
+    assert item["type"] == "Конденсатор"
+    assert item["params"][1] == f"Значение: 2200 {units}"
+    assert item["params"][3] == f"Корпус: {expected_case}"
 
 
 def test_component_parser_matches_expected_results_for_entire_bom(bom_data):

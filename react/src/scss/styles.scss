@@ -140,6 +140,14 @@ body.modal-open .scrollbar-offset-correction {
   z-index: 1100;
 }
 
+.delete-rows-menu {
+  min-width: min(22rem, calc(100vw - 2rem));
+  max-width: calc(100vw - 2rem);
+  max-height: 70vh;
+  overflow-y: auto;
+  z-index: 1100;
+}
+
 .bom-list-editor {
   position: relative;
   overflow: hidden;

@@ -324,6 +324,7 @@ def handle_bom():
 
             temp_item = {
                 'designator': item['designator'],
+                'source_line': item['source_line'],
                 'name': item['name'],
                 'type': parse_res['type'],
                 'count': item['count'],

@@ -87,6 +87,7 @@ export interface ManufacturerInfo {
 
 export interface ParseResult {
   designator: string
+  source_line: number
   type: string
   count: number
   en: string

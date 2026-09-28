@@ -84,6 +84,9 @@ def __GenerateValueForCapacitor(component_obj):
     units_str = re.sub(r'[fF]', '', units_str)
     units_str = re.sub(r'[uU]', '', units_str)
 
+    # Elitan uses a decimal value without a unit suffix for microfarads.
+    if units_str == "":
+        return str(float(val))
 
     res = re.sub(r'\.[0][0]?[0]?', '', str(val)) + units_str.upper()
 

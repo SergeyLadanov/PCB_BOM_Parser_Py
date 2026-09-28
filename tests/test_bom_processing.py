@@ -152,6 +152,37 @@ def test_elitan_resistor_value_in_request_and_link(client, bom_line, expected_re
 
 
 @pytest.mark.parametrize(
+    ("bom_line", "expected_request"),
+    [
+        ("10 мкФ 16В 0805\t1", "SMCCAP/0805-16-10.0-*-"),
+        ("10uF 16V 0805\t1", "SMCCAP/0805-16-10.0-*-"),
+        ("4.7 мкФ 16В 0805\t1", "SMCCAP/0805-16-4.7-*-"),
+        ("0.01 мкФ 16В 0805\t1", "SMCCAP/0805-16-0.01-*-"),
+        ("0.01uF 16V 0805\t1", "SMCCAP/0805-16-0.01-*-"),
+        ("100 нФ 16В 0805\t1", "SMCCAP/0805-16-100N-*-"),
+        ("2200pF 16V 0805\t1", "SMCCAP/0805-16-2200P-*-"),
+        ("100 мкФ 10% 10В тант. тип D\t1", "SMTCAP/D-10-100.0-*-*"),
+    ],
+)
+def test_elitan_capacitor_value_in_request_and_link(client, bom_line, expected_request):
+    form = make_form(bom_line)
+    form["cap_filter[skip_tol]"] = "true"
+    response = client.post("/bom_data", data=form)
+
+    assert response.status_code == 200
+    item = response.get_json()[0]
+    assert item["elitan"] == expected_request
+    elitan_order = next(
+        order for order in item["ordering"] if order["store_name"] == "elitan"
+    )
+    assert elitan_order["order_name"] == expected_request
+    assert elitan_order["order_link"] == (
+        "https://www.elitan.ru/price/index.php?find="
+        f"{expected_request.replace('/', '%2F')}&delay=-1&mfg=all&seenform=y"
+    )
+
+
+@pytest.mark.parametrize(
     ("name", "units", "voltage_units", "expected_case"),
     [
         ("2200pF 1% 50V NP0 0603", "pF", "V", "0603"),

@@ -77,9 +77,25 @@ export function useModalForm(): FormController {
 
 function ModalForm({ form, csv_link }: FormProps) {
   const modalRef = React.useRef(null)
+  const textRef = useRef<HTMLTextAreaElement>(null)
+  const lineNumbersRef = useRef<HTMLDivElement>(null)
+  const lineCount = Math.max(1, form.ModalText.split('\n').length)
+  const lineNumberWidth = `${lineCount.toString().length + 2}ch`
   const [ShowDeleteButton, SetShowDeleteButton] = useState(false)
   const [CopyStatus, SetCopyStatus] = useState(false)
   const timeoutRef = useRef(null)
+
+  const OnModalTextScroll = (event: React.UIEvent<HTMLTextAreaElement>) => {
+    if (lineNumbersRef.current) {
+      lineNumbersRef.current.scrollTop = event.currentTarget.scrollTop
+    }
+  }
+
+  useEffect(() => {
+    if (lineNumbersRef.current && textRef.current) {
+      lineNumbersRef.current.scrollTop = textRef.current.scrollTop
+    }
+  }, [form.ModalText])
 
   const OnDeleteManufacturersClick = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -189,14 +205,32 @@ function ModalForm({ form, csv_link }: FormProps) {
                   <label htmlFor="message-text" className="col-form-label">
                     Компоненты:
                   </label>
-                  <textarea
-                    name="bom_list"
-                    className="form-control"
-                    rows={15}
-                    id="message-text"
-                    value={form.ModalText}
-                    readOnly
-                  ></textarea>
+                  <div className="bom-list-editor">
+                    <div
+                      ref={lineNumbersRef}
+                      className="bom-list-line-numbers"
+                      style={{ width: lineNumberWidth }}
+                      aria-hidden="true"
+                    >
+                      {Array.from({ length: lineCount }, (_, index) => (
+                        <span key={index}>{index + 1}</span>
+                      ))}
+                    </div>
+                    <textarea
+                      ref={textRef}
+                      name="bom_list"
+                      className="form-control bom-list-input"
+                      style={{
+                        paddingLeft: `calc(${lineNumberWidth} + 0.75rem)`
+                      }}
+                      rows={15}
+                      id="message-text"
+                      wrap="off"
+                      onScroll={OnModalTextScroll}
+                      value={form.ModalText}
+                      readOnly
+                    ></textarea>
+                  </div>
                   <br />
                   <div className="row p-2">
                     <div className="col-md-5 mb-2">

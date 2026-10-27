@@ -86,16 +86,24 @@ def __GetParamArray(spec_component):
         mout_way_str = "SMD"
 
     if isParameters:
+        tolerance_str = (
+            f'{spec_component.GetTolerance():.1f} %'
+            if spec_component.HasTolerance() else '—'
+        )
         res = [
             f'Способ монтажа: {mout_way_str:s}',
             f'Значение: {Component.format_value(spec_component.GetValue())} {spec_component.GetUnitsValue():s}',
             f'Корпус: {spec_component.GetCase():s}',
-            f'Точность: {spec_component.GetTolerance():.1f} %',
-            f'Тип: {spec_component.GetDesignVariant():s}'
+            f'Точность: {tolerance_str}',
+            f'Тип: {spec_component.GetDesignVariant() or "—"}'
             ]
 
         if EnduranceName:
-            enndurance_str = f'{EnduranceName:s}: {spec_component.GetEndurance():.3f} {spec_component.GetUnitsEndurance():s}'
+            endurance_value = (
+                f'{spec_component.GetEndurance():.3f} {spec_component.GetUnitsEndurance():s}'
+                if spec_component.HasEndurance() else '—'
+            )
+            enndurance_str = f'{EnduranceName:s}: {endurance_value}'
             res.insert(2, enndurance_str)
 
     return res
@@ -167,10 +175,7 @@ def HandleRowBOM(spec_item, store_array, manufacturers_settings, filter = None):
     res['type'] = __GetComponentClass(parse_res)
     res['params'] = __GetParamArray(parse_res)
 
-    ParamFilter = filter
-
-    if not ParamFilter:
-        ParamFilter = Filter()
+    ParamFilter = (filter or Filter()).WithMissingParametersSkipped(parse_res)
     
     for store in store_array:
         store_item = {
@@ -181,11 +186,11 @@ def HandleRowBOM(spec_item, store_array, manufacturers_settings, filter = None):
 
         res['ordering'].append(store_item)
     
-    res['ru_text_item'] = en_to_ru_units_decoder.GetParametersString(parse_res, filter)
-    res['en_text_item'] = ru_to_en_units_decoder.GetParametersString(parse_res, filter)
-    res['elitan_text_item'] = elitanGenerator.GenerateFindRequest(parse_res, filter)
+    res['ru_text_item'] = en_to_ru_units_decoder.GetParametersString(parse_res, ParamFilter)
+    res['en_text_item'] = ru_to_en_units_decoder.GetParametersString(parse_res, ParamFilter)
+    res['elitan_text_item'] = elitanGenerator.GenerateFindRequest(parse_res, ParamFilter)
 
-    man_name, man = manNameGenerator.GetManufacturerName(parse_res, filter)
+    man_name, man = manNameGenerator.GetManufacturerName(parse_res, ParamFilter)
 
     res['manufacturer_info'] = {
         'manufacturer_name': man,

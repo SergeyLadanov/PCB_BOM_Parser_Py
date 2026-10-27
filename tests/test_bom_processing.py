@@ -1,9 +1,13 @@
 from pathlib import Path
 from io import BytesIO
+from itertools import product
 
 import pytest
 from openpyxl import load_workbook
 
+import model
+from ManufacturerManager import Settings
+from ParamFilter import FilterObj
 from Components.ComponentBase import ComponentBase
 from Components.ReferenceDesignator import (
     get_component_designator,
@@ -154,13 +158,13 @@ def test_elitan_resistor_value_in_request_and_link(client, bom_line, expected_re
 @pytest.mark.parametrize(
     ("bom_line", "expected_request"),
     [
-        ("10 мкФ 16В 0805\t1", "SMCCAP/0805-16-10.0-*-"),
-        ("10uF 16V 0805\t1", "SMCCAP/0805-16-10.0-*-"),
-        ("4.7 мкФ 16В 0805\t1", "SMCCAP/0805-16-4.7-*-"),
-        ("0.01 мкФ 16В 0805\t1", "SMCCAP/0805-16-0.01-*-"),
-        ("0.01uF 16V 0805\t1", "SMCCAP/0805-16-0.01-*-"),
-        ("100 нФ 16В 0805\t1", "SMCCAP/0805-16-100N-*-"),
-        ("2200pF 16V 0805\t1", "SMCCAP/0805-16-2200P-*-"),
+        ("10 мкФ 16В 0805\t1", "SMCCAP/0805-16-10.0-*-*"),
+        ("10uF 16V 0805\t1", "SMCCAP/0805-16-10.0-*-*"),
+        ("4.7 мкФ 16В 0805\t1", "SMCCAP/0805-16-4.7-*-*"),
+        ("0.01 мкФ 16В 0805\t1", "SMCCAP/0805-16-0.01-*-*"),
+        ("0.01uF 16V 0805\t1", "SMCCAP/0805-16-0.01-*-*"),
+        ("100 нФ 16В 0805\t1", "SMCCAP/0805-16-100N-*-*"),
+        ("2200pF 16V 0805\t1", "SMCCAP/0805-16-2200P-*-*"),
         ("100 мкФ 10% 10В тант. тип D\t1", "SMTCAP/D-10-100.0-*-*"),
     ],
 )
@@ -297,6 +301,127 @@ def make_json(bom):
             "smd_tant_cap": "Xiangyee",
         },
     }
+
+
+@pytest.mark.parametrize("missing", list(product([False, True], repeat=3)))
+@pytest.mark.parametrize("manufacturer", ["Yageo", "Murata"])
+def test_missing_capacitor_parameters_match_manual_corrections(
+    client, missing, manufacturer
+):
+    parameters = ["16V", "10%", "X7R"]
+    name = " ".join(
+        ["0.1 мкФ"]
+        + [value for value, absent in zip(parameters, missing) if not absent]
+        + ["0603"]
+    )
+    automatic = make_form(f"{name};1")
+    automatic["man_settings[smd_cer_cap]"] = manufacturer
+    manual = make_form("0.1 мкФ 16V 10% X7R 0603;1")
+    manual["man_settings[smd_cer_cap]"] = manufacturer
+    for option, absent in zip(["skip_voltage", "skip_tol", "skip_dielectric"], missing):
+        manual[f"cap_filter[{option}]"] = str(absent).lower()
+
+    actual_response = client.post("/bom_data", data=automatic)
+    expected_response = client.post("/bom_data", data=manual)
+    assert actual_response.status_code == expected_response.status_code == 200
+    actual = actual_response.get_json()[0]
+    expected = expected_response.get_json()[0]
+    for field in ["ru", "en", "elitan", "ordering", "manufacturer_info"]:
+        assert actual[field] == expected[field], field
+    for label, absent in zip(["Напряжение", "Точность", "Тип"], missing):
+        assert (f"{label}: —" in actual["params"]) == absent
+
+
+@pytest.mark.parametrize("missing", list(product([False, True], repeat=2)))
+@pytest.mark.parametrize("manufacturer", ["Yageo", "Viking"])
+def test_missing_resistor_parameters_match_manual_corrections(
+    client, missing, manufacturer
+):
+    name = " ".join(
+        ["0 Ом"]
+        + [value for value, absent in zip(["0.063W", "1%"], missing) if not absent]
+        + ["0603"]
+    )
+    automatic = make_form(f"{name};1")
+    automatic["man_settings[smd_res]"] = manufacturer
+    manual = make_form("0 Ом 0.063W 1% 0603;1")
+    manual["man_settings[smd_res]"] = manufacturer
+    for option, absent in zip(["skip_power", "skip_tol"], missing):
+        manual[f"res_filter[{option}]"] = str(absent).lower()
+
+    actual_response = client.post("/bom_data", data=automatic)
+    expected_response = client.post("/bom_data", data=manual)
+    assert actual_response.status_code == expected_response.status_code == 200
+    actual = actual_response.get_json()[0]
+    expected = expected_response.get_json()[0]
+    for field in ["ru", "en", "elitan", "ordering", "manufacturer_info"]:
+        assert actual[field] == expected[field], field
+    assert actual["params"][1] == "Значение: 0 Ом"
+    for label, absent in zip(["Мощность", "Точность"], missing):
+        assert (f"{label}: —" in actual["params"]) == absent
+
+
+def test_automatic_corrections_are_isolated_between_rows_and_requests(client):
+    complete = "0.1 мкФ 16V 10% X7R 0603;1"
+    incomplete = "0.1 мкФ 0603;1"
+    response = client.post(
+        "/bom_data", data=make_form("\n".join([complete, incomplete, complete]))
+    )
+    assert response.status_code == 200
+    first, second, third = response.get_json()
+    assert first["elitan"] == third["elitan"] == "SMCCAP/0603-16-0.1-K-X7R"
+    assert second["elitan"] == "SMCCAP/0603-*-0.1-*-*"
+    assert first["ordering"] == third["ordering"]
+    assert first["manufacturer_info"] == third["manufacturer_info"]
+
+    form = make_form(incomplete)
+    form["cap_filter[skip_tol]"] = "true"
+    assert client.post("/bom_data", data=form).status_code == 200
+    later = client.post("/bom_data", data=make_form(complete))
+    assert later.status_code == 200
+    assert later.get_json()[0]["elitan"] == first["elitan"]
+
+
+def test_row_filter_preserves_user_settings_and_default_filter():
+    user_filter = FilterObj()
+    user_filter.SetSkipingTolerance("C", True)
+    result = model.HandleRowBOM(
+        {"name": "0.1 мкФ 16V 0603"}, ["elitan"], Settings(), user_filter
+    )
+    assert result["elitan_text_item"] == "SMCCAP/0603-16-0.1-*-*"
+    assert user_filter.GetFilter("C").SkipTolerance
+    assert not user_filter.GetFilter("C").SkipEndurance
+    assert not user_filter.GetFilter("C").SkipVariant
+
+    result = model.HandleRowBOM(
+        {"name": "0.1 мкФ 16V 10% X7R 0603"}, ["elitan"], Settings()
+    )
+    assert result["elitan_text_item"] == "SMCCAP/0603-16-0.1-K-X7R"
+
+
+def test_explicit_zero_parameters_are_distinct_from_missing_parameters(client):
+    component = ComponentBase("0.1 мкФ 0V 0% X7R 0603")
+    row_filter = FilterObj().WithMissingParametersSkipped(component).GetFilter("C")
+    assert not row_filter.SkipEndurance
+    assert not row_filter.SkipTolerance
+    response = client.post(
+        "/bom_data", data=make_form("0.1 мкФ 0V 0% X7R 0603;1")
+    )
+    assert response.status_code == 200
+    assert "Напряжение: 0.000 V" in response.get_json()[0]["params"]
+    assert "Точность: 0.0 %" in response.get_json()[0]["params"]
+
+
+def test_excel_export_applies_automatic_corrections(client):
+    response = client.post(
+        "/download_excel", json=make_json("0.1 мкФ 0603;1")
+    )
+    assert response.status_code == 200
+    worksheet = load_workbook(BytesIO(response.data)).active
+    assert "Напряжение: —" in worksheet["E2"].value
+    assert "Точность: —" in worksheet["E2"].value
+    assert "Тип: —" in worksheet["E2"].value
+    assert "find=SMCCAP%2F0603-*-0.1-*-*" in worksheet["K2"].hyperlink.target
 
 
 @pytest.mark.parametrize(

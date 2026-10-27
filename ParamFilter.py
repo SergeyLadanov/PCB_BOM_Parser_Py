@@ -1,4 +1,7 @@
 
+from copy import deepcopy
+
+
 class FilterItem:
     def __init__(self, skip_endurance = False, skip_tolerance = False, skip_designvariant = False):
         self.SkipEndurance = skip_endurance
@@ -7,11 +10,24 @@ class FilterItem:
 
 
 class FilterObj:
-    FilterData = {
-                  'C': FilterItem(),
-                  'R': FilterItem(),
-                  'L': FilterItem(),
-                  }
+    def __init__(self):
+        self.FilterData = {
+            'C': FilterItem(),
+            'R': FilterItem(),
+            'L': FilterItem(),
+        }
+
+    def WithMissingParametersSkipped(self, component):
+        """Derive a row-local filter without changing the user's settings."""
+        result = deepcopy(self)
+        designator = component.GetDesignator()
+        if designator in {'R', 'C'}:
+            item = result.GetFilter(designator)
+            item.SkipEndurance |= not component.HasEndurance()
+            item.SkipTolerance |= not component.HasTolerance()
+            if designator == 'C':
+                item.SkipVariant |= not component.GetDesignVariant()
+        return result
 
     def SetFilter(self, key_str, filter):
         self.FilterData[key_str] = filter

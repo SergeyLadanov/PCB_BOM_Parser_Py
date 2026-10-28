@@ -625,6 +625,33 @@ def test_excel_export_formats_store_link_in_any_selected_position(client):
     assert worksheet["D2"].hyperlink is not None
 
 
+def test_excel_export_keeps_final_minimum_lots_without_scaling_twice(client):
+    data = make_json("R1;10 кОм 1% 0603;10\n\nC1;0.1 мкФ 0603;30")
+    data.update(count=3, tech_res=1.1, final_quantities=[10, 99],
+                excel_columns=["designator"])
+    response = client.post("/download_excel", json=data)
+    assert response.status_code == 200
+    worksheet = load_workbook(BytesIO(response.data)).active
+    assert [cell.value for cell in worksheet[2]] == [1, "R1", "10 кОм 1% 0603", 10]
+    assert [cell.value for cell in worksheet[3]] == [2, "C1", "0.1 мкФ 0603", 99]
+
+
+@pytest.mark.parametrize("quantities", [[], [10, 20], "10", [True], [-1], [1.5], ["10"], [9007199254740992]])
+def test_excel_export_rejects_invalid_final_quantities(client, quantities):
+    data = make_json("R1;10 кОм 1% 0603;1")
+    data["final_quantities"] = quantities
+    response = client.post("/download_excel", json=data)
+    assert response.status_code == 400
+
+
+def test_excel_export_without_overrides_keeps_scaling(client):
+    data = make_json("R1;10 кОм 1% 0603;2")
+    data.update(count=3, tech_res=1.1, excel_columns=[])
+    response = client.post("/download_excel", json=data)
+    assert response.status_code == 200
+    assert load_workbook(BytesIO(response.data)).active["C2"].value == 7
+
+
 @pytest.mark.parametrize(
     ("prefix", "expected_type"),
     [

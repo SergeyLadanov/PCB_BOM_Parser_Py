@@ -19,6 +19,11 @@ import ManufacturerSettingsForm, {
   useManufacturerSettingsForm
 } from '../forms/ManufacturerSettingsForm'
 import { useFetching } from '../hooks/useFetching'
+import {
+  MinimumLotSettings,
+  matchingMinimumLotIndexes,
+  raiseSourceMinimum
+} from '../ts/minimumLots'
 
 function MainContainer() {
   const API_URL = ApiUrls.API_URL
@@ -247,6 +252,7 @@ function MainContainer() {
   const OnDownloadExcelClick = (excelColumns: ExcelColumnKey[]) => {
     const data = {
       ...LastBomRequest,
+      final_quantities: BomParseResult.map(item => item.count),
       excel_columns: excelColumns
     }
     SetIsLoadingExcel(true)
@@ -276,6 +282,45 @@ function MainContainer() {
         alert('Потеряна связь с сервером')
       }
     })
+  }
+
+  const OnApplyMinimumLot = (
+    settings: MinimumLotSettings,
+    updateSource: boolean
+  ) => {
+    if (!LastBomRequest) return
+    const indexes = matchingMinimumLotIndexes(
+      tableForm.RowArray,
+      tableForm.RowStatusArray,
+      settings
+    )
+    if (indexes.length === 0) return
+    const selected = new Set(indexes)
+    SetBomParseResult(
+      BomParseResult.map((item, index) =>
+        selected.has(index)
+          ? { ...item, count: Math.max(item.count, settings.minimum) }
+          : item
+      )
+    )
+    tableForm.RaiseMinimum(indexes, settings.minimum)
+
+    if (updateSource && canUpdateSource) {
+      const sourceLines = new Set(
+        indexes.map(index => BomParseResult[index].source_line)
+      )
+      const updatedSource = raiseSourceMinimum(
+        srcDataForm.BomList,
+        sourceLines,
+        settings.minimum
+      )
+      srcDataForm.SetBomList(updatedSource)
+      Storage.Bom = updatedSource
+      SetLastBomRequest({
+        ...LastBomRequest,
+        bom: replaceAll(updatedSource, ';', '\t')
+      })
+    }
   }
 
   const OnDeleteRows = (status: 'green' | 'gray', updateSource: boolean) => {
@@ -395,6 +440,7 @@ function MainContainer() {
           disabled={BomParseResult.length === 0}
           OnDownloadExcelClick={OnDownloadExcelClick}
           OnDeleteRows={OnDeleteRows}
+          OnApplyMinimumLot={OnApplyMinimumLot}
           canUpdateSource={canUpdateSource}
         />
       </div>

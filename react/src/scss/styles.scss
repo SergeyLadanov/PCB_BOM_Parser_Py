@@ -134,7 +134,8 @@ body.modal-open .scrollbar-offset-correction {
 }
 
 .export-settings-menu {
-  min-width: 19rem;
+  width: min(25rem, calc(100vw - 3rem));
+  min-width: 0;
   max-height: min(32rem, 70vh);
   overflow-y: auto;
   z-index: 1100;

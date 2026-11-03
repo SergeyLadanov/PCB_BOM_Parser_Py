@@ -192,6 +192,18 @@ def download_excel():
     bom = data['bom']
     spec_list = __GetSpec(bom)
 
+    # Final table quantities already include scaling, reserve and minimum lots.
+    final_quantities = data.get('final_quantities')
+    if final_quantities is not None and (
+        not isinstance(final_quantities, list)
+        or len(final_quantities) != len(spec_list)
+        or any(
+            type(quantity) is not int or not 0 <= quantity <= 9007199254740991
+            for quantity in final_quantities
+        )
+    ):
+        return {'error': {'message': 'Некорректные итоговые количества.'}}, 400
+
     requested_column_keys = data.get('excel_columns')
     if requested_column_keys is None:
         selected_column_keys = DEFAULT_EXCEL_COLUMN_KEYS
@@ -234,6 +246,8 @@ def download_excel():
     row_number = 1
     for item in spec_list:
         model.CorrectionCount(item, device_count, tech_reseve)
+        if final_quantities is not None:
+            item['count'] = final_quantities[row_number - 1]
         parse_res = model.HandleRowBOM(item, ['elitan', 'chipdip', 'platan', 'promelec', 'dko_electronshik'], manufacturers_settings, parser_filter)
 
         store_links = {

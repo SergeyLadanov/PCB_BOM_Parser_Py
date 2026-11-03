@@ -4,6 +4,8 @@ import '../css/circle_status.css'
 import LinkArray, { OrderLink } from '../components/LinkArray'
 import { ExcelColumnKey, REQUIRED_EXCEL_COLUMN_KEYS } from '../ts/api'
 import { StorageSettings } from '../ts/StorageSettings'
+import MinimumLotSettingsForm from './MinimumLotSettingsForm'
+import { MinimumLotSettings } from '../ts/minimumLots'
 
 interface ExcelColumnOption {
   key: ExcelColumnKey
@@ -48,7 +50,7 @@ export interface TableRow {
   Name: string
   Type: string
   Parameters: string[]
-  Quantity: Number
+  Quantity: number
   Links: OrderLink[]
 }
 
@@ -58,6 +60,7 @@ interface TableController {
   AddRow: (value: TableRow) => void
   Clear: () => void
   RemoveRows: (indexes: number[]) => void
+  RaiseMinimum: (indexes: number[], minimum: number) => void
   ToggleStatus: (index: number) => void
   SetStatus: (index: number, value: string) => void
 }
@@ -97,6 +100,16 @@ export function useTableForm(): TableController {
         statuses.filter((_, index) => !removed.has(index))
       )
     },
+    RaiseMinimum: (indexes: number[], minimum: number) => {
+      const selected = new Set(indexes)
+      setFormData(rows =>
+        rows.map((row, index) =>
+          selected.has(index)
+            ? { ...row, Quantity: Math.max(row.Quantity, minimum) }
+            : row
+        )
+      )
+    },
 
     SetStatus: SetRowStatusFn,
 
@@ -120,6 +133,10 @@ interface TableFormProps {
   disabled: boolean
   OnDownloadExcelClick?: (columns: ExcelColumnKey[]) => void
   OnDeleteRows?: (status: 'green' | 'gray', updateSource: boolean) => void
+  OnApplyMinimumLot: (
+    settings: MinimumLotSettings,
+    updateSource: boolean
+  ) => void
   canUpdateSource: boolean
 }
 
@@ -128,6 +145,7 @@ function TableForm({
   disabled,
   OnDownloadExcelClick,
   OnDeleteRows,
+  OnApplyMinimumLot,
   canUpdateSource
 }: TableFormProps) {
   const excelSettingsStorage = React.useMemo(() => new StorageSettings(), [])
@@ -135,6 +153,9 @@ function TableForm({
     () => excelSettingsStorage.ExcelColumns
   )
   const [showExcelSettings, setShowExcelSettings] = useState(false)
+  const [settingsSection, setSettingsSection] = useState<'excel' | 'minimum'>(
+    'excel'
+  )
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
   const [deleteStatus, setDeleteStatus] = useState<'green' | 'gray'>('green')
   const [updateSource, setUpdateSource] = useState(false)
@@ -229,8 +250,8 @@ function TableForm({
                 <button
                   type="button"
                   className="btn btn-outline-secondary btn-sm d-flex align-items-center justify-content-center"
-                  aria-label="Настроить столбцы Excel"
-                  title="Настроить столбцы Excel"
+                  aria-label="Настройки списка"
+                  title="Настройки списка"
                   aria-expanded={showExcelSettings}
                   onClick={() => {
                     setShowDeleteConfirmation(false)
@@ -250,36 +271,69 @@ function TableForm({
                 </button>
                 {showExcelSettings && (
                   <div className="dropdown-menu show end-0 export-settings-menu p-3">
-                    <p className="fw-semibold mb-2">Столбцы Excel</p>
-                    {EXCEL_COLUMN_OPTIONS.map(option => (
-                      <div className="form-check" key={option.key}>
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          id={`excel-column-${option.key}`}
-                          checked={excelColumns.includes(option.key)}
-                          disabled={option.required}
-                          onChange={event =>
-                            handleExcelColumnChange(
-                              option.key,
-                              event.target.checked
-                            )
-                          }
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor={`excel-column-${option.key}`}
-                        >
-                          {option.label}
-                          {option.required && (
-                            <span className="text-body-secondary small">
-                              {' '}
-                              (обязательно)
-                            </span>
-                          )}
-                        </label>
-                      </div>
-                    ))}
+                    <div
+                      className="d-flex gap-2 mb-3"
+                      role="group"
+                      aria-label="Раздел настроек списка"
+                    >
+                      <button
+                        type="button"
+                        className={`btn btn-sm ${settingsSection === 'excel' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                        aria-pressed={settingsSection === 'excel'}
+                        onClick={() => setSettingsSection('excel')}
+                      >
+                        Столбцы Excel
+                      </button>
+                      <button
+                        type="button"
+                        className={`btn btn-sm ${settingsSection === 'minimum' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                        aria-pressed={settingsSection === 'minimum'}
+                        onClick={() => setSettingsSection('minimum')}
+                      >
+                        Минимальные партии
+                      </button>
+                    </div>
+                    {settingsSection === 'minimum' ? (
+                      <MinimumLotSettingsForm
+                        rows={form.RowArray}
+                        statuses={form.RowStatusArray}
+                        canUpdateSource={canUpdateSource}
+                        onApply={OnApplyMinimumLot}
+                      />
+                    ) : (
+                      <>
+                        <p className="fw-semibold mb-2">Столбцы Excel</p>
+                        {EXCEL_COLUMN_OPTIONS.map(option => (
+                          <div className="form-check" key={option.key}>
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              id={`excel-column-${option.key}`}
+                              checked={excelColumns.includes(option.key)}
+                              disabled={option.required}
+                              onChange={event =>
+                                handleExcelColumnChange(
+                                  option.key,
+                                  event.target.checked
+                                )
+                              }
+                            />
+                            <label
+                              className="form-check-label"
+                              htmlFor={`excel-column-${option.key}`}
+                            >
+                              {option.label}
+                              {option.required && (
+                                <span className="text-body-secondary small">
+                                  {' '}
+                                  (обязательно)
+                                </span>
+                              )}
+                            </label>
+                          </div>
+                        ))}
+                      </>
+                    )}
                   </div>
                 )}
               </div>

@@ -4,7 +4,6 @@ import '../scss/styles.scss'
 import '../css/offcanvas.css'
 import '../css/index.css'
 import { Dropdown } from 'bootstrap'
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 
 interface FormData {
   Version: string

@@ -47,6 +47,7 @@ class ComponentBase:
         self.__Value = 0.0
         self.__UnitsValue = ""
         self.__Tolerance = 0
+        self.__HasTolerance = False
         self.__Case = ""
         self.__Endurance = 0.0
         self.__UnitsEndurance = ""
@@ -239,6 +240,7 @@ class ComponentBase:
         res = re.search(r'[+-]?([0-9]*[.])?[0-9]+\s?%', name)
 
         if res:
+            self.__HasTolerance = True
             self.__Tolerance = float(re.search(r'[+-]?([0-9]*[.])?[0-9]+', res[0])[0])
 
 
@@ -343,6 +345,7 @@ class ComponentBase:
             self.__UnitsEndurance = ""
             self.__Endurance = 0.0
             self.__Tolerance = 0
+            self.__HasTolerance = False
             self.__Case = ""
             self.__DesignVariant = ""
             self.__MountWay = self.MOUNT_WAY_NOT_SET
@@ -440,12 +443,20 @@ class ComponentBase:
         return self.__Tolerance
 
 
+    def HasTolerance(self):
+        return self.__HasTolerance
+
+
     def GetCase(self):
         return self.__Case
 
 
     def GetEndurance(self):
         return self.__Endurance
+
+
+    def HasEndurance(self):
+        return bool(self.__UnitsEndurance)
 
 
     def GetUnitsEndurance(self):
